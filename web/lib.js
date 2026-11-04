@@ -356,11 +356,15 @@ export function replayTarget(demos, routed) {
   return demo && demo.message === routed.message ? demo : null;
 }
 
-/** True when an override can be sent: a different level and a known reason. */
+/**
+ * True when an override can be sent: a different level and a known reason.
+ * `from` is null for a case with no disposition (Human review); any level
+ * can then be assigned.
+ */
 export function canOverride({from, to, reason, blocked}) {
   return (
     !blocked &&
-    LEVELS.includes(from) &&
+    (from === null || LEVELS.includes(from)) &&
     LEVELS.includes(to) &&
     to !== from &&
     Object.hasOwn(OVERRIDE_REASON_LABELS, reason)

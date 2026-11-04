@@ -27,12 +27,19 @@ const RouteBody = z.object({
   mode: z.enum(['full', 'floor_only']).optional(),
 });
 
-const OverrideBody = z.strictObject({
-  input_sha256: z.string().regex(/^[0-9a-f]{64}$/),
-  from: z.enum(LEVELS),
-  to: z.enum(LEVELS),
-  reason_code: OverrideReasonCodeSchema,
-});
+/**
+ * A physician override. `from` is null when the case had no disposition
+ * (Human review), which is where a physician most needs to assign a level.
+ * An override to the level the case already had is not an override.
+ */
+const OverrideBody = z
+  .strictObject({
+    input_sha256: z.string().regex(/^[0-9a-f]{64}$/),
+    from: z.enum(LEVELS).nullable(),
+    to: z.enum(LEVELS),
+    reason_code: OverrideReasonCodeSchema,
+  })
+  .refine(o => o.from !== o.to);
 
 /** Compares two strings in time that depends only on their lengths. */
 function sameToken(a: string, b: string): boolean {

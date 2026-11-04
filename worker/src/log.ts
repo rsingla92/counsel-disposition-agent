@@ -47,7 +47,8 @@ export function traceLine(result: RouteResult): string {
 
 export type Override = {
   input_sha256: string;
-  from: Level;
+  /** Null when the case had no disposition (Human review). */
+  from: Level | null;
   to: Level;
   reason_code: OverrideReasonCode;
 };

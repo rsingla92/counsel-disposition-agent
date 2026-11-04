@@ -221,6 +221,19 @@ describe('POST /v1/override', () => {
     });
   });
 
+  it('logs an override of a case with no disposition as from null', async () => {
+    const logged: string[] = [];
+    const res = await app({}, l => logged.push(l)).request(
+      '/v1/override',
+      post({...body, from: null, to: 'ed_now'}),
+      ENV,
+    );
+    expect(res.status).toBe(204);
+    expect(logged).toHaveLength(1);
+    expect(logged[0]).toContain('"from":null');
+    expect(JSON.parse(logged[0])).toMatchObject({from: null, to: 'ed_now'});
+  });
+
   it('accepts every reason code', async () => {
     for (const reason_code of OverrideReasonCodeSchema.options) {
       const res = await app().request(
@@ -239,6 +252,10 @@ describe('POST /v1/override', () => {
       {...body, reason_code: 'rash_needs_exam'},
       {...body, reason_code: undefined},
       {...body, to: 'urgent'},
+      {...body, from: 'none'},
+      {...body, from: undefined},
+      {...body, from: null, to: null},
+      {...body, to: 'routine'},
       {...body, input_sha256: 'xyz'},
       {...body, input_sha256: 'A'.repeat(64)},
     ]) {

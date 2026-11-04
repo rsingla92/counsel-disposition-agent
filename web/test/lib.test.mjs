@@ -414,8 +414,15 @@ test('canOverride needs a different level, a known reason and no block', () => {
   assert.equal(canOverride({...ok, to: 'bogus'}), false);
   assert.equal(canOverride({...ok, reason: ''}), false);
   assert.equal(canOverride({...ok, reason: 'bogus'}), false);
-  assert.equal(canOverride({...ok, from: null}), false);
   assert.equal(canOverride({...ok, blocked: 'replay'}), false);
+});
+
+test('canOverride allows any level when there is no disposition', () => {
+  const none = {from: null, to: 'ed_now', reason: 'under_triage', blocked: null};
+  assert.equal(canOverride(none), true);
+  assert.equal(canOverride({...none, to: null}), false);
+  assert.equal(canOverride({...none, from: 'none'}), false);
+  assert.equal(canOverride({...none, blocked: 'replay'}), false);
 });
 
 // --- fallback after a failed live call --------------------------------------

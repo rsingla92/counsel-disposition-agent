@@ -436,13 +436,12 @@ function overrideCard(run) {
     el('h2', {class: 'eyebrow', id: 'override-h', text: 'Physician override'}),
   );
   if (!result) return null;
-  const from = result.disposition;
+  // Null for a Human-review case: every level can be assigned.
+  const from = result.disposition ?? null;
   const sha = result.trace?.input_sha256 ?? '';
   let blocked = null;
   if (run.replay) {
     blocked = 'Overrides are disabled in replay: nothing would be sent.';
-  } else if (!from) {
-    blocked = 'No disposition to override. Assign a level in the physician queue.';
   } else if (!/^[0-9a-f]{64}$/.test(sha)) {
     blocked = 'This result has no input hash, so an override cannot be logged.';
   }
@@ -508,7 +507,7 @@ function overrideCard(run) {
         body: JSON.stringify({input_sha256: sha, from, to, reason_code: reason.value}),
       });
       feedback.textContent = res.ok
-        ? `Override logged: ${levelLabel(from)} to ${levelLabel(to)}, ${OVERRIDE_REASON_LABELS[reason.value]}.`
+        ? `Override logged: ${from ? levelLabel(from) : 'none'} to ${levelLabel(to)}, ${OVERRIDE_REASON_LABELS[reason.value]}.`
         : `Override not logged (HTTP ${res.status}).`;
     } catch {
       feedback.textContent = 'Override not logged: the Worker could not be reached.';
@@ -518,6 +517,7 @@ function overrideCard(run) {
 
   appendAll(card, 
     el('p', {class: 'note', text: 'Pick the level you would assign and a reason. Only the codes are logged, never free text.'}),
+    from ? null : el('p', {class: 'note', text: 'Current: none (Human review)'}),
     el('div', {class: 'levels', role: 'group', 'aria-label': 'Override level'}, buttons),
     el('label', {for: 'override-reason', text: 'Reason (required)'}),
     reason,
