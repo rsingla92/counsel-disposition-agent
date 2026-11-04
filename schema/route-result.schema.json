@@ -362,6 +362,29 @@
             "additionalProperties": false
           }
         },
+        "extraction_model": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "model",
+                "provider"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "latency_ms": {
           "type": "number",
           "minimum": 0

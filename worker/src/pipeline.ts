@@ -94,6 +94,7 @@ type Run = {
   start: number;
   hash: Promise<string>;
   models: ModelSpec[];
+  extractionModel: ModelSpec | null;
   raw: {
     extraction: string | null;
     primary: string[];
@@ -223,6 +224,7 @@ async function assemble(run: Run, o: Outcome): Promise<RouteResult> {
       input_sha256: await run.hash,
       policy_version: run.deps.policy.policy_version,
       models: run.models,
+      extraction_model: run.extractionModel,
       latency_ms: Date.now() - run.start,
       raw: run.raw,
     },
@@ -449,6 +451,7 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
       const got = await extract(message, spec, deps.llm, policy);
       ex = got.extraction;
       run.raw.extraction = got.raw;
+      run.extractionModel = spec;
       break;
     } catch (e) {
       try {
@@ -458,6 +461,7 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
       }
       if (e instanceof ExtractionInvalidError && e.flags) {
         run.raw.extraction = e.raw;
+        run.extractionModel = spec;
         salvaged = mergeFlags(salvaged, e.flags);
         if (Object.values(salvaged).some(f => f.state === 'present')) break;
       }
@@ -582,6 +586,7 @@ export async function route(
     // never delays the early event.
     hash: sha256Hex(message).catch(() => ''),
     models: [],
+    extractionModel: null,
     raw: {extraction: null, primary: [], secondary: null},
     extraction: null,
     floor: null,
@@ -638,6 +643,7 @@ function lastResort(run: Run): RouteResult {
       input_sha256: '',
       policy_version: run.deps.policy?.policy_version ?? '',
       models: run.models,
+      extraction_model: run.extractionModel,
       latency_ms: Date.now() - run.start,
       raw: null,
     },

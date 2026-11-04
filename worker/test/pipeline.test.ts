@@ -646,6 +646,12 @@ describe('route: extraction fallback', () => {
       expect.objectContaining({floor: 'call_911'}),
     );
     expect(r.trace.models).toEqual([PRIMARY, SECONDARY]);
+    expect(r.trace.extraction_model).toEqual(SECONDARY);
+  });
+
+  it('records the primary as the extraction model when it succeeds', async () => {
+    const r = await route(M, {...deps(scripted({})), secondary: SECONDARY});
+    expect(r.trace.extraction_model).toEqual(PRIMARY);
   });
 
   it('gives Human review when both models fail to extract', async () => {
@@ -659,6 +665,7 @@ describe('route: extraction fallback', () => {
     expect(r.status).toBe('human_review');
     expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.disposition).toBeNull();
+    expect(r.trace.extraction_model).toBeNull();
     expect(llm.calls).toBe(2);
     // Each failed extraction is logged by model and error code, without text.
     const errors = lines
@@ -745,6 +752,7 @@ describe('route: extraction fallback', () => {
     expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.floor).toBe('call_911');
     expect(r.disposition).toBe('call_911');
+    expect(r.trace.extraction_model).toEqual(SECONDARY);
   });
 
   it('keeps the floor when the logger throws', async () => {
@@ -809,6 +817,7 @@ describe('route: extraction fallback', () => {
     });
     expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.floor).toBe('call_911');
+    expect(r.trace.extraction_model).toEqual(PRIMARY);
     expect(llm.calls).toBe(1);
   });
 });

@@ -118,6 +118,7 @@ export const validResult: RouteResult = {
     input_sha256: 'a'.repeat(64),
     policy_version: '0.1.0',
     models: [{model: 'test-model', provider: 'test'}],
+    extraction_model: {model: 'test-model', provider: 'test'},
     latency_ms: 10,
     raw: null,
   },
