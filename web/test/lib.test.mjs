@@ -8,7 +8,9 @@ import {
   LEVEL_WINDOWS,
   OVERRIDE_REASON_LABELS,
   REASON_LABELS,
+  canOverride,
   emergencyLead,
+  failedRun,
   formatPercent,
   highlight,
   isEmergency,
@@ -16,6 +18,7 @@ import {
   parseNdjson,
   patientBlocks,
   readToken,
+  replayTarget,
   takeLines,
   tierOf,
   voteBars,
@@ -336,4 +339,53 @@ test('token storage survives storage that throws', () => {
   assert.equal(readToken(storage), '');
   assert.doesNotThrow(() => writeToken(storage, 'abc'));
   assert.equal(readToken(undefined), '');
+});
+
+// --- failure state, replay target, override guard --------------------------
+
+test('failedRun keeps the early Emergency instruction and marks failure', () => {
+  const early = {event: 'early', floor: 'ed_now', patient_message: 'Go now.'};
+  const run = failedRun('msg A', early);
+  assert.deepEqual(run, {
+    message: 'msg A',
+    early,
+    result: null,
+    replay: false,
+    failed: true,
+  });
+  assert.equal(emergencyLead(run.result, run.early), 'Go now.');
+  assert.equal(patientBlocks(run.result, run.early, true)[0].kind, 'emergency');
+});
+
+test('a failed run is not shown as still pending in the patient view', () => {
+  const blocks = patientBlocks(null, null, true);
+  assert.ok(blocks.every(b => b.kind !== 'pending'));
+  assert.deepEqual(blocks.at(-1), {
+    kind: 'failed',
+    text: 'We could not finish checking your message. A Counsel physician will review it. If this is an emergency, call 911 now.',
+  });
+});
+
+test('replayTarget matches the routed message, not whatever is selected now', () => {
+  const demos = [
+    {id: 'a', message: 'message A'},
+    {id: 'b', message: 'message B'},
+  ];
+  assert.equal(replayTarget(demos, {demoId: 'a', message: 'message A'}).id, 'a');
+  // Demo id and text must agree: an edited message has no saved run.
+  assert.equal(replayTarget(demos, {demoId: 'a', message: 'message A, edited'}), null);
+  assert.equal(replayTarget(demos, {demoId: 'b', message: 'message A'}), null);
+  assert.equal(replayTarget(demos, {demoId: '', message: 'message A'}), null);
+});
+
+test('canOverride needs a different level, a known reason and no block', () => {
+  const ok = {from: 'routine', to: 'ed_now', reason: 'under_triage', blocked: null};
+  assert.equal(canOverride(ok), true);
+  assert.equal(canOverride({...ok, to: 'routine'}), false);
+  assert.equal(canOverride({...ok, to: null}), false);
+  assert.equal(canOverride({...ok, to: 'bogus'}), false);
+  assert.equal(canOverride({...ok, reason: ''}), false);
+  assert.equal(canOverride({...ok, reason: 'bogus'}), false);
+  assert.equal(canOverride({...ok, from: null}), false);
+  assert.equal(canOverride({...ok, blocked: 'replay'}), false);
 });

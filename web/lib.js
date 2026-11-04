@@ -230,6 +230,40 @@ export function emergencyLead(result, early) {
   return null;
 }
 
+const FAILED_MESSAGE =
+  'We could not finish checking your message. A Counsel physician will ' +
+  'review it. If this is an emergency, call 911 now.';
+
+/**
+ * The run to show when a live call failed with no saved run to fall back
+ * on. Keeps any early Emergency event so its instruction still leads.
+ */
+export function failedRun(message, early) {
+  return {message, early: early ?? null, result: null, replay: false, failed: true};
+}
+
+/**
+ * The demo whose saved run belongs to `routed` ({demoId, message}, captured
+ * when the call started), or null. Id and text must both match, so an
+ * edited message, or a demo picked after the call began, never borrows
+ * another message's run.
+ */
+export function replayTarget(demos, routed) {
+  const demo = (demos ?? []).find(d => d.id === routed?.demoId);
+  return demo && demo.message === routed.message ? demo : null;
+}
+
+/** True when an override can be sent: a different level and a known reason. */
+export function canOverride({from, to, reason, blocked}) {
+  return (
+    !blocked &&
+    LEVELS.includes(from) &&
+    LEVELS.includes(to) &&
+    to !== from &&
+    Object.hasOwn(OVERRIDE_REASON_LABELS, reason)
+  );
+}
+
 /** Splits a trailing safety net off the patient message, if it is there. */
 function splitSafetyNet(message, safetyNet) {
   const net = (safetyNet ?? '').trim();
@@ -246,12 +280,16 @@ function splitSafetyNet(message, safetyNet) {
  * emergency, draft, message, safety_net, pending. An Emergency instruction
  * always comes first; Self-care is a draft until a physician signs it off.
  */
-export function patientBlocks(result, early) {
+export function patientBlocks(result, early, failed = false) {
   const blocks = [];
   if (!result) {
     const lead = emergencyLead(null, early);
     if (lead) blocks.push({kind: 'emergency', text: lead});
-    blocks.push({kind: 'pending', text: 'Checking the rest of your message.'});
+    blocks.push(
+      failed
+        ? {kind: 'failed', text: FAILED_MESSAGE}
+        : {kind: 'pending', text: 'Checking the rest of your message.'},
+    );
     return blocks;
   }
   const {body, net} = splitSafetyNet(result.patient_message, result.safety_net);

@@ -8,13 +8,16 @@ import {
   REASON_LABELS,
   STATUS_LABELS,
   TIER_LABELS,
+  canOverride,
   emergencyLead,
+  failedRun,
   formatPercent,
   highlight,
   levelLabel,
   parseNdjson,
   patientBlocks,
   readToken,
+  replayTarget,
   takeLines,
   tierOf,
   voteBars,
@@ -77,6 +80,14 @@ function el(tag, attrs = {}, ...children) {
     node.append(c instanceof Node ? c : document.createTextNode(String(c)));
   }
   return node;
+}
+
+/** Appends children, skipping null and false (append would print "null"). */
+function appendAll(node, ...children) {
+  for (const c of children.flat()) {
+    if (c === null || c === undefined || c === false) continue;
+    node.append(c);
+  }
 }
 
 function setStatus(text, isError = false) {
@@ -187,14 +198,22 @@ function flagsCard(run) {
     stepHeading('02', 'Red flags found', 'step-2'),
   );
   if (!result) {
-    card.append(el('p', {class: 'empty', text: 'Waiting for the result.'}));
+    appendAll(
+      card,
+      el('p', {
+        class: 'empty',
+        text: run.failed
+          ? 'No result: the live call failed.'
+          : 'Waiting for the result.',
+      }),
+    );
     return card;
   }
   const flags = presentFlags(result);
   if (flags.length === 0) {
-    card.append(el('p', {class: 'empty', text: 'No red flags found.'}));
+    appendAll(card, el('p', {class: 'empty', text: 'No red flags found.'}));
   } else {
-    card.append(
+    appendAll(card, 
       el(
         'ul',
         {class: 'flags'},
@@ -220,7 +239,7 @@ function flagsCard(run) {
   }
   const mods = result.modifiers ?? [];
   if (mods.length) {
-    card.append(
+    appendAll(card, 
       el('h3', {class: 'subhead', text: 'Modifiers'}),
       el(
         'ul',
@@ -282,7 +301,7 @@ function dispositionCard(run) {
   );
   if (!result) {
     const floor = run.early?.floor;
-    card.append(
+    appendAll(card, 
       el('p', {
         class: 'empty',
         text: run.failed
@@ -306,7 +325,7 @@ function dispositionCard(run) {
   const photo = result.info_requests?.photo === true;
   const models = result.trace?.models ?? [];
 
-  card.append(
+  appendAll(card, 
     el(
       'div',
       {class: 'disposition'},
@@ -363,7 +382,7 @@ function dispositionCard(run) {
         : 'None',
     ),
   );
-  card.append(dl);
+  appendAll(card, dl);
 
   const primary = voteBlock(
     'Primary',
@@ -377,7 +396,7 @@ function dispositionCard(run) {
     result.votes?.secondary,
     result.disposition,
   );
-  card.append(
+  appendAll(card, 
     el('h3', {class: 'subhead', text: 'Votes'}),
     primary ?? el('p', {class: 'empty', text: 'No votes.'}),
     secondary ??
@@ -433,29 +452,39 @@ function overrideCard(run) {
     text: 'Submit override',
   });
   const feedback = el('p', {class: 'status', role: 'status', 'aria-live': 'polite'});
-  const buttons = LEVELS.map(level =>
-    el(
+  // The current level is shown but cannot be chosen: an override to the
+  // same level is not an override.
+  const buttons = LEVELS.map(level => {
+    const isCurrent = level === from;
+    return el(
       'button',
       {
         type: 'button',
         class: 'secondary',
         'aria-pressed': 'false',
-        disabled: blocked !== null,
+        'aria-disabled': isCurrent ? 'true' : null,
+        disabled: blocked !== null || isCurrent,
         onclick: () => {
+          if (isCurrent) return;
           to = level;
-          for (const b of buttons) b.setAttribute('aria-pressed', String(b === buttons[LEVELS.indexOf(level)]));
+          for (const b of buttons) {
+            b.setAttribute('aria-pressed', String(b.dataset.level === level));
+          }
           refresh();
         },
+        'data-level': level,
       },
       levelLabel(level),
-      level === from ? el('span', {class: 'current', text: 'Current'}) : null,
-    ),
-  );
+      isCurrent ? el('span', {class: 'current', text: 'Current'}) : null,
+    );
+  });
+  const ready = () => canOverride({from, to, reason: reason.value, blocked});
   const refresh = () => {
-    submit.disabled = blocked !== null || to === null || reason.value === '';
+    submit.disabled = !ready();
   };
   reason.addEventListener('change', refresh);
   submit.addEventListener('click', async () => {
+    if (!ready()) return;
     submit.disabled = true;
     feedback.textContent = 'Sending…';
     try {
@@ -476,7 +505,7 @@ function overrideCard(run) {
     refresh();
   });
 
-  card.append(
+  appendAll(card, 
     el('p', {class: 'note', text: 'Pick the level you would assign and a reason. Only the codes are logged, never free text.'}),
     el('div', {class: 'levels', role: 'group', 'aria-label': 'Override level'}, buttons),
     el('label', {for: 'override-reason', text: 'Reason (required)'}),
@@ -526,7 +555,7 @@ function renderPatient(run) {
     root.append(el('p', {class: 'empty', text: 'No message routed yet.'}));
     return;
   }
-  const blocks = patientBlocks(run.result, run.early);
+  const blocks = patientBlocks(run.result, run.early, run.failed === true);
   const reply = el(
     'div',
     {class: 'reply'},
@@ -609,34 +638,36 @@ function selectedDemo() {
   return state.demos.find(d => d.id === ui.demo.value) ?? null;
 }
 
+/** What is being routed, captured once so later UI changes cannot alter it. */
+function currentTarget() {
+  return {demoId: ui.demo.value, message: ui.message.value};
+}
+
 /**
- * Shows the saved run for the selected demo; true if one is now on screen.
- * liveEarly, an Emergency instruction from a failed live call, is never
- * dropped.
+ * Shows the saved run for `routed` ({demoId, message}, captured when the
+ * call started); true if one is now on screen. liveEarly, an Emergency
+ * instruction from a failed live call for the same message, is never
+ * dropped: every path that shows no saved run shows it as a failed run.
  */
-async function showReplay(liveEarly = null) {
-  const demo = selectedDemo();
-  if (!demo || ui.message.value !== demo.message) {
-    // Never leave another message's result on screen; keep a live
-    // Emergency instruction if one arrived before the failure.
-    state.run = liveEarly
-      ? {message: ui.message.value, early: liveEarly, result: null, replay: false, failed: true}
-      : null;
+async function showReplay(routed, liveEarly = null) {
+  const fail = status => {
+    state.run = liveEarly ? failedRun(routed.message, liveEarly) : null;
     render();
-    setStatus('Replay only has saved runs for the unedited demo messages.', true);
+    if (status) setStatus(status, true);
     return false;
+  };
+  const demo = replayTarget(state.demos, routed);
+  if (!demo) {
+    return fail('Replay only has saved runs for the unedited demo messages.');
   }
   let saved;
   try {
     saved = await replayFor(demo.id);
   } catch {
-    setStatus('Could not load the saved run.', true);
-    return false;
+    return fail('Could not load the saved run.');
   }
   if (!saved) {
-    state.run = liveEarly
-      ? {message: demo.message, early: liveEarly, result: null, replay: false, failed: true}
-      : null;
+    state.run = liveEarly ? failedRun(demo.message, liveEarly) : null;
     render();
     setStatus('No saved run for this message yet.');
     return false;
@@ -655,24 +686,35 @@ async function showReplay(liveEarly = null) {
 
 function updateReplayUi() {
   const replay = ui.replay.checked;
-  ui.message.readOnly = replay;
+  ui.message.readOnly = replay || state.busy;
   ui.route.textContent = replay ? 'Show saved run' : 'Route message';
   if (!WORKER_URL) {
     ui.replay.disabled = true;
     ui.replayNote.textContent =
       'No Worker is configured, so this page shows saved runs only.';
   } else {
+    ui.replay.disabled = state.busy;
     ui.replayNote.textContent = replay
       ? 'Showing saved runs. Turn replay off to call the Worker live.'
       : '';
   }
 }
 
+/** Locks the inputs that define the routed message while a call runs. */
+function setBusy(busy) {
+  state.busy = busy;
+  ui.route.disabled = busy;
+  ui.demo.disabled = busy;
+  updateReplayUi();
+}
+
 // --- live ------------------------------------------------------------------
 
 class LiveError extends Error {}
 
-async function routeLive(message) {
+let callSeq = 0;
+
+async function routeLive(routed) {
   const token = currentToken();
   if (!token) {
     setStatus('Enter the access token first (Access token, above).', true);
@@ -680,7 +722,12 @@ async function routeLive(message) {
     ui.token.focus();
     return;
   }
-  state.run = {message, early: null, result: null, replay: false};
+  const call = ++callSeq;
+  // Events for any call but the latest are dropped, so a late answer for a
+  // message no longer on screen never renders.
+  const current = () => call === callSeq;
+  const run = {message: routed.message, early: null, result: null, replay: false};
+  state.run = run;
   render();
   setStatus('Routing…');
   const ctrl = new AbortController();
@@ -689,7 +736,7 @@ async function routeLive(message) {
     const res = await fetch(`${WORKER_URL}/v1/route`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
-      body: JSON.stringify({message}),
+      body: JSON.stringify({message: routed.message}),
       signal: ctrl.signal,
     });
     if (!res.ok || !res.body) {
@@ -703,10 +750,10 @@ async function routeLive(message) {
     const handle = events => {
       for (const e of events) {
         if (e.event === 'early') {
-          state.run.early = e;
-          render();
+          run.early = e;
+          if (current()) render();
         } else if (e.event === 'result') {
-          state.run.result = e.result;
+          run.result = e.result;
         }
       }
     };
@@ -718,15 +765,22 @@ async function routeLive(message) {
       handle(got.events);
     }
     handle(parseNdjson(buffer + decoder.decode()));
-    if (!state.run.result) throw new LiveError('no result in the stream');
+    if (!run.result) throw new LiveError('no result in the stream');
+    if (!current()) return;
     render();
     setStatus('Live result.');
   } catch (e) {
+    if (!current()) return;
     const why = e instanceof LiveError ? e.message : 'the Worker could not be reached';
-    const early = state.run?.early ?? null;
     ui.replay.checked = true;
     updateReplayUi();
-    const shown = await showReplay(early);
+    const shown = await showReplay(routed, run.early);
+    if (!shown && !run.early) {
+      // Nothing saved and no early event: say so on screen, not only in the
+      // status line, so nothing reads as still in progress.
+      state.run = failedRun(routed.message, null);
+      render();
+    }
     setStatus(
       shown
         ? `Live call failed (${why}). Switched to replay.`
@@ -742,23 +796,22 @@ async function routeLive(message) {
 
 async function onRoute() {
   if (state.busy) return;
-  const message = ui.message.value;
-  if (message.trim() === '') {
+  const routed = currentTarget();
+  if (routed.message.trim() === '') {
     setStatus('Type a message or pick a demo message first.', true);
     return;
   }
-  state.busy = true;
-  ui.route.disabled = true;
+  setBusy(true);
   try {
     if (ui.replay.checked) {
       setStatus('');
-      await showReplay();
+      callSeq++;
+      await showReplay(routed);
     } else {
-      await routeLive(message);
+      await routeLive(routed);
     }
   } finally {
-    state.busy = false;
-    ui.route.disabled = false;
+    setBusy(false);
   }
 }
 

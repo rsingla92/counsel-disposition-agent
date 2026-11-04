@@ -679,6 +679,11 @@ dl.rows dd .mono {
   margin-bottom: 4px;
 }
 
+.block.failed {
+  border-color: var(--error);
+  font-weight: 500;
+}
+
 .block.pending {
   color: var(--muted);
   font-style: italic;
