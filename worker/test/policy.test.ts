@@ -67,6 +67,13 @@ describe('policy', () => {
     ).toThrow();
   });
 
+  it('has a major_trauma adult flag at ed_now with no cases', () => {
+    const f = policy.red_flags.find(f => f.id === 'major_trauma')!;
+    expect(f.group).toBe('adult');
+    expect(f.min_level).toBe('ed_now');
+    expect(f.cases).toEqual([]);
+  });
+
   it('defines every level with windows and a patient message', () => {
     for (const l of LEVELS) {
       expect(policy.levels[l].physician_window).not.toBe('');

@@ -173,6 +173,12 @@ red_flags:
     min_level: ed_now
     subsumes_modifiers: [age_65_plus]
     cases: [48]
+  - id: major_trauma
+    group: adult
+    description: "Major injury: a high-energy mechanism (car crash at speed, pedestrian struck, fall from height), a penetrating wound (stab or gunshot), or bleeding that will not stop. Minor sprains, bumps and everyday falls do not count"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
   - id: suicidal_thoughts
     group: adult
     description: "Suicidal thoughts without a stated plan or intent"
