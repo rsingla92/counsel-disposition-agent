@@ -66,6 +66,7 @@ const REVIEW_REASONS: ReadonlySet<ReasonCode> = new Set([
   'wide_spread',
   'family_disagreement',
   'unverified_excerpt',
+  'secondary_unavailable',
 ]);
 
 const EXPLANATIONS: Record<ReasonCode, string> = {
@@ -81,6 +82,8 @@ const EXPLANATIONS: Record<ReasonCode, string> = {
   unverified_excerpt: 'A red-flag excerpt was not found in the message.',
   missing_info: 'More information is needed.',
   photo_needed: 'A photo is needed.',
+  secondary_unavailable:
+    'The second model family returned too few valid samples to cross-check.',
 };
 
 /** State shared by every exit from route(). */
@@ -412,11 +415,20 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
 
   // 7. Choose and flag.
   const disposition = chooseLevel(primary.votes, floor.floor, policy);
+  // A configured secondary with too few valid samples cannot cross-check
+  // the primary. The primary's disposition stands, but a physician looks:
+  // a failed cross-check must not pass silently as an agreeing one.
+  const secondaryFailed =
+    secondary !== null && secondary.valid < policy.sampling.min_valid;
   const secondaryVotes: Votes | null =
-    secondary && secondary.valid >= policy.sampling.min_valid
-      ? secondary.votes
-      : null;
-  reasons.unshift(...reviewReasons(primary.votes, secondaryVotes, policy));
+    secondary && !secondaryFailed ? secondary.votes : null;
+  const crossCheck: ReasonCode[] = secondaryFailed
+    ? ['secondary_unavailable']
+    : [];
+  reasons.unshift(
+    ...reviewReasons(primary.votes, secondaryVotes, policy),
+    ...crossCheck,
+  );
   const needsInfo = ex.questions.length > 0 || ex.photo_needed;
   if (ex.questions.length > 0) reasons.push('missing_info');
   if (ex.photo_needed) reasons.push('photo_needed');

@@ -21,6 +21,7 @@ export const REASON_CODES = [
   'wide_spread',
   'family_disagreement',
   'unverified_excerpt',
+  'secondary_unavailable',
   'missing_info',
   'photo_needed',
 ] as const;

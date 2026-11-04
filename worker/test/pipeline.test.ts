@@ -508,18 +508,63 @@ describe('route: secondary model', () => {
     expect(r.disposition).toBe('routine');
   });
 
-  it('treats a failed secondary as absent but records its votes', async () => {
+  it('flags a configured secondary that failed, keeping the disposition', async () => {
     const d = {
       ...deps(scripted({samples: 'routine', secondary: 'fail'})),
       secondary: SECONDARY,
     };
     const r = await route(M, d);
     expect(r.status).toBe('routed');
-    expect(r.human_review.reasons).toEqual([]);
+    expect(r.disposition).toBe('routine');
+    expect(r.human_review.flagged).toBe(true);
+    expect(r.human_review.reasons).toEqual(['secondary_unavailable']);
+    expect(r.patient_message).toContain(policy.levels.routine.patient_message);
     expect(r.votes.secondary).toEqual(
       expect.objectContaining({routine: 0, ed_now: 0}),
     );
     expect((r.trace.raw as {secondary: string[]}).secondary).toEqual([]);
+  });
+});
+
+describe('route: secondary below min_valid', () => {
+  it('flags a secondary under min_valid and skips the disagreement check', async () => {
+    // 6 of 20 secondary calls fail (14 valid < 15); the 14 valid ones
+    // disagree on tier but must not count as a family disagreement.
+    let n = 0;
+    const llm = scripted({samples: 'routine', secondary: 'ed_now'});
+    const inner = llm.complete.bind(llm);
+    llm.complete = async req => {
+      if (req.spec.model === SECONDARY.model && n++ < 6) {
+        throw new Error('secondary down');
+      }
+      return inner(req);
+    };
+    const r = await route(M, {...deps(llm), secondary: SECONDARY});
+    expect(r.votes.secondary?.ed_now).toBe(14);
+    expect(r.human_review.reasons).toEqual(['secondary_unavailable']);
+    expect(r.human_review.flagged).toBe(true);
+    expect(r.disposition).toBe('routine');
+  });
+
+  it('does not flag when no secondary is configured', async () => {
+    const r = await route(M, deps(scripted({samples: 'routine'})));
+    expect(r.votes.secondary).toBeNull();
+    expect(r.human_review).toEqual({flagged: false, reasons: []});
+  });
+
+  it('keeps an Emergency floor when the secondary fails', async () => {
+    const r = await route(REFILL_WITH_CHEST, {
+      ...deps(
+        scripted({
+          flags: {cardiac_chest_pain: 'present'},
+          samples: 'routine',
+          secondary: 'fail',
+        }),
+      ),
+      secondary: SECONDARY,
+    });
+    expect(r.disposition).toBe('call_911');
+    expect(r.human_review.reasons).toEqual(['secondary_unavailable']);
   });
 });
 

@@ -286,6 +286,7 @@
               "wide_spread",
               "family_disagreement",
               "unverified_excerpt",
+              "secondary_unavailable",
               "missing_info",
               "photo_needed"
             ]
