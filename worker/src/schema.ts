@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {LEVELS, briefLabelOf, tierOf, type Level} from './levels';
+import {LEVELS, briefLabelOf, rank, tierOf, type Level} from './levels';
 import type {Policy} from './policy';
 
 const LevelSchema = z.enum(LEVELS);
@@ -122,6 +122,33 @@ export const RouteResultSchema = z
     }),
   })
   .superRefine((r, ctx) => {
+    if (
+      r.disposition !== null &&
+      r.floor !== null &&
+      rank(r.disposition) < rank(r.floor)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['disposition'],
+        message: `disposition must not be below floor ${r.floor}`,
+      });
+    }
+    if (r.status === 'human_review' || r.human_review.flagged) {
+      if (!r.human_review.flagged) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['human_review', 'flagged'],
+          message: 'status human_review requires human_review.flagged',
+        });
+      }
+      if (r.human_review.reasons.length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['human_review', 'reasons'],
+          message: 'human review requires at least one reason code',
+        });
+      }
+    }
     if (r.disposition === null) {
       if (r.status !== 'human_review') {
         ctx.addIssue({

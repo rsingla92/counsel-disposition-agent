@@ -85,6 +85,7 @@ describe('RouteResultSchema', () => {
         disposition: null,
         tier: null,
         brief_label: null,
+        human_review: {flagged: true, reasons: ['split_vote']},
       }).success,
     ).toBe(true));
 
@@ -99,9 +100,13 @@ describe('RouteResultSchema', () => {
     ).toBe(false));
 
   it('accepts a non-null disposition with any status', () => {
+    const flagged = {flagged: true, reasons: ['split_vote']};
     for (const status of ['routed', 'needs_info', 'human_review']) {
+      const human_review =
+        status === 'human_review' ? flagged : validResult.human_review;
       expect(
-        RouteResultSchema.safeParse({...validResult, status}).success,
+        RouteResultSchema.safeParse({...validResult, status, human_review})
+          .success,
       ).toBe(true);
     }
   });
@@ -157,6 +162,72 @@ describe('RouteResultSchema', () => {
     expect(
       RouteResultSchema.safeParse({...validResult, extra: 1}).success,
     ).toBe(false);
+  });
+
+  it('rejects a disposition below the floor', () => {
+    const r = RouteResultSchema.safeParse({...validResult, floor: 'ed_now'});
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0].path).toEqual(['disposition']);
+  });
+
+  it('accepts a disposition at or above the floor', () => {
+    for (const floor of ['routine', 'self_care', null]) {
+      expect(RouteResultSchema.safeParse({...validResult, floor}).success).toBe(
+        true,
+      );
+    }
+    expect(
+      RouteResultSchema.safeParse({
+        ...validResult,
+        disposition: 'ed_now',
+        tier: 'emergency',
+        brief_label: 'URGENT_ESCALATION',
+        floor: 'in_person_today',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('requires a reason code and the flag when status is human_review', () => {
+    const hr = {
+      ...validResult,
+      status: 'human_review',
+      disposition: null,
+      tier: null,
+      brief_label: null,
+    };
+    const noFlag = RouteResultSchema.safeParse({
+      ...hr,
+      human_review: {flagged: false, reasons: ['split_vote']},
+    });
+    expect(noFlag.success).toBe(false);
+    expect(noFlag.error?.issues[0].path).toEqual(['human_review', 'flagged']);
+    const noReason = RouteResultSchema.safeParse({
+      ...hr,
+      human_review: {flagged: true, reasons: []},
+    });
+    expect(noReason.success).toBe(false);
+    expect(noReason.error?.issues[0].path).toEqual(['human_review', 'reasons']);
+    expect(
+      RouteResultSchema.safeParse({
+        ...hr,
+        human_review: {flagged: true, reasons: ['split_vote']},
+      }).success,
+    ).toBe(true);
+  });
+
+  it('requires a reason code whenever human review is flagged', () => {
+    const r = RouteResultSchema.safeParse({
+      ...validResult,
+      human_review: {flagged: true, reasons: []},
+    });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0].path).toEqual(['human_review', 'reasons']);
+    expect(
+      RouteResultSchema.safeParse({
+        ...validResult,
+        human_review: {flagged: true, reasons: ['wide_spread']},
+      }).success,
+    ).toBe(true);
   });
 
   it('exported JSON schema is up to date', () =>
