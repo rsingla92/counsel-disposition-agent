@@ -8,6 +8,8 @@ export type LlmRequest = {
   jsonSchema: object;
   temperature: number;
   timeoutMs: number;
+  /** Retries after HTTP 429. Defaults to MAX_RETRIES. */
+  maxRetries?: number;
 };
 
 export type LlmResponse = {json: unknown; raw: string; latencyMs: number};
@@ -89,7 +91,7 @@ export function openRouterClient(
           return await gate(() => send(apiKey, fetchImpl, req));
         } catch (e) {
           const limited = e instanceof LlmError && e.status === 429;
-          if (!limited || attempt >= MAX_RETRIES) throw e;
+          if (!limited || attempt >= (req.maxRetries ?? MAX_RETRIES)) throw e;
           await sleep(1000 * 2 ** attempt + Math.random() * 500);
         }
       }

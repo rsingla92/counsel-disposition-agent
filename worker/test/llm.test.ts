@@ -194,3 +194,36 @@ describe('openRouterClient retries', () => {
     expect(second).toBeGreaterThanOrEqual(2000);
   });
 });
+
+describe('openRouterClient retry limits', () => {
+  const tooMany = () => Promise.resolve(new Response('{}', {status: 429}));
+
+  it('honours a request-level retry cap', async () => {
+    const impl = vi.fn(tooMany);
+    await expect(
+      openRouterClient('k', impl, 6, async () => {}).complete({
+        ...req,
+        maxRetries: 1,
+      }),
+    ).rejects.toMatchObject({status: 429});
+    expect(impl).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives up its slot while it backs off', async () => {
+    let release = () => {};
+    const held = new Promise<void>(resolve => (release = resolve));
+    const impl = vi
+      .fn()
+      .mockImplementationOnce(tooMany)
+      .mockImplementation(() => Promise.resolve(okJson({a: 1})));
+    const client = openRouterClient('k', impl, 1, () => held);
+    const order: string[] = [];
+    const first = client.complete(req).then(() => order.push('first'));
+    // Let the first request fail and start its backoff.
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await client.complete(req).then(() => order.push('second'));
+    release();
+    await first;
+    expect(order).toEqual(['second', 'first']);
+  });
+});

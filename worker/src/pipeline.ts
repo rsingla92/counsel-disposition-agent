@@ -1,4 +1,4 @@
-import {extract} from './extract';
+import {ExtractionInvalidError, extract} from './extract';
 import {ruleFloor, verifyExcerpt, type FloorResult} from './floor';
 import {
   LEVELS,
@@ -361,6 +361,45 @@ function addSpec(run: Run, spec: ModelSpec): void {
   }
 }
 
+/**
+ * Sets the rule floor from run.extraction and, for an emergency floor, sends
+ * the early event without waiting for sampling.
+ */
+function setFloor(run: Run, opts: RouteOptions): FloorResult {
+  const floor = ruleFloor(run.extraction!, run.message, run.deps.policy);
+  run.floor = floor;
+  if (isEmergency(floor.floor) && opts.onEarly) {
+    try {
+      opts.onEarly({
+        event: 'early',
+        floor: floor.floor,
+        patient_message: levelMessage(run, floor.floor),
+      });
+    } catch {
+      // A failed listener must not stop routing.
+    }
+  }
+  return floor;
+}
+
+/** An extraction holding only salvaged red flags: no modifiers or questions. */
+function salvagedExtraction(
+  flags: Extraction['red_flags'],
+  policy: Policy,
+): Extraction {
+  return {
+    language: 'en',
+    is_care_request: true,
+    red_flags: flags,
+    modifiers: Object.fromEntries(
+      policy.modifiers.map(m => [m.id, {present: false, excerpt: null}]),
+    ),
+    questions: [],
+    photo_needed: false,
+    time_sensitive: false,
+  };
+}
+
 async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   const {deps, message} = run;
   const {policy} = deps;
@@ -377,25 +416,20 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     const got = await extract(message, deps.primary, deps.llm, policy);
     ex = got.extraction;
     run.raw.extraction = got.raw;
-  } catch {
+  } catch (e) {
+    // Output that missed or repeated a flag still floors the flags it did
+    // mark present; the case goes to a physician either way.
+    if (e instanceof ExtractionInvalidError && e.flags) {
+      run.raw.extraction = e.raw;
+      run.extraction = salvagedExtraction(e.flags, policy);
+      setFloor(run, opts);
+    }
     return humanReview(run, 'extraction_failed');
   }
   run.extraction = ex;
 
   // 3. Rule floor, and emergency instructions without waiting for sampling.
-  const floor = ruleFloor(ex, message, policy);
-  run.floor = floor;
-  if (isEmergency(floor.floor) && opts.onEarly) {
-    try {
-      opts.onEarly({
-        event: 'early',
-        floor: floor.floor,
-        patient_message: levelMessage(run, floor.floor),
-      });
-    } catch {
-      // A failed listener must not stop routing.
-    }
-  }
+  const floor = setFloor(run, opts);
 
   // 4. Scope.
   if (ex.language !== 'en') return humanReview(run, 'non_english');

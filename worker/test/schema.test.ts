@@ -8,6 +8,7 @@ import {
   SampleSchema,
   extractionJsonSchema,
   extractionSchema,
+  salvageFlags,
 } from '../src/schema';
 import {fakeExtraction, toWire, validResult} from './fixtures';
 
@@ -319,4 +320,52 @@ describe('RouteResultSchema', () => {
     expect(readJson('../../schema/route-result.schema.json')).toEqual(
       z.toJSONSchema(RouteResultSchema),
     ));
+});
+
+describe('salvageFlags', () => {
+  const ok = toWire(fakeExtraction(policy));
+  const ids = policy.red_flags.map(f => f.id);
+
+  it('keeps present flags and reads missing ones as unknown', () => {
+    const list = [
+      {id: 'cardiac_chest_pain', state: 'present', excerpt: 'my chest'},
+    ];
+    const out = salvageFlags(policy, {...ok, red_flags: list})!;
+    expect(Object.keys(out)).toEqual(ids);
+    expect(out.cardiac_chest_pain).toEqual({
+      state: 'present',
+      excerpt: 'my chest',
+    });
+    expect(out.anaphylaxis).toEqual({state: 'unknown', excerpt: null});
+  });
+
+  it('keeps the most severe state of a repeated flag', () => {
+    const list = [
+      {id: 'anaphylaxis', state: 'present', excerpt: 'throat closing'},
+      {id: 'anaphylaxis', state: 'absent', excerpt: ''},
+      {id: 'anaphylaxis', state: 'unknown', excerpt: ''},
+    ];
+    expect(salvageFlags(policy, {red_flags: list})!.anaphylaxis).toEqual({
+      state: 'present',
+      excerpt: 'throat closing',
+    });
+  });
+
+  it('skips entries it cannot read', () => {
+    const list = [
+      {id: 'not_a_flag', state: 'present', excerpt: ''},
+      {id: 'anaphylaxis', state: 'maybe', excerpt: ''},
+      'anaphylaxis',
+      null,
+    ];
+    const out = salvageFlags(policy, {red_flags: list})!;
+    expect(Object.values(out).every(f => f.state === 'unknown')).toBe(true);
+  });
+
+  it.each([[null], ['text'], [{}], [{red_flags: 'x'}]])(
+    'returns null without a flag list (%j)',
+    json => {
+      expect(salvageFlags(policy, json)).toBeNull();
+    },
+  );
 });

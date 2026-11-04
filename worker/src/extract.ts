@@ -3,8 +3,23 @@ import type {Policy} from './policy';
 import {
   extractionJsonSchema,
   extractionSchema,
+  salvageFlags,
   type Extraction,
 } from './schema';
+
+/**
+ * Extraction output that did not match the schema. Carries the red flags that
+ * could still be read, so a flag marked present keeps its floor.
+ */
+export class ExtractionInvalidError extends LlmError {
+  constructor(
+    readonly flags: Extraction['red_flags'] | null,
+    readonly raw: string,
+  ) {
+    super('invalid_json', 'Extraction did not match the schema');
+    this.name = 'ExtractionInvalidError';
+  }
+}
 
 /** System prompt for the extraction step, built from the policy. */
 export function extractionSystemPrompt(policy: Policy): string {
@@ -91,10 +106,13 @@ export async function extract(
     jsonSchema: extractionJsonSchema(policy),
     temperature: 0,
     timeoutMs: policy.extraction.timeout_ms,
+    // Extraction gates the early emergency event, so it waits out one rate
+    // limit at most.
+    maxRetries: 1,
   });
   const parsed = schema.safeParse(res.json);
   if (!parsed.success) {
-    throw new LlmError('invalid_json', 'Extraction did not match the schema');
+    throw new ExtractionInvalidError(salvageFlags(policy, res.json), res.raw);
   }
   return {extraction: parsed.data, raw: res.raw};
 }

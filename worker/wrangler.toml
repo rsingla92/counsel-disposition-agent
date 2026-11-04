@@ -9,6 +9,6 @@ compatibility_date = "2026-10-01"
 [vars]
 PRIMARY_MODEL = "anthropic/claude-sonnet-5.5"
 PRIMARY_PROVIDER = "google-vertex"
-SECONDARY_MODEL = "google/gemini-4-argon"
+SECONDARY_MODEL = "google/gemini-3.8-flash"
 SECONDARY_PROVIDER = "google-vertex"
 ALLOWED_ORIGIN = "https://counsel-disposition-web.counsel-demo.workers.dev"

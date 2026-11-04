@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {extract} from '../src/extract';
+import {ExtractionInvalidError, extract} from '../src/extract';
 import {LlmError} from '../src/llm';
 import {loadPolicy} from '../src/policy';
 import {fakeExtraction, stubLlm, toWire} from './fixtures';
@@ -12,6 +12,32 @@ describe('extract', () => {
     await expect(
       extract('hi', spec, stubLlm({language: 'en'}), policy),
     ).rejects.toMatchObject({code: 'invalid_json'}));
+
+  it('reports the flags it could read from invalid output', async () => {
+    const wire = toWire(fakeExtraction(policy));
+    wire.red_flags = wire.red_flags
+      .filter(f => f.id !== 'anaphylaxis')
+      .map(f =>
+        f.id === 'cardiac_chest_pain'
+          ? {...f, state: 'present', excerpt: 'hi'}
+          : f,
+      );
+    const err = await extract('hi', spec, stubLlm(wire), policy).catch(e => e);
+    expect(err).toBeInstanceOf(ExtractionInvalidError);
+    expect(err.code).toBe('invalid_json');
+    expect(err.raw).toBe(JSON.stringify(wire));
+    expect(err.flags.cardiac_chest_pain).toEqual({
+      state: 'present',
+      excerpt: 'hi',
+    });
+    expect(err.flags.anaphylaxis.state).toBe('unknown');
+  });
+
+  it('allows extraction one retry after a rate limit', async () => {
+    const llm = stubLlm(toWire(fakeExtraction(policy)));
+    await extract('hi', spec, llm, policy);
+    expect(llm.lastRequest.maxRetries).toBe(1);
+  });
 
   it('puts the message inside the data delimiters', async () => {
     const llm = stubLlm(toWire(fakeExtraction(policy)));

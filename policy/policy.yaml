@@ -12,7 +12,7 @@ sampling:
   n: 20
   temperature: 0.7
   min_valid: 15
-  timeout_ms: 15000 # Gemini 4 Argon takes 4-8 s, with a tail to about 16 s
+  timeout_ms: 15000 # samples take 2-8 s; allows for slow providers
 
 # Extraction answers every red flag, so its output is long (about 2,000 tokens).
 extraction:

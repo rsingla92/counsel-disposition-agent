@@ -775,3 +775,65 @@ describe('traceLine', () => {
     expect(raw).not.toContain('secret words');
   });
 });
+
+describe('route with invalid extraction output', () => {
+  type Flags = WireExtraction['red_flags'];
+
+  // Runs scripted() with a present chest-pain flag, then edits the flag list.
+  function broken(edit: (flags: Flags) => unknown) {
+    const llm = scripted({
+      flags: {cardiac_chest_pain: 'present'},
+      samples: 'routine',
+    });
+    const inner = llm.complete.bind(llm);
+    llm.complete = async req => {
+      const res = await inner(req);
+      if (req.schemaName !== 'extraction') return res;
+      const ex = res.json as WireExtraction;
+      const json = {...ex, red_flags: edit(ex.red_flags)};
+      return {...res, json, raw: JSON.stringify(json)};
+    };
+    return llm;
+  }
+
+  it.each([
+    ['a missing flag', (f: Flags) => f.filter(e => e.id !== 'anaphylaxis')],
+    [
+      'a repeated flag',
+      (f: Flags) => [
+        ...f,
+        {id: 'cardiac_chest_pain', state: 'absent', excerpt: ''},
+      ],
+    ],
+    [
+      'an unknown flag id',
+      (f: Flags) => [...f, {id: 'not_a_flag', state: 'present', excerpt: ''}],
+    ],
+  ])('keeps a present emergency flag despite %s', async (_name, edit) => {
+    const onEarly = vi.fn();
+    const llm = broken(edit);
+    const r = await route(REFILL_WITH_CHEST, deps(llm), {onEarly});
+    expect(r.status).toBe('human_review');
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.disposition).toBe('call_911');
+    expect(r.floor).toBe('call_911');
+    expect(onEarly).toHaveBeenCalledWith(
+      expect.objectContaining({floor: 'call_911'}),
+    );
+    expect(r.red_flags.find(f => f.id === 'cardiac_chest_pain')?.state).toBe(
+      'present',
+    );
+    // No samples are drawn after a failed extraction.
+    expect(llm.calls).toBe(1);
+  });
+
+  it('gives plain Human review when no flag list can be read', async () => {
+    const onEarly = vi.fn();
+    const r = await route(REFILL_WITH_CHEST, deps(broken(() => 'not a list')), {
+      onEarly,
+    });
+    expect(r.disposition).toBeNull();
+    expect(r.floor).toBeNull();
+    expect(onEarly).not.toHaveBeenCalled();
+  });
+});

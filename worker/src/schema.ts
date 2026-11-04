@@ -108,6 +108,39 @@ function extractionShape<F extends z.ZodType, E extends z.ZodType>(
   });
 }
 
+const SEVERITY: Record<FlagState, number> = {unknown: 0, absent: 1, present: 2};
+
+/**
+ * Reads the red flags it can from extraction output that failed to parse, so
+ * a flag the model did mark present still sets the floor. Entries with an
+ * unknown id or a bad state are skipped, a flag listed twice keeps its most
+ * severe state, and a missing flag is unknown. Null when there is no list.
+ */
+export function salvageFlags(
+  policy: Policy,
+  json: unknown,
+): Extraction['red_flags'] | null {
+  const list = (json as {red_flags?: unknown} | null)?.red_flags;
+  if (!Array.isArray(list)) return null;
+  const ids = policy.red_flags.map(f => f.id) as [string, ...string[]];
+  const Entry = z.object({
+    id: z.enum(ids),
+    state: FlagStateSchema,
+    excerpt: ParsedExcerpt,
+  });
+  const out: Extraction['red_flags'] = Object.fromEntries(
+    ids.map(id => [id, {state: 'unknown' as FlagState, excerpt: null}]),
+  );
+  for (const item of list) {
+    const e = Entry.safeParse(item);
+    if (!e.success) continue;
+    if (SEVERITY[e.data.state] > SEVERITY[out[e.data.id].state]) {
+      out[e.data.id] = {state: e.data.state, excerpt: e.data.excerpt};
+    }
+  }
+  return out;
+}
+
 /** Parses the extraction model's output. A blank excerpt becomes null. */
 export function extractionSchema(policy: Policy) {
   return extractionShape(policy, parsedFlags(policy), ParsedExcerpt);
