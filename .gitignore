@@ -224,3 +224,5 @@ docs/brief
 data/private
 # Claude Code worktrees
 .claude/worktrees/
+# Local Worker secrets
+.dev.vars
