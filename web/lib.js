@@ -242,6 +242,31 @@ export function failedRun(message, early) {
   return {message, early: early ?? null, result: null, replay: false, failed: true};
 }
 
+/** The run to show for a saved replay file. */
+export function replayRun(saved) {
+  return {
+    message: saved.message,
+    early: saved.early ?? null,
+    result: saved.result,
+    replay: true,
+    synthetic: saved.synthetic_fixture === true,
+    recordedAt: saved.recorded_at ?? null,
+  };
+}
+
+/**
+ * What to show after a live call failed. Once a live early event arrived,
+ * the call never falls back to a saved run: a recording could be less
+ * acute than the live floor, or carry a different Emergency instruction.
+ * The failed run keeps the live instruction leading. Only a call that
+ * produced no early event falls back to its saved run, if there is one.
+ */
+export function fallbackFor(message, liveEarly, saved) {
+  if (liveEarly) return failedRun(message, liveEarly);
+  if (saved) return replayRun(saved);
+  return failedRun(message, null);
+}
+
 /**
  * The demo whose saved run belongs to `routed` ({demoId, message}, captured
  * when the call started), or null. Id and text must both match, so an

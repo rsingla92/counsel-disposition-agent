@@ -10,13 +10,14 @@ import {
   TIER_LABELS,
   canOverride,
   emergencyLead,
-  failedRun,
+  fallbackFor,
   formatPercent,
   highlight,
   levelLabel,
   parseNdjson,
   patientBlocks,
   readToken,
+  replayRun,
   replayTarget,
   takeLines,
   tierOf,
@@ -644,44 +645,28 @@ function currentTarget() {
 }
 
 /**
- * Shows the saved run for `routed` ({demoId, message}, captured when the
- * call started); true if one is now on screen. liveEarly, an Emergency
- * instruction from a failed live call for the same message, is never
- * dropped: every path that shows no saved run shows it as a failed run.
+ * Loads the saved run for `routed` ({demoId, message}, captured when the
+ * call started). Returns {saved} on success, or {saved: null, why}.
  */
-async function showReplay(routed, liveEarly = null) {
-  const fail = status => {
-    state.run = liveEarly ? failedRun(routed.message, liveEarly) : null;
-    render();
-    if (status) setStatus(status, true);
-    return false;
-  };
+async function loadSaved(routed) {
   const demo = replayTarget(state.demos, routed);
   if (!demo) {
-    return fail('Replay only has saved runs for the unedited demo messages.');
+    return {saved: null, why: 'Replay only has saved runs for the unedited demo messages.'};
   }
-  let saved;
   try {
-    saved = await replayFor(demo.id);
+    const saved = await replayFor(demo.id);
+    return saved ? {saved} : {saved: null, why: 'No saved run for this message yet.'};
   } catch {
-    return fail('Could not load the saved run.');
+    return {saved: null, why: 'Could not load the saved run.'};
   }
-  if (!saved) {
-    state.run = liveEarly ? failedRun(demo.message, liveEarly) : null;
-    render();
-    setStatus('No saved run for this message yet.');
-    return false;
-  }
-  state.run = {
-    message: saved.message,
-    early: liveEarly ?? saved.early ?? null,
-    result: saved.result,
-    replay: true,
-    synthetic: saved.synthetic_fixture === true,
-    recordedAt: saved.recorded_at ?? null,
-  };
+}
+
+/** Replay mode: shows the saved run for `routed`, or nothing. */
+async function showReplay(routed) {
+  const {saved, why} = await loadSaved(routed);
+  state.run = saved ? replayRun(saved) : null;
   render();
-  return true;
+  if (why) setStatus(why, true);
 }
 
 function updateReplayUi() {
@@ -774,17 +759,18 @@ async function routeLive(routed) {
     const why = e instanceof LiveError ? e.message : 'the Worker could not be reached';
     ui.replay.checked = true;
     updateReplayUi();
-    const shown = await showReplay(routed, run.early);
-    if (!shown && !run.early) {
-      // Nothing saved and no early event: say so on screen, not only in the
-      // status line, so nothing reads as still in progress.
-      state.run = failedRun(routed.message, null);
-      render();
-    }
+    // After a live early event the call never falls back to a saved run
+    // (fallbackFor), so there is no need to load one.
+    const saved = run.early ? null : (await loadSaved(routed)).saved;
+    if (!current()) return;
+    state.run = fallbackFor(routed.message, run.early, saved);
+    render();
     setStatus(
-      shown
+      state.run.replay
         ? `Live call failed (${why}). Switched to replay.`
-        : `Live call failed (${why}). No saved run for this message; a physician must review it.`,
+        : run.early
+          ? `Live call failed (${why}) after the Emergency instruction; the full result did not arrive. A physician must review it.`
+          : `Live call failed (${why}). No saved run for this message; a physician must review it.`,
       true,
     );
   } finally {

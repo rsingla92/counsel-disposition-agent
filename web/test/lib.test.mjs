@@ -11,6 +11,7 @@ import {
   canOverride,
   emergencyLead,
   failedRun,
+  fallbackFor,
   formatPercent,
   highlight,
   isEmergency,
@@ -388,4 +389,52 @@ test('canOverride needs a different level, a known reason and no block', () => {
   assert.equal(canOverride({...ok, reason: 'bogus'}), false);
   assert.equal(canOverride({...ok, from: null}), false);
   assert.equal(canOverride({...ok, blocked: 'replay'}), false);
+});
+
+// --- fallback after a failed live call --------------------------------------
+
+function savedRun(disposition, patientMessage) {
+  return {
+    id: 'demo',
+    message: 'saved message',
+    early: null,
+    synthetic_fixture: true,
+    recorded_at: '2026-11-03T00:00:00+00:00',
+    result: result({disposition, patient_message: patientMessage, safety_net: ''}),
+  };
+}
+
+test('fallbackFor: a live ed_now early event never falls back to a lower saved run', () => {
+  const early = {event: 'early', floor: 'ed_now', patient_message: 'Go to the ED now.'};
+  const run = fallbackFor('live message', early, savedRun('within_few_days', 'Within 72 hours.'));
+  assert.equal(run.failed, true);
+  assert.equal(run.replay, false);
+  assert.equal(run.result, null);
+  assert.equal(run.message, 'live message');
+  assert.equal(emergencyLead(run.result, run.early), 'Go to the ED now.');
+  const blocks = patientBlocks(run.result, run.early, run.failed);
+  assert.deepEqual(blocks[0], {kind: 'emergency', text: 'Go to the ED now.'});
+  assert.ok(blocks.every(b => !b.text.includes('72 hours')));
+});
+
+test('fallbackFor: a live call_911 early event is not replaced by a saved ed_now', () => {
+  const early = {event: 'early', floor: 'call_911', patient_message: 'Call 911 now.'};
+  const run = fallbackFor('live message', early, savedRun('ed_now', 'Go to the ED now.'));
+  assert.equal(run.failed, true);
+  assert.equal(run.result, null);
+  assert.equal(emergencyLead(run.result, run.early), 'Call 911 now.');
+});
+
+test('fallbackFor: with no early event the saved run is shown as a replay', () => {
+  const saved = savedRun('within_few_days', 'Within 72 hours.');
+  const run = fallbackFor('saved message', null, saved);
+  assert.equal(run.replay, true);
+  assert.equal(run.failed, undefined);
+  assert.equal(run.result, saved.result);
+  assert.equal(run.synthetic, true);
+  assert.equal(run.recordedAt, '2026-11-03T00:00:00+00:00');
+});
+
+test('fallbackFor: no early event and nothing saved is a failed run', () => {
+  assert.deepEqual(fallbackFor('m', null, null), failedRun('m', null));
 });
