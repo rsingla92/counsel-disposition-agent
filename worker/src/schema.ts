@@ -113,7 +113,7 @@ const SEVERITY: Record<FlagState, number> = {unknown: 0, absent: 1, present: 2};
 /**
  * Reads the red flags it can from extraction output that failed to parse, so
  * a flag the model did mark present still sets the floor. Entries with an
- * unknown id or a bad state are skipped, a flag listed twice keeps its most
+ * unknown id or a bad state are skipped, a bad excerpt reads as none, a flag listed twice keeps its most
  * severe state, and a missing flag is unknown. Null when there is no list.
  */
 export function salvageFlags(
@@ -126,7 +126,9 @@ export function salvageFlags(
   const Entry = z.object({
     id: z.enum(ids),
     state: FlagStateSchema,
-    excerpt: ParsedExcerpt,
+    // A malformed excerpt must not drop a present flag: it reads as none,
+    // which never verifies.
+    excerpt: ParsedExcerpt.catch(null),
   });
   const out: Extraction['red_flags'] = Object.fromEntries(
     ids.map(id => [id, {state: 'unknown' as FlagState, excerpt: null}]),

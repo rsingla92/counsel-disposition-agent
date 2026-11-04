@@ -351,6 +351,17 @@ describe('salvageFlags', () => {
     });
   });
 
+  it.each([[undefined], [42], [{text: 'x'}]])(
+    'keeps a present flag whose excerpt is malformed (%j)',
+    excerpt => {
+      const list = [{id: 'anaphylaxis', state: 'present', excerpt}];
+      expect(salvageFlags(policy, {red_flags: list})!.anaphylaxis).toEqual({
+        state: 'present',
+        excerpt: null,
+      });
+    },
+  );
+
   it('skips entries it cannot read', () => {
     const list = [
       {id: 'not_a_flag', state: 'present', excerpt: ''},
