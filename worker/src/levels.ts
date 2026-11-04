@@ -13,6 +13,17 @@ export type Level = (typeof LEVELS)[number];
 export type Tier = 'emergency' | 'same_day' | 'async' | 'self_care';
 export type BriefLabel = 'URGENT_ESCALATION' | 'ASYNC_PHYSICIAN' | 'SELF_CARE';
 
+/** Human-readable level names for patient- and physician-facing text. */
+export const LEVEL_LABELS: Record<Level, string> = {
+  call_911: 'Call 911',
+  ed_now: 'ED now',
+  in_person_today: 'In person today',
+  physician_contact_today: 'Physician contact today',
+  within_few_days: 'Within a few days',
+  routine: 'Routine',
+  self_care: 'Self-care',
+};
+
 const TIERS: Record<Level, Tier> = {
   call_911: 'emergency',
   ed_now: 'emergency',

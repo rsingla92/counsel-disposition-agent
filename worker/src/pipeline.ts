@@ -1,6 +1,14 @@
 import {extract} from './extract';
 import {ruleFloor, verifyExcerpt, type FloorResult} from './floor';
-import {LEVELS, briefLabelOf, rank, tierOf, type Level} from './levels';
+import {
+  LEVELS,
+  LEVEL_LABELS,
+  briefLabelOf,
+  levelAtRank,
+  rank,
+  tierOf,
+  type Level,
+} from './levels';
 import type {LlmClient, ModelSpec} from './llm';
 import {traceLine} from './log';
 import type {Policy} from './policy';
@@ -12,6 +20,7 @@ import {
   type Extraction,
   type ReasonCode,
   type RouteResult,
+  type Sample,
 } from './schema';
 
 export {traceLine};
@@ -39,6 +48,11 @@ export type RouteOptions = {
 export const HUMAN_REVIEW_MESSAGE =
   'Thanks for your message. A Counsel physician will review it within 1 ' +
   'hour. If this is an emergency, call 911 now.';
+
+/** Safety-netting when no sample supplied any. */
+export const FALLBACK_SAFETY_NET =
+  'If your symptoms get worse, or you are worried, call 911 or go to the ' +
+  'nearest emergency department.';
 
 /** Reasons that put the case in front of a physician for review. */
 const REVIEW_REASONS: ReadonlySet<ReasonCode> = new Set([
@@ -220,8 +234,13 @@ function humanReview(
   });
 }
 
-/** The first valid primary sample that itself proposed `level`, unclamped. */
-function proposer(set: VoteSet, level: Level) {
+/**
+ * The valid samples as the model proposed them, before the floor clamp, in
+ * call order. drawSamples keeps each clamped sample's original text, so the
+ * justification must come from a sample that argued for the chosen level.
+ */
+function proposals(set: VoteSet): Sample[] {
+  const out: Sample[] = [];
   for (const raw of set.raw) {
     let json: unknown;
     try {
@@ -230,9 +249,67 @@ function proposer(set: VoteSet, level: Level) {
       continue;
     }
     const s = SampleSchema.safeParse(json);
-    if (s.success && s.data.disposition === level) return s.data;
+    if (s.success) out.push(s.data);
   }
-  return null;
+  return out;
+}
+
+function countByLevel(samples: Sample[]): Votes {
+  const n = emptyVotes();
+  for (const s of samples) n[s.disposition]++;
+  return n;
+}
+
+function joinAnd(items: string[]): string {
+  return items.length <= 1
+    ? (items[0] ?? '')
+    : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+
+/**
+ * A deterministic justification for when no sample proposed the chosen level:
+ * either a red flag's floor overrode the samples, or the expected-cost router
+ * chose a level between split votes.
+ */
+function fallbackJustification(
+  chosen: Level,
+  floor: FloorResult,
+  samples: Sample[],
+): string {
+  const label = (l: Level) => LEVEL_LABELS[l];
+  const ending = (because: string) =>
+    chosen === 'call_911'
+      ? 'This is the most urgent level.'
+      : `Not ${label(levelAtRank(rank(chosen) + 1))} because ${because}.`;
+  const n = countByLevel(samples);
+  if (floor.drivers.length > 0) {
+    // Most-voted proposal; LEVELS is most acute first, so ties go acute.
+    const top = LEVELS.reduce((a, b) => (n[b] > n[a] ? b : a));
+    return (
+      `Red flag(s) ${floor.drivers.join(', ')} set a minimum of ` +
+      `${label(floor.floor)}. The samples proposed ${label(top)} below ` +
+      `that, so the floor applies. ${ending('no red flag or sample supports it')}`
+    );
+  }
+  const split = LEVELS.filter(l => n[l] > 0).map(l => `${label(l)} (${n[l]})`);
+  return (
+    `Routed by expected cost: the samples split between ${joinAnd(split)}, ` +
+    'and under-triage costs more than over-triage at this boundary. ' +
+    ending('too few samples supported it')
+  );
+}
+
+/**
+ * The safety-netting of the most acute proposal with a non-empty safety_net
+ * (ties go to the first in call order), else the fixed fallback line.
+ */
+function fallbackSafetyNet(samples: Sample[]): string {
+  let best: Sample | null = null;
+  for (const s of samples) {
+    if (s.safety_net.trim() === '') continue;
+    if (best === null || rank(s.disposition) > rank(best.disposition)) best = s;
+  }
+  return best?.safety_net ?? FALLBACK_SAFETY_NET;
 }
 
 function addSpec(run: Run, spec: ModelSpec): void {
@@ -330,17 +407,18 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   const top = Math.max(...LEVELS.map(l => primary.votes[l]));
 
   // 8. Explain.
-  const chosen = proposer(primary, disposition);
-  const safetyNet = chosen?.safety_net ?? '';
+  const proposed = proposals(primary);
+  const chosen = proposed.find(s => s.disposition === disposition);
+  const safetyNet = chosen ? chosen.safety_net : fallbackSafetyNet(proposed);
   return assemble(run, {
     status: needsInfo ? 'needs_info' : 'routed',
     disposition,
     votes,
     confidence: top / primary.valid,
     reasons,
-    justification:
-      chosen?.justification ??
-      `${floorJustification(run)} No sample proposed this level; routed by expected cost.`,
+    justification: chosen
+      ? chosen.justification
+      : fallbackJustification(disposition, floor, proposed),
     safety_net: safetyNet,
     patient_message: levelMessage(run, disposition, safetyNet),
   });

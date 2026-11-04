@@ -8,6 +8,7 @@ import {
 } from '../src/llm';
 import type {Deps} from '../src/pipeline';
 import {loadPolicy} from '../src/policy';
+import type {Sample} from '../src/schema';
 import {fakeExtraction, sample, withFlags} from './fixtures';
 
 // Synthetic messages only: the repo is public.
@@ -25,12 +26,16 @@ export const SECONDARY: ModelSpec = {
 };
 
 export type ScriptOpts = {
-  /** Flags to mark; a present flag's excerpt is the whole message. */
+  /** Flags to mark; a present flag's excerpt is `excerpt`. */
   flags?: Record<string, 'present' | 'unknown'>;
+  /** Excerpt for present flags and modifiers (default: the whole message). */
+  excerpt?: string;
   /** Modifiers to mark present. */
   mods?: string[];
   /** The level every primary sample proposes (default routine). */
   samples?: Level;
+  /** The i-th primary sample, in call order; overrides `samples`. */
+  sampleFor?: (i: number) => Sample;
   /** The level every secondary sample proposes, or 'fail' (default: samples). */
   secondary?: Level | 'fail';
   /** Makes the extraction call fail with this LlmError code. */
@@ -73,7 +78,7 @@ export function scripted(opts: ScriptOpts): LlmClient & {calls: number} {
           fakeExtraction(policy),
           opts.flags ?? {},
           opts.mods ?? [],
-          messageOf(req),
+          opts.excerpt ?? messageOf(req),
         );
         ex.language = opts.language ?? 'en';
         ex.is_care_request = opts.care ?? true;
@@ -92,7 +97,8 @@ export function scripted(opts: ScriptOpts): LlmClient & {calls: number} {
         throw new LlmError('timeout', 'scripted timeout');
       }
       if (level === 'fail') throw new LlmError('timeout', 'scripted timeout');
-      const json = sample(level);
+      const json =
+        isPrimary && opts.sampleFor ? opts.sampleFor(i) : sample(level);
       return {json, raw: JSON.stringify(json), latencyMs: 1};
     },
   };

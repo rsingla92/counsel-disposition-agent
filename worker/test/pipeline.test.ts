@@ -1,7 +1,13 @@
 import {describe, expect, it, vi} from 'vitest';
-import {route, traceLine, type EarlyEvent} from '../src/pipeline';
+import type {Level} from '../src/levels';
+import {
+  FALLBACK_SAFETY_NET,
+  route,
+  traceLine,
+  type EarlyEvent,
+} from '../src/pipeline';
 import {loadPolicy} from '../src/policy';
-import {RouteResultSchema} from '../src/schema';
+import {RouteResultSchema, type Sample} from '../src/schema';
 import {
   M,
   PRIMARY,
@@ -115,6 +121,17 @@ describe('route', () => {
       expect(JSON.parse(lines[0]).trace.input_sha256).toMatch(/^[0-9a-f]{64}$/);
     }
   });
+
+  it('logs a present excerpt but not the full message', async () => {
+    const excerpt = 'itchy rash on my forearm';
+    expect(SECRET_MSG).toContain(excerpt);
+    const lines: string[] = [];
+    const llm = scripted({flags: {diabetic_foot_redness: 'present'}, excerpt});
+    await route(SECRET_MSG, {...deps(llm), log: l => lines.push(l)});
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toContain(excerpt);
+    expect(lines[0]).not.toContain(SECRET_MSG);
+  });
 });
 
 describe('route: result details', () => {
@@ -162,20 +179,6 @@ describe('route: result details', () => {
     expect(others.every(f => f.state === 'absent' && !f.excerpt_verified)).toBe(
       true,
     );
-  });
-
-  it('cites the floor when no sample proposed the chosen level', async () => {
-    const r = await route(
-      REFILL_WITH_CHEST,
-      deps(
-        scripted({flags: {cardiac_chest_pain: 'present'}, samples: 'routine'}),
-      ),
-    );
-    expect(r.justification).toBe(
-      'Rule floor: cardiac_chest_pain. No sample proposed this level; ' +
-        'routed by expected cost.',
-    );
-    expect(r.patient_message).toBe(policy.levels.call_911.patient_message);
   });
 
   it('adds a flag instruction to the early and final messages', async () => {
@@ -282,6 +285,99 @@ describe('route: result details', () => {
       },
     });
     expect(r.disposition).toBe('call_911');
+  });
+});
+
+describe('route: fallback justification', () => {
+  const net = (level: Level, safety_net: string): Sample => ({
+    disposition: level,
+    justification: `Argues for ${level}.`,
+    safety_net,
+  });
+
+  it('explains a red-flag floor over routine samples', async () => {
+    const r = await route(
+      REFILL_WITH_CHEST,
+      deps(
+        scripted({
+          flags: {cardiac_chest_pain: 'present'},
+          sampleFor: i =>
+            i % 4 === 3
+              ? net('within_few_days', `Acute net ${i}`)
+              : net('routine', 'Routine net'),
+        }),
+      ),
+    );
+    expect(r.disposition).toBe('call_911');
+    expect(r.justification).toBe(
+      'Red flag(s) cardiac_chest_pain set a minimum of Call 911. The ' +
+        'samples proposed Routine below that, so the floor applies. This is ' +
+        'the most urgent level.',
+    );
+    expect(r.safety_net).toBe('Acute net 3');
+    expect(r.patient_message).toBe(
+      `${policy.levels.call_911.patient_message} Acute net 3`,
+    );
+  });
+
+  it('uses the fixed safety net when no sample gave one', async () => {
+    const r = await route(
+      REFILL_WITH_CHEST,
+      deps(
+        scripted({
+          flags: {cardiac_chest_pain: 'present'},
+          sampleFor: () => net('routine', ''),
+        }),
+      ),
+    );
+    expect(r.safety_net).toBe(FALLBACK_SAFETY_NET);
+    expect(r.safety_net).toBe(
+      'If your symptoms get worse, or you are worried, call 911 or go to ' +
+        'the nearest emergency department.',
+    );
+    expect(r.patient_message).toBe(
+      `${policy.levels.call_911.patient_message} ${FALLBACK_SAFETY_NET}`,
+    );
+  });
+
+  it('says why not one level higher below call_911', async () => {
+    const r = await route(
+      M,
+      deps(
+        scripted({
+          flags: {orthopnea_or_leg_swelling: 'present'},
+          samples: 'routine',
+        }),
+      ),
+    );
+    expect(r.disposition).toBe('in_person_today');
+    expect(r.justification).toBe(
+      'Red flag(s) orthopnea_or_leg_swelling set a minimum of In person ' +
+        'today. The samples proposed Routine below that, so the floor ' +
+        'applies. Not ED now because no red flag or sample supports it.',
+    );
+  });
+
+  it('explains an expected-cost choice between split votes', async () => {
+    // 4 x call_911 and 16 x routine: the router picks ed_now, which no
+    // sample proposed.
+    const r = await route(
+      M,
+      deps(
+        scripted({
+          sampleFor: i =>
+            i < 4 ? net('call_911', `Urgent net ${i}`) : net('routine', 'R'),
+        }),
+      ),
+    );
+    expect(r.disposition).toBe('ed_now');
+    expect(r.justification).toBe(
+      'Routed by expected cost: the samples split between Call 911 (4) and ' +
+        'Routine (16), and under-triage costs more than over-triage at this ' +
+        'boundary. Not Call 911 because too few samples supported it.',
+    );
+    expect(r.safety_net).toBe('Urgent net 0');
+    expect(r.human_review.reasons).toContain('wide_spread');
   });
 });
 
