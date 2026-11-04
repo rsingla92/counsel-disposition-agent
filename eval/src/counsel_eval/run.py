@@ -506,6 +506,14 @@ def _system_section(
   return out
 
 
+def _cohort_line(cohort: str, scored: Sequence[str]) -> str:
+  n = len(scored)
+  noun = "case" if n == 1 else "cases"
+  if cohort == "all":
+    return f"Cohort: all ({n} {noun})"
+  return f"Cohort: {cohort} subset ({n} {noun}: {', '.join(scored)})"
+
+
 def write_report(
     runs: Mapping[str, Sequence[Mapping[str, Any]]],
     out_dir: str | os.PathLike[str],
@@ -514,8 +522,12 @@ def write_report(
     policy: Mapping[str, Any],
     date: str | None = None,
     repeat: int = 1,
+    cohort: str = "all",
 ) -> pathlib.Path:
   """Writes the aggregate-only markdown report and returns its path.
+
+  The header names the cohort and the number of distinct case ids scored at
+  repeat 0. Pass a `reference` restricted to the selected cases for a subset.
 
   Args:
     runs: System name to saved-run entries.
@@ -531,15 +543,26 @@ def write_report(
       "%Y-%m-%d"
   )
   version = policy["policy_version"]
+  known = set(reference["case_id"])
+  scored = sorted(
+      {
+          e["case_id"]
+          for entries in runs.values()
+          for e in entries
+          if e.get("repeat", 0) == 0 and e["case_id"] in known
+      }
+  )
   readme = out_dir / "README.md"
   if not readme.exists():
     readme.write_text(_README, encoding="utf-8")
   lines = [
       f"# Disposition eval, policy {version}",
       "",
-      f"Date: {date}. Reviewed cases: {len(reference)}. "
-      f"Repeats per case: {repeat}.",
+      f"Date: {date}. Repeats per case: {repeat}.",
       "",
+      _cohort_line(cohort, scored),
+      "",
+      *(["Subset run — not a headline result.", ""] if cohort != "all" else []),
       "Aggregate only: case ids and rates. Headline metrics use the first "
       "run of each case; repeats feed the any-repeat gate line and the "
       "repeatability section only.",
@@ -684,9 +707,10 @@ def _main(
     report = write_report(
         runs,
         args.reports_dir,
-        reference=reference,
+        reference=reference[reference["case_id"].isin(cases["case_id"])],
         policy=policy,
         repeat=args.repeat,
+        cohort=args.cases,
     )
   except Exception as e:  # pylint: disable=broad-exception-caught
     return _config_error("cannot write the report", e)
