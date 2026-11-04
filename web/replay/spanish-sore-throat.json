@@ -1,0 +1,370 @@
+{
+  "id": "spanish-sore-throat",
+  "label": "Sore throat, written in Spanish",
+  "message": "Hola, tengo dolor de garganta desde hace tres días y un poco de fiebre por la noche. Puedo tragar líquidos sin problema. ¿Qué me recomiendan?",
+  "recorded_at": "2026-11-04T15:55:31+00:00",
+  "early": null,
+  "result": {
+    "status": "human_review",
+    "disposition": null,
+    "tier": null,
+    "brief_label": null,
+    "floor": "self_care",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      },
+      "secondary": null
+    },
+    "confidence": null,
+    "human_review": {
+      "flagged": true,
+      "reasons": [
+        "non_english"
+      ]
+    },
+    "info_requests": {
+      "questions": [
+        "¿Tiene dificultad para respirar o para abrir la boca?",
+        "¿Tiene rigidez en el cuello o molestia con la luz brillante?",
+        "¿Cuál es la temperatura más alta que ha medido?"
+      ],
+      "photo": false
+    },
+    "time_sensitive": false,
+    "justification": "The message is not in English.",
+    "safety_net": "",
+    "patient_message": "Thanks for your message. A Counsel physician will review it within 1 hour. If this is an emergency, call 911 now.",
+    "trace": {
+      "input_sha256": "1cf7ff0f60d19a2d472f039ae91b63c5aea690d6e4e43e0395baaa5d07d6f93b",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 11282,
+      "raw": {
+        "extraction": "{\"language\":\"es\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[\"¿Tiene dificultad para respirar o para abrir la boca?\",\"¿Tiene rigidez en el cuello o molestia con la luz brillante?\",\"¿Cuál es la temperatura más alta que ha medido?\"],\"photo_needed\":false,\"time_sensitive\":false}",
+        "primary": [],
+        "secondary": null
+      }
+    }
+  }
+}

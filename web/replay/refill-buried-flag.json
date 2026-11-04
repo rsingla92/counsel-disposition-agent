@@ -1,320 +1,319 @@
 {
   "id": "refill-buried-flag",
   "label": "Metformin refill with a buried red flag",
-  "synthetic_fixture": true,
-  "note": "Hand-written placeholder so the page is reviewable before Task 11 records real runs. Not model output.",
   "message": "Hi, could you please renew my metformin? I have about a week of tablets left and the pharmacy said they need a new prescription. Same dose as before, 500 mg twice a day. Oh and unrelated, there's a red patch on top of my right foot that seems to be spreading since Monday, probably from my new shoes. Thanks!",
+  "recorded_at": "2026-11-04T15:51:31+00:00",
   "early": null,
   "result": {
     "status": "needs_info",
-    "disposition": "within_few_days",
-    "tier": "async",
-    "brief_label": "ASYNC_PHYSICIAN",
+    "disposition": "in_person_today",
+    "tier": "same_day",
+    "brief_label": "URGENT_ESCALATION",
     "floor": "within_few_days",
     "red_flags": [
       {
         "id": "cardiac_chest_pain",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "anaphylaxis",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "cauda_equina_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "sudden_vision_loss",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "stroke_signs_now",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "airway_breathing_compromise",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "altered_consciousness",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "seizure_ongoing",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "suicidal_plan_or_intent",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "stroke_signs_resolved",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "thunderclap_headache",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "anticoagulated_head_injury",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "fever_neck_stiffness",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "gi_bleeding_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "acute_testicular_pain",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "hyperglycemia_vomiting",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "bowel_obstruction_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "older_adult_fall_no_weight_bearing",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "major_trauma",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "suicidal_thoughts",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "orthopnea_or_leg_swelling",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "chronic_lung_disease_worsening",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "one_sided_calf_swelling",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "chronic_cough_constitutional",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "diabetic_foot_redness",
         "state": "present",
-        "excerpt": "a red patch on top of my right foot that seems to be spreading",
+        "excerpt": "there's a red patch on top of my right foot that seems to be spreading since Monday",
         "excerpt_verified": true
       },
       {
         "id": "peds_respiratory_distress",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_prolonged_seizure",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_nonblanching_rash_fever",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "infant_fever_under_3_months",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_lethargy_or_floppy",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_first_seizure_resolved",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "infant_green_vomit_or_bulging_fontanelle",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_possible_ingestion",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_head_injury_red_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "fever_sickle_or_immunosuppressed",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_dehydration",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_prolonged_fever",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "peds_limp_with_fever",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "obstetric_heavy_bleeding",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "obstetric_seizure",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "obstetric_chest_pain_or_dyspnea",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "early_pregnancy_ectopic_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "bleeding_from_20_weeks",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "preterm_labour_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "reduced_fetal_movement",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "preeclampsia_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "early_pregnancy_bleeding_cramping",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "hyperemesis_no_fluids",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "postpartum_fever_or_discharge",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "postpartum_harm_thoughts",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       },
       {
         "id": "postpartum_psychosis_signs",
-        "state": "absent",
+        "state": "unknown",
         "excerpt": null,
         "excerpt_verified": false
       }
@@ -322,7 +321,7 @@
     "modifiers": [
       {
         "id": "diabetes",
-        "excerpt": "renew my metformin",
+        "excerpt": "metformin",
         "excerpt_verified": true
       }
     ],
@@ -330,23 +329,23 @@
       "primary": {
         "call_911": 0,
         "ed_now": 0,
-        "in_person_today": 0,
-        "physician_contact_today": 3,
-        "within_few_days": 16,
-        "routine": 1,
+        "in_person_today": 20,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
         "self_care": 0
       },
       "secondary": {
         "call_911": 0,
         "ed_now": 0,
-        "in_person_today": 0,
-        "physician_contact_today": 5,
-        "within_few_days": 14,
-        "routine": 1,
+        "in_person_today": 17,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
         "self_care": 0
       }
     },
-    "confidence": 0.8,
+    "confidence": 1,
     "human_review": {
       "flagged": false,
       "reasons": [
@@ -356,31 +355,74 @@
     },
     "info_requests": {
       "questions": [
-        "Is the red area warm, swollen or painful to touch?",
-        "Is there any break in the skin, blister or discharge?",
-        "Have you had a fever or chills?"
+        "Do you have a fever, pain, warmth or swelling in the foot?",
+        "Do you have diabetes, and have you noticed any open sores or blisters on the foot?",
+        "Has the redness grown in size since you first noticed it?"
       ],
       "photo": true
     },
-    "time_sensitive": false,
-    "justification": "The refill is routine, but spreading redness on the foot of a patient taking metformin meets the diabetic foot red flag, so the patient needs a physician assessment within 72 hours. No fever or open wound is described; a photo and answers to the questions would show whether this needs to be seen sooner.",
-    "safety_net": "If the redness spreads quickly, the foot becomes hot or very painful, you see pus or an open wound, or you get a fever or feel unwell, contact us right away or go to the nearest emergency department.",
-    "patient_message": "A Counsel physician will review your message within 24 hours, and you will be assessed within 72 hours. If the redness spreads quickly, the foot becomes hot or very painful, you see pus or an open wound, or you get a fever or feel unwell, contact us right away or go to the nearest emergency department.",
+    "time_sensitive": true,
+    "justification": "Flag diabetic_foot_redness: a spreading red patch on the foot in a patient who takes metformin (diabetes modifier) may be early cellulitis or a skin infection. Diabetic patients can deteriorate quickly with foot infections, so it should be assessed in person. The floor is within_few_days, but spreading redness over several days in a diabetic foot warrants a same-day exam. Not ed_now: no reported fever, severe pain, pus, black skin, red streaking, systemic symptoms or inability to walk. Not lower: waiting several days risks progression. The metformin renewal is routine, with a week of supply left, and can be handled at the same visit or alongside it.",
+    "safety_net": "Go to the ED or call 911 right away if you develop fever or chills, red streaks moving up the leg, rapidly spreading redness, severe pain, swelling, warmth, pus, blisters, dark or black skin, numbness, vomiting, confusion, or feel very unwell. Check your blood sugar more often, and do not let your metformin run out; contact the clinic again if the refill is not sent to the pharmacy within a few days.",
+    "patient_message": "You need to be seen in person today, within about 6 hours. A Counsel physician will review your message within 1 hour. Go to the ED or call 911 right away if you develop fever or chills, red streaks moving up the leg, rapidly spreading redness, severe pain, swelling, warmth, pus, blisters, dark or black skin, numbness, vomiting, confusion, or feel very unwell. Check your blood sugar more often, and do not let your metformin run out; contact the clinic again if the refill is not sent to the pharmacy within a few days.",
     "trace": {
       "input_sha256": "ecf36ef7fb05f5f14d4d6e189cac395ae9c4fd446ee8c5ace81ab10e54225a31",
       "policy_version": "0.1.0",
       "models": [
         {
-          "model": "synthetic/hand-written-primary",
-          "provider": "none"
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
         },
         {
-          "model": "synthetic/hand-written-secondary",
-          "provider": "none"
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
         }
       ],
-      "latency_ms": 0,
-      "raw": null
+      "latency_ms": 99141,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"present\",\"excerpt\":\"there's a red patch on top of my right foot that seems to be spreading since Monday\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":true,\"excerpt\":\"metformin\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[\"Do you have a fever, pain, warmth or swelling in the foot?\",\"Do you have diabetes, and have you noticed any open sores or blisters on the foot?\",\"Has the redness grown in size since you first noticed it?\"],\"photo_needed\":true,\"time_sensitive\":true}",
+        "primary": [
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot in a patient who takes metformin (diabetes modifier) may be early cellulitis or a skin infection. Diabetic patients can deteriorate quickly with foot infections, so it should be assessed in person. The floor is within_few_days, but spreading redness over several days in a diabetic foot warrants a same-day exam. Not ed_now: no reported fever, severe pain, pus, black skin, red streaking, systemic symptoms or inability to walk. Not lower: waiting several days risks progression. The metformin renewal is routine, with a week of supply left, and can be handled at the same visit or alongside it.\",\"safety_net\":\"Go to the ED or call 911 right away if you develop fever or chills, red streaks moving up the leg, rapidly spreading redness, severe pain, swelling, warmth, pus, blisters, dark or black skin, numbness, vomiting, confusion, or feel very unwell. Check your blood sugar more often, and do not let your metformin run out; contact the clinic again if the refill is not sent to the pharmacy within a few days.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot since Monday in a patient on metformin (diabetes modifier) could be early cellulitis or a diabetic foot infection, which can progress quickly because of neuropathy and impaired healing. This is above the floor of within_few_days because spreading redness in a diabetic needs an exam soon, not days later. Not ed_now or call_911 because no fever, severe pain, pus, black skin, red streaking, or systemic symptoms are reported. Not physician_contact_today alone because the lesion needs in-person inspection to assess depth, warmth, and skin breaks. The metformin renewal is routine; with about a week of tablets left it can be handled at the same visit or by the clinic.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, red streaks up the leg, rapid spread of redness, severe pain, swelling, pus, a foul smell, blistering, dark or black skin, numbness, confusion, vomiting, or feel very unwell. Do not wait for the appointment if it worsens. Check your feet daily and avoid the new shoes until it is examined. Contact the clinic if the metformin renewal is not sorted before you run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient on metformin (diabetes modifier) since Monday could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes and cause serious complications. The floor is within_few_days, but spreading redness warrants a same-day exam to assess for infection, check for wounds or neuropathy, and decide on treatment. Not one level higher (ed_now): no reported fever, severe pain, drainage, black or numb skin, red streaking, or systemic illness. Not one level lower (physician_contact_today): a virtual visit cannot reliably assess the extent of spread, warmth, or skin breaks. The metformin refill is routine; a week of supply remains, and it can be renewed alongside this visit.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, red streaks up the leg, rapidly spreading redness, severe pain, swelling, pus, blisters, dark or black skin, numbness, feeling very unwell, confusion, or vomiting. Do not wait for the appointment if things worsen. Mark the edge of the redness with a pen to track spread, and avoid the new shoes until it is evaluated. Request your metformin refill at the same visit, and contact the clinic if the pharmacy has not received it before you run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier: diabetes, on metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes because of neuropathy and impaired healing. The floor is within_few_days, but spreading redness over several days warrants a same-day look, so I chose a level above the floor. Not ed_now or call_911: no fever, severe pain, pus, black skin, red streaking, or systemic symptoms are reported. Not physician_contact_today or lower: a virtual conversation cannot assess the extent of spread, warmth, skin breaks, or perfusion. The metformin renewal is routine and can be handled with a bridging refill, since about a week of tablets remains.\",\"safety_net\":\"Go to the ED now if you develop fever or chills, red streaks up the leg, rapidly expanding redness, severe pain, swelling, pus, a blister or open sore, black or numb skin, or you feel generally unwell, confused, or very weak. Check your blood sugar if you can; contact us right away if readings run unusually high. Do not wait for the metformin renewal: we will address it, and if you run low before it is sent, contact the clinic or pharmacy.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient on metformin (diabetes modifier) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes. The floor is within_few_days, but spreading redness over several days in a diabetic foot warrants same-day in-person exam to assess for infection, perfusion and neuropathy. Not ed_now: no reported fever, severe pain, pus, black skin, red streaking, or feeling systemically unwell. Not lower (within_few_days or physician_contact_today): the redness is progressing and cannot be assessed remotely. The metformin renewal is routine; about a week of supply remains, so it can be handled at the same visit or by the clinic.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, red streaks up the leg, rapidly spreading redness, severe pain, swelling, pus, blisters, black or dusky skin, numbness, feeling very unwell, confusion, vomiting, or fast breathing. Do not wait for the appointment if any of these occur. Check your blood sugar if you can, and make sure the metformin renewal is sorted before your tablets run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier diabetes, on metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly in people with diabetes. Spreading since Monday argues against simple shoe irritation. This is above the floor of within_few_days because spreading redness over several days needs hands-on exam today (skin, pulses, sensation, signs of infection) rather than waiting. Not ed_now because there is no reported fever, severe pain, pus, red streaking, black skin, systemic illness or inability to walk, so emergency care is not clearly required. Not physician_contact_today alone because a virtual visit cannot adequately assess the lesion. The metformin renewal is routine with a week of supply left and can be handled at the same time.\",\"safety_net\":\"Go to the ED or call 911 right away if you develop fever or chills, feeling very unwell, red streaks up the leg, rapidly expanding redness, severe or increasing pain, swelling, warmth, pus or drainage, blisters, black or dusky skin, numbness, confusion, or if you cannot walk on the foot. Do not wait for the appointment if any of these occur. Until you are seen, avoid the new shoes, keep the foot clean and dry, and do not pop or scratch the area. Also tell us if you run low on metformin before the refill is processed.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier diabetes, on metformin) could be early cellulitis or a diabetic foot infection. These can progress quickly in diabetic patients, so it should be examined in person soon. Not one level higher (ed_now): no reported fever, severe pain, drainage, black skin, red streaking, or systemic symptoms, and the patient sounds otherwise well. Not one level lower (within_few_days, the floor): the redness is actively spreading over several days in a diabetic patient, so waiting several days is unsafe, and an exam today is more appropriate than a virtual conversation. The metformin renewal is routine; the patient has a week of tablets left, and the same dose can be renewed by the clinician at the visit.\",\"safety_net\":\"Go to the emergency department or call 911 right away if you develop fever or chills, feel unwell or confused, notice red streaks moving up the leg, rapidly spreading redness, severe or worsening pain, swelling, pus or drainage, blisters, dark or black skin, numbness, or a foot that feels cold or looks pale or blue. Do not wait for the appointment if any of these occur. Until you are seen, avoid the new shoes, keep the foot clean and dry, do not walk barefoot, and do not pop blisters or apply creams without advice.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to be diabetic (metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes. The floor is within_few_days, but a spreading lesion over several days warrants a same-day exam to assess for infection, check for wounds or neuropathy, and decide on treatment. Not one level higher (ed_now): there is no reported fever, severe pain, pus, black skin, red streaking or systemic illness. Not one level lower (physician_contact_today or within_few_days): a virtual visit cannot properly examine the skin or foot, and waiting risks deeper infection. The metformin renewal is routine; about a week of supply remains, so it can be handled at the same visit or by a refill request.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, feel very unwell or confused, notice redness spreading quickly or red streaks up the leg, or have severe pain, swelling, blistering, pus, black or purple skin, or numbness in the foot. Check your feet daily and avoid the new shoes until it is seen. Make sure the metformin refill is sent before your tablets run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Spreading redness on the foot of a patient who appears to be diabetic (on metformin) is concerning for early cellulitis or diabetic foot infection (diabetic_foot_redness, diabetes modifier). Diabetic patients can deteriorate quickly with foot infections, and spread over several days is more than a minor shoe irritation. The floor is within_few_days, but progression since Monday warrants a same-day look to assess for infection, check for wounds or neuropathy, and decide on antibiotics. Not ed_now because there is no reported fever, severe pain, rapid streaking, drainage, systemic symptoms or black/necrotic skin. Not physician_contact_today alone because the lesion needs visual and physical examination. The metformin refill is routine, with about a week left, and can be handled in the same encounter.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, red streaks up the leg, rapid spread of redness, severe or increasing pain, swelling, pus or drainage, skin turning dark or blistering, numbness, confusion, vomiting, or feel very unwell. Check your feet daily, avoid the new shoes, and do not let the metformin run out; confirm the refill is sent to your pharmacy.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier diabetes, on metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly with neuropathy and impaired healing. Spreading since Monday over several days argues against a simple shoe irritation. Not one level higher (ed_now): no reported fever, severe pain, pus, black skin, red streaking, or systemic illness. Not one level lower (physician_contact_today or within_few_days): the spreading redness needs a hands-on exam to assess for infection, and delay risks complications. The floor is within_few_days, and this is above it. The metformin renewal is routine, with a week of supply left, and can be handled at the same time.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, feel unwell or confused, notice red streaks up the leg, rapidly spreading redness, severe pain, swelling, blistering, pus, a foul smell, dark or black skin, or an open sore. Also seek care if you have numbness in the foot or very high blood sugars. Avoid the new shoes until it is examined and check both feet daily. Your metformin renewal will be handled, so please do not let your supply run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot since Monday in a patient on metformin (diabetes modifier) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes, with possible neuropathy masking symptoms. This is above the within_few_days floor because spreading redness warrants a same-day foot exam, and the message gives no details on fever, pain, warmth, skin breaks, or glucose control. Not ed_now or call_911, since there are no reported systemic symptoms, severe pain, fever, red streaking, or rapid progression. Not physician_contact_today, because a virtual visit cannot assess the extent or depth of the spread. The metformin renewal (about a week left) is routine and can be handled at the same visit or by the physician.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, red streaks up the leg, rapidly spreading redness, severe pain or swelling, pus, a blackened or numb area, a foot that is hot and very tender, confusion, vomiting, or you feel very unwell. Check your blood sugar if you can; very high readings are another reason to seek care sooner. Do not let the metformin run out; confirm the renewal with your pharmacy within a few days.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient on metformin (diabetes modifier) since Monday could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes. The floor is within_few_days, but spreading redness warrants same-day in-person examination to assess for infection, check for wounds or neuropathy, and decide on treatment. Not one level higher (ed_now): no fever, systemic symptoms, pain severity, open wound, pus, or rapid streaking is reported. Not one level lower (physician_contact_today or within_few_days): a virtual visit cannot adequately assess spread, warmth, skin breaks or perfusion, and waiting days risks progression. The metformin renewal is routine (about a week of supply left) and can be handled at the same time.\",\"safety_net\":\"Go to the emergency department or call 911 if you develop fever or chills, red streaks moving up the leg, rapidly increasing redness, swelling, severe pain, pus, blisters, black or numb skin, a foot wound, feeling very unwell, confusion, or vomiting. Do not wait if the redness spreads quickly. Also contact the clinic if your metformin supply runs low before the refill is processed.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier diabetes, on metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly with neuropathy or poor circulation. This is above the floor of within_few_days because spreading redness over several days warrants same-day examination rather than waiting. Not ed_now or higher because there is no reported fever, severe pain, pus, black skin, red streaking, or systemic illness. Not physician_contact_today because the foot needs to be examined in person to assess for infection and ulcers. The metformin renewal is routine, and about a week of supply remains, so it can be handled alongside this visit.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, feeling very unwell, red streaks up the leg, rapidly spreading redness, severe pain, swelling, pus, a foul smell, blistering, black or dusky skin, numbness, or confusion. Do not wait for the visit if any of these happen. Check your feet daily, avoid the new shoes until this is assessed, and request the metformin refill now so you do not run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier diabetes, on metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly given the risk of neuropathy, poor perfusion and impaired healing. Spreading since Monday suggests progression over several days, so a delay of a few days (the floor) is not safe. Not one level higher (ed_now): no reported fever, severe pain, pus, black or necrotic skin, red streaking, or systemic illness, so emergency care is not clearly needed now. Not one level lower (physician_contact_today): a virtual conversation cannot adequately assess spread, warmth, skin breaks, pulses or sensation, and an exam is needed to decide on antibiotics. The metformin renewal (about a week left) is routine and can be handled at the same time.\",\"safety_net\":\"Go to the emergency department or call 911 right away if you develop fever or chills, feel unwell or confused, the redness spreads quickly or forms red streaks up the leg, or the foot becomes very painful, swollen, hot, blistered, or has pus, a foul smell, or dark or black skin. Check your blood sugar if you can and seek care sooner if it is unusually high. Do not wait until the end of your metformin supply to get the refill sorted out. Avoid the new shoes until the foot has been examined.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient on metformin (diabetes modifier) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes. Not one level higher (ed_now): no reported fever, severe pain, pus, black or necrotic skin, red streaking, or systemic symptoms, so emergency care is not clearly needed. Not one level lower (physician_contact_today or within_few_days): spreading erythema over several days needs a hands-on exam to assess for infection, perfusion and neuropathy, which a virtual visit cannot do. The floor is within_few_days and this is above it. The metformin renewal is routine and can be handled at the same time, since about a week of supply remains.\",\"safety_net\":\"Go to the emergency department or call 911 right away if you develop fever or chills, red streaks moving up the leg, rapidly spreading redness, severe or increasing pain, swelling, pus, blistering, black or dusky skin, numbness, feeling very unwell, confusion, or vomiting. Do not wait for your appointment if any of these occur. Until you are seen, avoid the new shoes, keep the foot clean and dry, and do not walk barefoot. Mark the edge of the redness with a pen to track spread. Your metformin will be renewed so you do not run out, so keep taking it as prescribed.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient on metformin (diabetes modifier) could be early cellulitis or a diabetic foot infection, which can progress quickly given diabetic vascular and neuropathic risk. The patient attributes it to new shoes, but spread over several days warrants hands-on exam today. Not one level higher (ed_now): no reported fever, severe pain, pus, black skin, red streaking, or systemic symptoms, so the patient is not clearly unstable. Not one level lower (physician_contact_today or within_few_days): spreading erythema cannot be assessed reliably by message, and a delay of days risks worsening infection. The metformin renewal is routine, with a week of supply left, and can be handled at the same time.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, red streaks up the leg, rapidly spreading redness, severe pain, swelling, pus, blistering, dark or black skin, numbness, feeling very unwell, confusion, or vomiting. Do not walk barefoot, and avoid the new shoes until the foot has been examined.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier diabetes, on metformin) raises concern for early cellulitis or infection, which can progress quickly in diabetics. This is above the floor of within_few_days because the redness is actively spreading over several days and needs prompt examination to assess for infection, ulcer or poor perfusion. Not one level higher (ed_now): no reported fever, severe pain, pus, black skin, systemic symptoms or inability to walk. Not one level lower (physician_contact_today or within_few_days): visual and tactile assessment is needed and a virtual visit cannot reliably exclude cellulitis. The metformin renewal is routine, with about a week left, and can be handled at the same time.\",\"safety_net\":\"Go to the emergency department or call 911 right away if you develop fever or chills, rapidly spreading redness or red streaks up the leg, increasing swelling, severe pain, pus, blisters, dark or black skin, numbness, feeling very unwell, confusion, or vomiting. Check your feet daily and check your blood sugar if you have a meter. Avoid the new shoes until your foot is examined. Contact the clinic if the metformin is not renewed within a couple of days.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient on metformin (diabetes modifier) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetes. The floor is within_few_days, but spreading redness over several days warrants in-person assessment today. Not one level higher (ed_now): no reported fever, severe pain, pus, black or necrotic skin, red streaking, or systemic illness. Not one level lower (physician_contact_today or within_few_days): a virtual visit cannot assess extent, warmth, wounds, perfusion, or sensation, and delay risks worsening infection. The metformin renewal is routine with about a week of supply left, so it can be handled alongside this visit.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, feel very unwell, have rapidly spreading redness, red streaks up the leg, severe pain, swelling, pus, blistering, dark or black skin, numbness, or confusion. Mark the edge of the redness with a pen to track spread, and don't walk barefoot or wear the new shoes until it is checked. Contact the clinic if the metformin prescription is not sorted before you run out.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (modifier: diabetes, on metformin) could be early cellulitis or a diabetic foot infection, which can progress quickly in diabetics. Spreading since Monday indicates progression, so waiting a few days (the floor) is not safe enough. Not one level lower: a same-day in-person exam is needed to assess for infection, neuropathy, and perfusion, and a message-only exchange cannot do that. Not one level higher (ed_now): no systemic symptoms, fever, severe pain, drainage, black or dusky skin, or rapid streaking are reported, so emergency care is not clearly required unless these develop. The metformin renewal (about 1 week left) is a routine matter and can be handled at the same visit or by the clinic.\",\"safety_net\":\"Go to the ED now or call 911 if you develop fever or chills, feeling very unwell, confusion, rapidly spreading redness or red streaks up the leg, severe pain, swelling, warmth, pus or drainage, blisters, black or dusky skin, or numbness. Until you are seen, avoid the new shoes, keep the foot clean and dry, and check both feet daily. Do not let the metformin run out; the clinic will arrange the renewal.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag diabetic_foot_redness: a spreading red patch on the foot of a patient who appears to have diabetes (metformin use) could be early cellulitis or a skin infection, which can progress quickly in diabetes. The floor is within_few_days, but spreading redness over several days warrants same-day examination. Not ed_now because there is no reported fever, severe pain, pus, black or numb skin, or feeling unwell. Not physician_contact_today alone because the foot needs to be seen to judge spread, warmth and wound status, and a virtual conversation cannot do that. Not within_few_days because the redness is actively spreading. The metformin renewal is routine and can be handled at the same time, since a week of supply remains.\",\"safety_net\":\"Go to the emergency department now or call 911 if you develop fever or chills, the redness spreads quickly or up the leg, the foot becomes very painful, swollen, hot, or blistered, you see pus, an open sore, or dark or black skin, you notice numbness, or you feel confused, faint, or very unwell. Do not let your metformin run out; the renewal will be processed, and contact the clinic if the pharmacy has not received it within a couple of days.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Patient has diabetes mellitus (diabetes) and reports a spreading red patch on their foot (diabetic_foot_redness). Given the high risk of rapid progression, deep tissue involvement, and complications from diabetic foot infections, this requires an in-person assessment today. ED now is not required as there are no systemic symptoms such as fever, chills, or signs of severe sepsis reported. Within a few days is too delayed given the actively spreading erythema on a diabetic extremity.\",\n  \"safety_net\": \"Please seek emergency care immediately if you develop fever, chills, nausea, confusion, worsening or severe pain, dark discoloration or blistering of the skin, foul-smelling drainage, or rapidly spreading redness.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on diabetic_foot_redness and diabetes, a spreading red patch on the foot of a diabetic patient requires prompt evaluation to rule out rapidly progressing cellulitis or deep space infection. Why not ed_now: no reported systemic symptoms such as fever, chills, altered mental status, or rapidly ascending streaking/necrosis. Why not within_few_days: delaying evaluation carries a high risk of rapid tissue deterioration and limb-threatening complications in patients with diabetes.\",\n  \"safety_net\": \"Please seek emergency care immediately if you develop fever, chills, nausea, dizziness, pus or foul-smelling drainage from the foot, black or blue skin changes, or rapidly spreading redness/swelling.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on diabetic_foot_redness and diabetes, a spreading erythematous lesion on the foot of a diabetic patient raises concern for cellulitis or early diabetic foot infection. In-person assessment today is necessary because diabetic foot infections can advance rapidly without prompt evaluation and antibiotics. Not one level higher (ed_now) as there are no systemic symptoms (e.g., fever, chills, confusion), severe pain, or signs of necrotizing infection. Not one level lower (within_few_days) because delaying care several days in a diabetic patient with an actively spreading foot lesion carries a high risk of limb-threatening progression.\",\n  \"safety_net\": \"Please be seen at the clinic or an urgent care clinic today. Go to the nearest emergency department immediately if you develop a fever, chills, nausea, worsening severe pain, rapidly spreading redness, red streaks moving up your leg, blisters, dark/black discoloration, or drainage from the area.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient has diabetes (taking metformin) and reports a spreading red patch on the foot (flag diabetic_foot_redness), which raises concern for an acute diabetic foot infection such as cellulitis. In-person assessment today is needed because diabetic foot infections can progress rapidly and require physical exam and timely treatment. ED now is not required as there are no reported systemic symptoms (such as fever, chills, or severe pain), while waiting within a few days is unsafe due to the risk of significant progression.\",\n  \"safety_net\": \"Please be seen in the clinic today. Seek emergency care immediately if you develop fever, chills, nausea, red streaks spreading up your leg, severe or worsening pain, pus drainage, or black/purple discoloration of the skin.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on diabetic_foot_redness in the presence of diabetes. Spreading erythema on the foot of a diabetic patient raises concern for cellulitis or early diabetic foot infection, requiring a timely physical exam today to evaluate for skin breakdown, assess perfusion, and initiate appropriate treatment. ED is not immediately indicated given the absence of systemic signs (fever, chills) or severe rapidly ascending infection; waiting a few days is unsafe due to the high risk of rapid progression and limb-threatening complications in diabetic foot infections.\",\n  \"safety_net\": \"Please come in for an evaluation today. Go to the nearest emergency department immediately if you develop a fever, chills, red streaks spreading up your leg, severe pain, pus or drainage, numbness, or if you feel generally unwell.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on diabetic_foot_redness and diabetes, spreading erythema on the foot of a diabetic patient raises concern for cellulitis or an evolving diabetic foot infection, requiring prompt evaluation in person today. Higher disposition (ed_now) is not required because there are no reported systemic symptoms such as fever, chills, severe pain, or rapidly advancing necrosis. Lower disposition (within_few_days) is unsafe due to the risk of rapid progression and limb-threatening complications associated with diabetic soft-tissue infections.\",\n  \"safety_net\": \"Please seek emergency care immediately at the nearest emergency department if you develop a fever, chills, nausea, red streaks spreading up your leg, severe or worsening pain, pus or drainage, or numbness/blackening of the skin.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on diabetic_foot_redness and diabetes. Spreading erythema on the foot of a patient with diabetes warrants an in-person physical exam today to evaluate for acute cellulitis or deep tissue infection and start prompt treatment. ED is not immediately indicated given the absence of systemic symptoms like fevers, chills, or severe pain. Waiting within a few days is unsafe due to the risk of rapid progression in diabetic extremities.\",\n  \"safety_net\": \"Please be seen in the clinic today. If you develop fevers, chills, red streaks spreading up your leg, severe pain, blistering, or drainage from the area before you are seen, proceed immediately to the nearest emergency department.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient reports a spreading red patch on the foot with concurrent diabetes (diabetic_foot_redness, diabetes). Diabetic foot infections carry high risk for rapid progression, deep-tissue involvement, and limb-threatening complications, warranting prompt in-person assessment today. ED now is not required in the absence of severe pain, systemic toxicity, fever, or signs of necrotizing infection. Within a few days is unsafe due to the risk of significant clinical deterioration while waiting.\",\n  \"safety_net\": \"Please seek emergency care immediately if you develop a fever, chills, nausea, confusion, rapidly expanding redness or swelling, blisters, black discoloration, pus drainage, or severe foot pain.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on diabetic_foot_redness in the context of diabetes. An expanding red lesion on a diabetic foot carries a high risk of rapidly progressive cellulitis or deep tissue infection, necessitating an in-person physical exam today rather than waiting within a few days. An emergency department visit (ed_now) is not immediately required as there are no reported systemic symptoms (e.g., fever, chills), severe pain, or drainage.\",\n  \"safety_net\": \"Seek immediate emergency care (ED) if you develop fever, chills, nausea, rapid spreading of the redness, severe pain, foul-smelling drainage, or if the foot becomes numb or discolored.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on diabetic_foot_redness and diabetes. In-person assessment today is indicated because spreading redness on the foot of a diabetic patient raises concern for cellulitis or early diabetic foot infection that requires physical examination and prompt management. ED now is not necessary as there are currently no signs of systemic toxicity, fever, or necrotizing infection. Physician contact today or within a few days is insufficient because physical inspection of the skin, pulses, and sensation cannot wait or be performed virtually.\",\n  \"safety_net\": \"Please seek emergency care immediately if you develop a fever, chills, nausea, confusion, worsening severe pain, rapidly spreading redness, red streaks, blistering, or foul-smelling drainage from the foot.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on diabetic_foot_redness and diabetes modifier. The patient has diabetes and describes a spreading area of redness on their foot, concerning for cellulitis or an evolving diabetic foot infection. An in_person_today exam is required to assess for skin breakdown, deep tissue involvement, and initiate timely antibiotics. ED now is not currently indicated as there are no systemic symptoms (e.g., fever, rigors) or signs of rapid necrotizing infection. Waiting within_few_days is unsafe given the high risk of rapid progression and limb-threatening complications in diabetic foot infections.\",\n  \"safety_net\": \"Please seek emergency care immediately if you develop high fevers, chills, nausea, dizziness, severe pain, swelling, drainage of pus, red streaks traveling up your leg, or areas that feel numb or blacken.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient has diabetes (taking metformin) and reports a spreading red patch on the foot (diabetic_foot_redness). In diabetic patients, soft-tissue foot infections can progress rapidly to deep-space infections or limb-threatening complications, requiring in-person evaluation today. ED now is not required as there are no reported systemic symptoms (fever, chills) or signs of necrotizing infection. Within a few days is inadequate given the active spread and high risk of rapid deterioration.\",\n  \"safety_net\": \"Please seek emergency care immediately if you develop a fever, chills, nausea, red streaks spreading up your leg, severe pain, foul-smelling drainage, or if the foot becomes numb or blackened.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on diabetic_foot_redness and diabetes, a spreading erythematous area on the foot of a diabetic patient warrants prompt physical examination to evaluate for cellulitis or early deep-tissue infection. Delaying to within_few_days carries high risk of rapid progression or complications in diabetic feet. However, ed_now is not currently required as there are no reported systemic symptoms such as fever, chills, severe intractable pain, or signs of necrotizing infection.\",\n  \"safety_net\": \"Please seek emergency care immediately at the nearest emergency department if you develop a fever, chills, nausea, confusion, rapidly expanding redness, pus or foul-smelling drainage, blistering, or worsening severe pain.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient has diabetes (on metformin) and reports a spreading red patch on the foot (flag diabetic_foot_redness), which presents a high risk for rapid progression of a diabetic foot infection or cellulitis. An in-person evaluation today is required to assess for deeper tissue involvement, perfusion, and initiate timely antibiotics. ED now is not required given the absence of systemic signs of infection (fever, chills), severe pain, or rapidly advancing necrosis. Waiting within a few days is unsafe due to the risk of limb-threatening progression.\",\n  \"safety_net\": \"Please be seen in person today for an evaluation of your foot. If you develop fever, chills, rapid spreading of the redness, severe or worsening pain, pus or drainage, or numbness/loss of feeling, proceed immediately to the nearest emergency department.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient has diabetes and describes a spreading red patch on the foot (diabetic_foot_redness, diabetes), which raises strong concern for cellulitis or diabetic foot infection requiring in-person assessment today. ED now is not currently required because there are no reported systemic symptoms (such as fever, chills, or altered mental status) or signs of severe necrotizing infection. Within a few days is inadequate because foot infections in diabetic patients can advance rapidly and risk serious complications if antibiotic therapy or wound care is delayed.\",\n  \"safety_net\": \"Please be seen in the clinic today. If you develop a fever, chills, red streaks spreading up your leg, severe pain, blister formation, blackened skin, or drainage from the area before your appointment, go to the nearest emergency department immediately.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient has diabetes (modifier: diabetes) and reports a spreading red patch on the foot (diabetic_foot_redness). Spreading erythema in a diabetic foot raises concern for cellulitis or soft tissue infection, requiring an in-person physical assessment today to evaluate depth, perfusion, and need for antibiotics. ED now is not required because there are no reported systemic symptoms (e.g., fever, rigors, lethargy) or signs of necrotizing infection. Within a few days is inadequate because diabetic foot infections can rapidly progress to limb-threatening complications.\",\n  \"safety_net\": \"Please seek care at an emergency department immediately if you develop a fever, chills, rapidly worsening redness or swelling, red streaks spreading up your leg, severe pain, blisters, or drainage/pus from the area.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient has diabetes (taking metformin) and reports a spreading red patch on the foot (flag diabetic_foot_redness), raising concern for diabetic foot cellulitis or infection. In_person_today is required rather than within_few_days because diabetic soft-tissue infections can progress rapidly and require urgent physical examination, wound inspection, and timely antimicrobial therapy. Ed_now is not currently required given the absence of systemic toxicity, fevers, severe pain, or rapidly advancing necrotizing signs.\",\n  \"safety_net\": \"Please be seen in person today. If you develop a fever, chills, worsening or severe pain, red streaks traveling up your leg, open sores, drainage/pus, or feel faint, go to the nearest emergency department immediately.\"\n}"
+        ]
+      }
     }
   }
 }

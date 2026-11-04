@@ -1,0 +1,436 @@
+{
+  "id": "walt-warfarin-head",
+  "label": "Walt, 70, on warfarin, hit his head",
+  "message": "This is Walt. I'm 70 and I take warfarin for my heart rhythm. Yesterday I hit my head on the kitchen cupboard door, pretty hard. There's a bump and a bit of a headache today but it's probably nothing. I didn't pass out. Just thought I'd mention it while I'm here.",
+  "recorded_at": "2026-11-04T15:47:28+00:00",
+  "early": {
+    "event": "early",
+    "floor": "ed_now",
+    "patient_message": "Go to the nearest emergency department now. A Counsel physician has been notified."
+  },
+  "result": {
+    "status": "needs_info",
+    "disposition": "ed_now",
+    "tier": "emergency",
+    "brief_label": "URGENT_ESCALATION",
+    "floor": "ed_now",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "present",
+        "excerpt": "I hit my head on the kitchen cupboard door, pretty hard",
+        "excerpt_verified": true
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [
+      {
+        "id": "age_65_plus",
+        "excerpt": "I'm 70",
+        "excerpt_verified": true
+      },
+      {
+        "id": "anticoagulation",
+        "excerpt": "I take warfarin",
+        "excerpt_verified": true
+      }
+    ],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 20,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      },
+      "secondary": {
+        "call_911": 0,
+        "ed_now": 18,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      }
+    },
+    "confidence": 1,
+    "human_review": {
+      "flagged": false,
+      "reasons": [
+        "missing_info"
+      ]
+    },
+    "info_requests": {
+      "questions": [
+        "Have you had any vomiting, confusion, drowsiness, or vision changes since the injury?",
+        "Is the headache getting worse?"
+      ],
+      "photo": false
+    },
+    "time_sensitive": true,
+    "justification": "Relied on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation; floor is ed_now. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk of delayed intracranial hemorrhage, which can occur even without loss of consciousness and with a minor-seeming injury. This needs prompt head CT and INR check, which cannot be done by phone or in a routine clinic visit. Not one level higher (call_911) because he is awake, communicating, did not lose consciousness, and reports no confusion, repeated vomiting, weakness or worsening symptoms, so he can be driven to the ED rather than needing an ambulance. Not lower (in_person_today or physician contact) because those levels cannot provide immediate CT imaging and would go below the floor.",
+    "safety_net": "Go to the ED now and have someone else drive you; do not drive yourself. Do not take aspirin or ibuprofen. Call 911 immediately if you become drowsy or hard to wake, confused, have a worsening or severe headache, repeated vomiting, a seizure, fainting, weakness or numbness, trouble speaking, vision changes, unequal pupils, or clear fluid or blood from the nose or ears, or if the bump rapidly swells.",
+    "patient_message": "Go to the nearest emergency department now. A Counsel physician has been notified. Go to the ED now and have someone else drive you; do not drive yourself. Do not take aspirin or ibuprofen. Call 911 immediately if you become drowsy or hard to wake, confused, have a worsening or severe headache, repeated vomiting, a seizure, fainting, weakness or numbness, trouble speaking, vision changes, unequal pupils, or clear fluid or blood from the nose or ears, or if the bump rapidly swells.",
+    "trace": {
+      "input_sha256": "dcb2f1aed7d2f9f6a19dbbd31ff756a9ad25092a4c5554e97ed9fcfd2dccd994",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        },
+        {
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 76743,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"present\",\"excerpt\":\"I hit my head on the kitchen cupboard door, pretty hard\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":true,\"excerpt\":\"I'm 70\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":true,\"excerpt\":\"I take warfarin\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[\"Have you had any vomiting, confusion, drowsiness, or vision changes since the injury?\",\"Is the headache getting worse?\"],\"photo_needed\":false,\"time_sensitive\":true}",
+        "primary": [
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation; floor is ed_now. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk of delayed intracranial hemorrhage, which can occur even without loss of consciousness and with a minor-seeming injury. This needs prompt head CT and INR check, which cannot be done by phone or in a routine clinic visit. Not one level higher (call_911) because he is awake, communicating, did not lose consciousness, and reports no confusion, repeated vomiting, weakness or worsening symptoms, so he can be driven to the ED rather than needing an ambulance. Not lower (in_person_today or physician contact) because those levels cannot provide immediate CT imaging and would go below the floor.\",\"safety_net\":\"Go to the ED now and have someone else drive you; do not drive yourself. Do not take aspirin or ibuprofen. Call 911 immediately if you become drowsy or hard to wake, confused, have a worsening or severe headache, repeated vomiting, a seizure, fainting, weakness or numbness, trouble speaking, vision changes, unequal pupils, or clear fluid or blood from the nose or ears, or if the bump rapidly swells.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on flags anticoagulated_head_injury, anticoagulation and age_65_plus. A 70-year-old on warfarin who hit his head 'pretty hard' and now has a headache and a scalp bump is at risk of delayed intracranial hemorrhage, even without loss of consciousness. Guidelines call for prompt head CT and INR assessment, which cannot be done by message or a virtual visit. The floor is ed_now, so I did not go lower. I did not choose call_911 because he is awake, communicating, did not pass out, and reports no confusion, weakness, repeated vomiting or worsening neurologic symptoms, so he can get to the ED himself, preferably with someone driving him and not driving himself.\",\"safety_net\":\"Go to the ED now and tell staff you take warfarin. Do not drive yourself if you can avoid it. Call 911 right away if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness or difficulty waking, fainting, a seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or a growing swelling on your head. Do not take aspirin or ibuprofen for the headache, and do not skip or change your warfarin dose unless the ED or your physician tells you to.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relies on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation, with floor ed_now. A 70-year-old on warfarin who hit his head hard and now has a new headache is at risk of delayed intracranial hemorrhage, even without loss of consciousness. This needs same-day head CT and INR, which cannot be done by message or virtual visit. Not one level lower (in_person_today or physician contact): an urgent clinic visit usually cannot get a CT and INR, and the floor forbids going below ed_now. Not call_911: he is awake, communicating and has no reported confusion, weakness, repeated vomiting, seizure or drowsiness, so he can be driven to the ED by someone else.\",\"safety_net\":\"Go to the ED now and have someone else drive; do not drive yourself. Tell them you take warfarin. Call 911 right away if you become drowsy or confused, have a worsening headache, repeated vomiting, a seizure, weakness or numbness, trouble speaking, vision changes, unequal pupils, fainting, or clear fluid or blood from the nose or ears. Do not take aspirin or ibuprofen, and do not skip or double warfarin doses until a clinician advises you.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin who hit his head hard yesterday and now has a headache is at risk of delayed intracranial hemorrhage, even without loss of consciousness. This needs same-day head imaging and an INR check, which only an ED can provide. The floor is ed_now, so I cannot go lower. Not one level higher (call_911) because he is awake, communicating, and has no reported confusion, weakness, repeated vomiting, or decreased consciousness, so he can get there himself, ideally with someone else driving. Not lower (in_person_today or physician_contact_today) because those cannot provide urgent CT and coagulation testing.\",\"safety_net\":\"Go to the ED now and have someone else drive if possible; do not drive yourself if your headache is worsening or you feel unwell. Tell the staff you take warfarin. Call 911 immediately if you develop confusion, unusual drowsiness or difficulty staying awake, fainting, a seizure, repeated vomiting, a worsening or severe headache, weakness or numbness, trouble speaking, vision changes, loss of balance, or clear fluid or blood from the nose or ears. Do not take aspirin or ibuprofen for the headache.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on flags anticoagulated_head_injury, anticoagulation and age_65_plus. A 70-year-old on warfarin who hit his head hard yesterday and now has a new headache and a scalp bump is at risk of delayed intracranial hemorrhage, which can develop hours to days after injury even without loss of consciousness. He needs urgent head imaging and an INR check, which only an ED can do promptly. The floor is ed_now. Not one level higher (call_911) because he is awake, did not pass out, and reports no neurologic deficits, so he can get to the ED himself, preferably with someone else driving. Not lower because a virtual or routine visit cannot rule out a bleed, and his own view that it is probably nothing does not outweigh the risk.\",\"safety_net\":\"Go to the ED now and tell staff you take warfarin. Do not drive yourself if you feel unwell, and have someone go with you if possible. Call 911 immediately if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness, trouble waking, fainting, a seizure, weakness or numbness, slurred speech, vision changes, loss of balance, or a growing swelling at the injury site. Do not take aspirin or ibuprofen for the headache, and do not skip or change warfarin doses unless a physician tells you to.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now and I agree. Flag anticoagulated_head_injury: 70-year-old (age_65_plus) on warfarin (anticoagulation) with a forceful head strike yesterday and a new headache today. This carries a risk of delayed intracranial hemorrhage, which can develop even without loss of consciousness, and it needs prompt head CT and INR check. Not one level lower (in_person_today or a virtual contact): that would not guarantee immediate imaging, and the headache could signal bleeding. Not call_911: he is awake, did not pass out, and reports no confusion, weakness, or vomiting, so he can be driven to the ED by someone else rather than needing an ambulance.\",\"safety_net\":\"Go to the ED now and do not drive yourself if you can avoid it; have someone take you. Tell staff you take warfarin. Call 911 immediately if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness, trouble speaking, weakness or numbness, vision changes, loss of balance, a seizure, or fainting. Do not take aspirin or ibuprofen for the headache.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on flags anticoagulated_head_injury, anticoagulation and age_65_plus. A 70-year-old on warfarin who hit his head hard yesterday and now has a headache and a bump is at risk of delayed intracranial hemorrhage, even without loss of consciousness. He needs urgent head imaging and an INR check, which requires an ED. Not one level lower (in_person_today or a virtual contact): neither can provide CT or INR, and the floor is ed_now. Not call_911: he is awake, communicating and has no reported confusion, weakness, vomiting, seizure or worsening symptoms. He can get to the ED himself, but should not drive if the headache is significant, and someone should accompany him.\",\"safety_net\":\"Call 911 right away if he has worsening or severe headache, repeated vomiting, confusion, unusual drowsiness, trouble speaking, weakness or numbness, vision changes, loss of balance, seizure, fainting, or clear fluid or blood from the nose or ears. Do not take aspirin or ibuprofen, and do not skip or double any warfarin dose until the ED team has advised him. Tell the ED staff that he takes warfarin.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk for delayed intracranial hemorrhage, which can occur even with no loss of consciousness and mild symptoms. This needs urgent head CT and an INR check, which cannot be done by message or a virtual visit. The floor is ed_now, so I cannot go lower (in_person_today or physician_contact_today would be too little). Not call_911 because he is awake, communicating, and has no reported confusion, weakness, repeated vomiting, seizure, or worsening neurologic symptoms, so he can get to the ED himself, ideally with someone else driving him.\",\"safety_net\":\"Go to the ED now and do not drive yourself if you can avoid it. Call 911 immediately if you develop worsening or severe headache, repeated vomiting, drowsiness or trouble staying awake, confusion, slurred speech, weakness or numbness, vision changes, a seizure, loss of consciousness, or unequal pupils. Do not take any extra warfarin, aspirin, or NSAIDs before being evaluated, and tell the ED staff you take warfarin.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relies on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk for delayed intracranial hemorrhage, which can occur even with no loss of consciousness and mild symptoms. Evaluation needs a head CT and an INR check, which cannot be done by message or virtual visit. Not one level lower (in_person_today or below): that would fall below the ed_now floor and a clinic visit may not offer CT imaging. Not one level higher (call_911): he is awake, communicating, and has no reported confusion, repeated vomiting, weakness, or drowsiness, so he can get to the ED himself, though someone else should drive him.\",\"safety_net\":\"Go to the ED now and do not drive yourself; have someone take you. Call 911 right away if you become drowsy or hard to wake, confused, have a worsening or severe headache, repeated vomiting, a seizure, weakness or numbness, trouble speaking, vision changes, unequal pupils, fainting, or clear fluid or blood from the nose or ears. Do not take aspirin or NSAIDs, and tell the ED staff that you take warfarin.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now and I agree. Flags: anticoagulated_head_injury, with modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin who hit his head hard and now has a headache is at risk of delayed intracranial hemorrhage. That can happen even without loss of consciousness and with minimal symptoms. He needs prompt evaluation with head CT and possibly an INR check, which can't be done by message or virtual visit. Not one level higher (call_911): he is awake, communicating, and has no reported confusion, vomiting, weakness, or decreased consciousness, so he can get to the ED himself as long as someone else drives him. Not one level lower (in_person_today): a clinic visit may not have immediate CT or reversal capability, and the risk of delayed bleed warrants the ED.\",\"safety_net\":\"Go to the ED now and don't drive yourself. Have someone take you. Call 911 right away if you become drowsy or hard to wake, confused, or have a worsening or severe headache, repeated vomiting, a seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or fainting. Do not take extra warfarin, aspirin, or NSAIDs before being seen. Tell the ED staff you take warfarin.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now and I agree. Flag anticoagulated_head_injury: a 70-year-old (age_65_plus) on warfarin (anticoagulation) hit his head hard yesterday and now has a bump and a new headache. This raises the risk of delayed intracranial hemorrhage, which can appear hours to days after the injury even when the patient did not lose consciousness and feels fine. He needs prompt head CT and an INR check, which cannot be done by message or by phone. Not one level lower (in_person_today or physician contact): an ED is the setting that can do immediate CT imaging and INR testing and reverse anticoagulation if needed. Not one level higher (call_911): he is awake, communicating, has not passed out, and reports no neurologic deficits, so he can be driven to the ED rather than needing an ambulance, as long as he stays stable.\",\"safety_net\":\"Go to the ED now and do not drive yourself if you feel unwell; have someone take you. Tell them you take warfarin and describe the head injury. Call 911 right away if you develop worsening or severe headache, repeated vomiting, confusion, unusual sleepiness or trouble waking, fainting, seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or if the bump swells quickly. Do not take aspirin or ibuprofen, and do not take extra warfarin.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relies on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk of delayed intracranial hemorrhage, which can be present even when the patient feels fine and did not lose consciousness. He needs urgent head imaging and an INR check, which cannot be done by message or virtual visit. This matches the floor of ed_now. Not call_911 because he is awake, communicating, and has no reported confusion, vomiting, weakness, seizure, or worsening neurologic symptoms, so he can get to the ED himself, ideally with someone else driving. Not lower (in_person_today or physician_contact_today) because those levels cannot guarantee same-day CT and reversal capability, and the floor forbids going below ed_now.\",\"safety_net\":\"Go to the ED now and do not drive yourself if you can avoid it; have someone take you. Tell them you take warfarin and hit your head yesterday. Call 911 immediately if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness or trouble staying awake, fainting, a seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or clear fluid or blood from the nose or ears. Do not take extra warfarin, aspirin, or NSAIDs until you have been evaluated.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relies on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk of delayed intracranial hemorrhage, which can occur even with no loss of consciousness and mild symptoms. This needs urgent head imaging and an INR check, which cannot be done by message or a virtual visit. Not one level lower (in_person_today or physician_contact_today) because the floor is ed_now and those options cannot provide CT imaging and INR testing. Not call_911 because the patient is awake, alert, wrote a coherent message, and reports no loss of consciousness or neurologic deficits, so he can get to the ED himself, ideally driven by someone else.\",\"safety_net\":\"Go to the ED now and have someone else drive you if possible. Do not take any more warfarin until you've been evaluated, unless told otherwise by a clinician. Call 911 right away if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness or trouble staying awake, fainting, seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or if the bump swells quickly or you have any bleeding that won't stop.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now and I agree. Flag anticoagulated_head_injury: a 70-year-old (age_65_plus) on warfarin (anticoagulation) hit his head hard yesterday and now has a bump and a new headache. This raises concern for delayed intracranial hemorrhage, which can appear hours to days after injury even without loss of consciousness. He needs urgent head imaging (CT) and an INR check, which only an ED can provide. Not one level lower (in_person_today or a virtual contact): neither can provide immediate CT, and the absence of syncope and the patient's own view that it is 'probably nothing' do not rule out bleeding. Not one level higher (call_911): he is currently awake, communicating and has no reported confusion, weakness, repeated vomiting, or drowsiness, so he can get to the ED himself, as long as someone else drives him.\",\"safety_net\":\"Go to the ED now and do not drive yourself; have someone take you. Tell them you take warfarin. Call 911 immediately if you become drowsy or hard to wake, confused, have a worsening or severe headache, repeated vomiting, a seizure, weakness or numbness, trouble speaking, vision changes, or fainting. Do not take any more warfarin, aspirin or ibuprofen until you have been assessed unless a clinician tells you to.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now. Relied on anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation: a 70-year-old on warfarin with a forceful head strike, a scalp bump and new headache today is at risk for delayed intracranial hemorrhage, which can occur even without loss of consciousness and with minimal symptoms. He needs urgent head CT and an INR check, which cannot be done by message or virtual visit. Not call_911 because he is awake, communicating, and has no reported confusion, weakness, vomiting, seizure or worsening symptoms, so he can be driven to the ED. Not lower than ed_now because the floor forbids it and in-person-today or phone contact would not provide imaging or INR.\",\"safety_net\":\"Go to the ED now, and have someone else drive you rather than driving yourself. Bring your medication list and tell staff you take warfarin. Call 911 immediately if you develop worsening or severe headache, repeated vomiting, confusion, unusual sleepiness or trouble waking, weakness or numbness, trouble speaking, vision changes, loss of balance, a seizure, fainting, or if the bump swells quickly or you notice any bleeding that won't stop.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on flags anticoagulated_head_injury, anticoagulation and age_65_plus. A 70-year-old on warfarin who hit his head hard and now has a headache is at risk for delayed intracranial hemorrhage, even without loss of consciousness and with the injury a day ago. He needs urgent head CT and an INR check, which are not possible by message or virtual visit. This matches the floor of ed_now. Not call_911 because he is awake, communicating, and has no reported confusion, weakness, vomiting, or worsening symptoms, so he can get to the ED himself, though he should not drive if symptoms worsen. Not lower than ed_now because the floor forbids it and the risk of missing a bleed is high.\",\"safety_net\":\"Go to the ED now and tell staff you take warfarin. Do not drive yourself if you feel dizzy or unwell; have someone take you. Call 911 right away if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness, trouble speaking, vision changes, weakness or numbness, loss of balance, a seizure, or fainting. Do not take aspirin or ibuprofen, and do not skip or change warfarin unless a clinician tells you to.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk of delayed intracranial hemorrhage, which can occur even without loss of consciousness and with minimal symptoms. He needs a prompt head CT and an INR check, which requires the ED. Not one level higher (call_911): he is awake, alert, and communicating, with no reported confusion, vomiting, weakness, or worsening symptoms, so he can get to the ED himself if someone else drives him. Not lower (in_person_today or below): the floor is ed_now, and a clinic visit usually cannot do emergent CT imaging.\",\"safety_net\":\"Go to the ED now and have someone else drive you rather than driving yourself. Tell the staff you take warfarin. Call 911 right away if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness or trouble staying awake, fainting, seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or bleeding from the nose or ears. Do not take aspirin or ibuprofen, and do not skip or adjust your warfarin without medical advice.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now and I agree with it. Flag anticoagulated_head_injury: a 70-year-old (age_65_plus) on warfarin (anticoagulation) hit his head hard yesterday and now has a bump and a new headache. This raises concern for delayed intracranial hemorrhage, which can present hours to days later even without loss of consciousness. He needs urgent head imaging and an INR check, which cannot be done by message or virtual visit. Not one level higher (call_911): he is awake, communicating, did not pass out, and has no reported neurologic deficit, vomiting, confusion or drowsiness, so he can get to the ED himself, but he should not drive if the headache worsens or he feels unwell. Not one level lower (in_person_today or below): clinic evaluation can't provide the immediate CT and coagulation testing needed, and delay risks missing a bleed.\",\"safety_net\":\"Go to the emergency department now, ideally with someone else driving you, and tell staff you take warfarin and hit your head. Call 911 right away if you develop worsening or severe headache, repeated vomiting, confusion, unusual sleepiness or trouble staying awake, fainting, seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or clear fluid or blood from the nose or ears. Do not take aspirin or ibuprofen, and do not skip evaluation even if you feel better.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Relied on red flag anticoagulated_head_injury plus modifiers age_65_plus and anticoagulation; floor is ed_now. A 70-year-old on warfarin with a forceful head strike and a new headache the next day is at risk of delayed intracranial hemorrhage, which can occur even without loss of consciousness and needs prompt head CT and INR assessment. Not one level lower (in_person_today or physician contact): a clinic visit or virtual conversation cannot provide the imaging needed and would only delay it. Not one level higher (call_911): he is alert, did not pass out, and reports only a mild headache with no stated neurologic deficits, so he can get to the ED himself, though he should not drive if symptoms worsen.\",\"safety_net\":\"Go to the ED now rather than waiting. Call 911 immediately if you develop worsening or severe headache, repeated vomiting, confusion, unusual drowsiness or difficulty staying awake, fainting, seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or a growing swelling at the injury. Do not take aspirin or ibuprofen, and do not skip or change warfarin on your own; tell the ED team you take warfarin and bring your medication list. Have someone else drive you or accompany you if possible.\"}",
+          "{\"disposition\":\"ed_now\",\"justification\":\"Floor is ed_now and I agree. A 70-year-old on warfarin (anticoagulation, age_65_plus) hit his head hard yesterday and now has a bump and headache (anticoagulated_head_injury). This carries a risk of delayed intracranial hemorrhage even without loss of consciousness and with minor-seeming symptoms. He needs urgent head CT and an INR check, which cannot be done by message or a virtual visit. Not one level lower (in_person_today or physician contact): those may not provide immediate CT and INR, and a delay risks missing a bleed. Not call_911: he is alert, communicating, and has no reported confusion, weakness, vomiting, or worsening symptoms, so he can be driven to the ED by someone else.\",\"safety_net\":\"Go to the ED now and do not drive yourself; have someone take you. Tell staff you take warfarin. Call 911 right away if you develop severe or worsening headache, repeated vomiting, confusion, unusual drowsiness or trouble staying awake, fainting, seizure, weakness or numbness, trouble speaking, vision changes, loss of balance, or bleeding from the nose or ears, or if the bump grows quickly.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient is 70 years old on warfarin presenting with a head injury and persistent headache, triggering anticoagulated_head_injury, age_65_plus, and anticoagulation flags which mandate emergency evaluation and neuroimaging to rule out intracranial hemorrhage. Call 911 is not immediately required as there is no loss of consciousness, acute severe neurologic deficit, or instability. A lower disposition like in-person today is inappropriate due to the high risk of occult or delayed bleeding requiring prompt emergency department resources.\",\n  \"safety_net\": \"Please have someone drive you to the nearest emergency department right away. If you develop sudden severe worsening of your headache, confusion, repeated vomiting, vision changes, weakness, numbness, difficulty speaking, or loss of consciousness, have someone call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"The patient is an older adult on warfarin who experienced a significant head strike and now has a headache, meeting criteria for anticoagulated_head_injury, age_65_plus, and anticoagulation. This warrants immediate emergency evaluation and non-contrast head CT due to high risk of delayed intracranial hemorrhage. 'call_911' is not required as there is no report of loss of consciousness, focal neurologic deficits, or hemodynamic instability requiring EMS. 'in_person_today' is unsafe and below the floor because outpatient clinics cannot provide immediate neuroimaging.\",\n  \"safety_net\": \"Please proceed to the nearest emergency department right away to have your head evaluated, and have someone else drive you. Call 911 immediately if you develop sudden confusion, worsening severe headache, repeated vomiting, vision changes, weakness or numbness on one side of your body, difficulty speaking, or loss of consciousness.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"The patient is an older adult on warfarin presenting with a head injury and headache (anticoagulated_head_injury, age_65_plus, anticoagulation), placing him at high risk for intracranial hemorrhage requiring immediate emergency evaluation and non-contrast CT imaging. Call 911 is not immediately required as he is alert, oriented, and without focal neurological deficits or loss of consciousness. Outpatient evaluation (in_person_today) is insufficient due to the need for rapid neuroimaging and potential emergency reversal of anticoagulation.\",\n  \"safety_net\": \"Please have someone drive you to the nearest Emergency Department immediately; do not drive yourself. If you develop sudden severe headache, confusion, vision changes, vomiting, weakness, numbness, difficulty speaking, or loss of consciousness, call 911 right away.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"The patient is an older adult on warfarin who sustained a significant head strike and now reports a headache, meeting criteria for anticoagulated_head_injury, age_65_plus, and anticoagulation. This warrants urgent ED neuroimaging to rule out intracranial hemorrhage. Call 911 is not currently indicated because there is no reported loss of consciousness, severe neurological deficit, or airway/hemodynamic instability. In-person today is too low given the risk of delayed bleeding on anticoagulation requiring emergent CT capabilities, which is also precluded by the ed_now floor.\",\n  \"safety_net\": \"Proceed immediately to the nearest emergency department for an evaluation and head scan. If you develop severe headache, vomiting, confusion, vision changes, weakness or numbness, trouble speaking, or loss of consciousness, have someone call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Walt has an anticoagulated_head_injury with modifiers age_65_plus and anticoagulation (warfarin), presenting with a persistent headache which carries a high risk for delayed intracranial hemorrhage requiring emergency head CT. ed_now is chosen over call_911 because he is conscious, hemodynamically stable, and did not experience loss of consciousness or acute focal neurological deficits requiring EMS. It cannot be downgraded to in_person_today because outpatient clinic settings lack immediate emergency neuroimaging capabilities, and the floor is ed_now.\",\n  \"safety_net\": \"Proceed directly to the nearest emergency department. Have someone else drive you; do not drive yourself. Call 911 immediately if you develop worsening headache, repeated vomiting, dizziness, confusion, vision changes, difficulty speaking, or weakness/numbness.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient has anticoagulated_head_injury with modifiers age_65_plus and anticoagulation, requiring emergent non-contrast head CT due to significant risk of intracranial hemorrhage even with mild symptoms. Call 911 is not required as there are no immediate life threats, loss of consciousness, or severe acute neurological deficits described, but the patient cannot be managed at in_person_today or lower due to the necessity of rapid emergency department imaging.\",\n  \"safety_net\": \"Please proceed directly to the nearest emergency department for evaluation and head imaging. Have someone drive you; do not drive yourself. Call 911 immediately if you develop severe or worsening headache, repeated vomiting, dizziness, confusion, vision changes, weakness or numbness in your face or limbs, or difficulty speaking.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient is an older adult on warfarin with head trauma and a persistent headache, raising significant concern for intracranial hemorrhage (anticoagulated_head_injury, age_65_plus, anticoagulation). ed_now is chosen over call_911 because the patient is awake, alert, without loss of consciousness, acute focal neurologic deficits, or instability requiring emergency medical transport. Lower dispositions such as in_person_today are inappropriate because urgent neuroimaging (CT head) is required and the floor is set to ed_now.\",\n  \"safety_net\": \"Proceed directly to the nearest emergency department. Have someone else drive you. Call 911 immediately if you develop severe or worsening headache, repeated vomiting, confusion, drowsiness, vision changes, weakness or numbness in your face or limbs, or difficulty speaking.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Based on anticoagulated_head_injury, age_65_plus, and anticoagulation, an elderly patient on warfarin with blunt head trauma and a persistent headache requires urgent neuroimaging (CT scan) to rule out an intracranial bleed. ED now is indicated rather than call_911 because the patient is currently alert, stable, and has no acute focal deficits or loss of consciousness. It cannot be lowered to in_person_today because outpatient clinics cannot provide immediate emergent CT imaging.\",\n  \"safety_net\": \"Proceed immediately to the nearest Emergency Department. Have someone else drive you. Call 911 right away if you develop worsening headache, vomiting, confusion, vision changes, weakness, numbness, difficulty speaking, or loss of consciousness.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient is an older adult on warfarin who sustained a significant head strike with persistent headache (anticoagulated_head_injury, age_65_plus, anticoagulation). This carries high risk for delayed intracranial hemorrhage requiring urgent neuroimaging (CT scan). Call_911 is not immediately required as there is no report of acute neurologic deficit, altered consciousness, or instability. In_person_today is insufficient because an outpatient clinic cannot provide emergency non-contrast head CT and emergent reversal capability.\",\n  \"safety_net\": \"Please have someone drive you to the nearest emergency department right away. Call 911 immediately if you develop sudden severe headache, confusion, dizziness, vomiting, vision changes, difficulty speaking, or weakness/numbness on one side of your body.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"The patient has anticoagulated_head_injury with modifiers age_65_plus and anticoagulation, creating a significant risk for traumatic intracranial hemorrhage even with mild symptoms. ED evaluation with neuroimaging is required now, meeting the floor of ed_now. Why not call_911: The patient is awake, alert, and neurologically stable without report of loss of consciousness, seizures, or acute focal deficits necessitating emergency medical transport. Why not in_person_today: Outpatient clinic settings lack immediate emergency CT neuroimaging capability required to rule out acute intracranial hemorrhage.\",\n  \"safety_net\": \"Proceed directly to the nearest emergency department for an evaluation and head scan. If you develop severe or worsening headache, nausea, vomiting, dizziness, confusion, vision changes, weakness, numbness, difficulty speaking, or unsteady walking, call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient is 70 years old on warfarin presenting with a head injury and persistent headache, meeting criteria for anticoagulated_head_injury with modifiers age_65_plus and anticoagulation. ED evaluation is urgently needed to obtain a non-contrast head CT and rule out delayed intracranial hemorrhage. Call 911 is not immediately required as the patient is conscious, alert, and lacks acute focal neurological deficits or severe distress. A lower disposition like in_person_today is unsafe because outpatient clinics lack immediate emergency neuroimaging capabilities.\",\n  \"safety_net\": \"Please go to the nearest emergency department right away. Have someone else drive you. Call 911 immediately if you develop worsening headache, confusion, sleepiness, dizziness, nausea or vomiting, vision changes, or weakness/numbness anywhere in your body.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient has an anticoagulated_head_injury modified by age_65_plus and anticoagulation (warfarin), presenting with a new headache following head trauma, placing him at high risk for delayed intracranial hemorrhage requiring urgent head CT. Why not call_911: Patient is currently alert and conscious with no acute neurological deficits or immediate airway/hemodynamic compromise, making self/assisted transport to the ED acceptable. Why not in_person_today: Clinic setting lacks emergent non-contrast CT capabilities, and the safety floor mandates ed_now.\",\n  \"safety_net\": \"Proceed immediately to the nearest Emergency Department. If you develop confusion, severe headache, repeated vomiting, vision changes, weakness/numbness, difficulty speaking, or loss of consciousness, have someone call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"The patient is 70 years old on warfarin presenting with blunt head trauma and a persistent headache, raising significant concern for intracranial hemorrhage (anticoagulated_head_injury, age_65_plus, anticoagulation). Call 911 is not currently indicated because the patient is awake, alert, without loss of consciousness, severe neurological deficits, or airway compromise. A lower disposition cannot be chosen as emergency neuroimaging is required and the floor is ed_now.\",\n  \"safety_net\": \"Proceed immediately to the nearest emergency department for evaluation. Have someone drive you; do not drive yourself. If you develop confusion, worsening headache, repeated vomiting, vision changes, difficulty speaking, weakness or numbness, or loss of consciousness, call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Relying on anticoagulated_head_injury with modifiers age_65_plus and anticoagulation, a blunt head trauma in an elderly anticoagulated patient requires urgent neuroimaging (non-contrast head CT) to rule out intracranial hemorrhage, meeting the floor of ed_now. One level higher (call_911) is not required because the patient is alert, did not lose consciousness, and reports no acute neurological deficits or hemodynamic instability. One level lower (in_person_today) is unsafe and below the mandatory floor given the risk of delayed bleeding needing immediate emergency diagnostic capability.\",\n  \"safety_net\": \"Please proceed directly to the nearest Emergency Department for an evaluation and CT scan of your head. Have someone drive you; do not drive yourself. If you develop severe or worsening headache, repeated vomiting, confusion, vision changes, weakness or numbness, difficulty walking or speaking, or if you feel faint, call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient is an older adult on warfarin presenting with head trauma and a persistent headache (anticoagulated_head_injury, age_65_plus, anticoagulation), warranting urgent emergency department evaluation and neuroimaging to rule out intracranial hemorrhage. ED now is indicated rather than call_911 because there are no signs of acute neuro compromise, loss of consciousness, or immediate life threats requiring paramedic transport. Lower dispositions are inappropriate due to the risk of delayed bleeding and the established safety floor.\",\n  \"safety_net\": \"Proceed directly to the nearest emergency department. Have someone else drive you. If you develop a severe or worsening headache, nausea or vomiting, confusion, vision changes, dizziness, numbness, weakness, or difficulty speaking or walking, call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Walt is an older adult on warfarin presenting with a head injury and headache, meeting criteria for anticoagulated_head_injury with modifiers age_65_plus and anticoagulation. This carries a high risk for delayed intracranial hemorrhage requiring prompt emergency evaluation and neuroimaging. It does not require call_911 because he is conscious, neurologically intact, and hemodynamically stable without reported acute life-threatening decline. It cannot be managed lower than ed_now due to the significant risk of bleeding on anticoagulation.\",\n  \"safety_net\": \"Proceed immediately to the nearest emergency department for an urgent head CT and evaluation. Have someone else drive you. If you develop worsening headache, vomiting, confusion, vision changes, weakness, numbness, difficulty speaking, or loss of consciousness, call 911 immediately.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Relying on anticoagulated_head_injury, age_65_plus, and anticoagulation, an older patient on warfarin with blunt head trauma and ongoing headache requires urgent emergency department neuroimaging (CT head) to evaluate for intracranial hemorrhage. Not call_911 because the patient is alert, reports no loss of consciousness, and has no acute focal neurological deficits requiring immediate EMS transport. Not in_person_today because outpatient clinics cannot provide immediate emergency CT scanning and reversal if acute bleeding is present.\",\n  \"safety_net\": \"Proceed directly to the nearest emergency department. Have someone else drive you. Call 911 immediately if you experience severe or worsening headache, vomiting, confusion, vision changes, slurred speech, weakness, numbness, or loss of balance.\"\n}",
+          "{\n  \"disposition\": \"ed_now\",\n  \"justification\": \"Patient is an older adult on warfarin with head trauma and a persistent headache, raising significant concern for intracranial hemorrhage (anticoagulated_head_injury, age_65_plus, anticoagulation). Call_911 is not immediately necessary as there is no reported loss of consciousness, severe confusion, or unstable status, but immediate emergency department evaluation for urgent neuroimaging is mandatory, so lower levels like in_person_today are inappropriate.\",\n  \"safety_net\": \"Proceed directly to the nearest emergency department for an urgent head CT. Have someone else drive you. Call 911 immediately if you develop worsening headache, repeated vomiting, confusion, vision changes, weakness, numbness, balance problems, or difficulty speaking.\"\n}"
+        ]
+      }
+    }
+  }
+}

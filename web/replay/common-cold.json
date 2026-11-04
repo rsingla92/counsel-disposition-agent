@@ -1,0 +1,418 @@
+{
+  "id": "common-cold",
+  "label": "Mild cold for two days",
+  "message": "I've had a runny nose, sneezing and a mildly scratchy throat for two days. No fever, I'm eating and drinking normally and I'm otherwise healthy. Is there anything I can take to feel better while it runs its course?",
+  "recorded_at": "2026-11-04T15:54:20+00:00",
+  "early": null,
+  "result": {
+    "status": "routed",
+    "disposition": "self_care",
+    "tier": "self_care",
+    "brief_label": "SELF_CARE",
+    "floor": "self_care",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 20
+      },
+      "secondary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 20
+      }
+    },
+    "confidence": 1,
+    "human_review": {
+      "flagged": false,
+      "reasons": []
+    },
+    "info_requests": {
+      "questions": [],
+      "photo": false
+    },
+    "time_sensitive": false,
+    "justification": "Two days of runny nose, sneezing and mild scratchy throat is a typical uncomplicated viral upper respiratory infection. No fever, normal eating and drinking, otherwise healthy. No red flags or modifiers were extracted (none to cite). Not one level higher (routine) because there is no need for a clinical workup, results or admin task and the patient is asking about symptom relief. Cannot go lower than the floor of self_care, which is also the lowest option.",
+    "safety_net": "Seek care sooner (contact the clinic within a day or two or be seen in person) if symptoms last beyond 10 days or worsen after initially improving, fever above 38.5 C (101.3 F) or lasting more than 3 days, severe sore throat or trouble swallowing, facial pain or pressure, ear pain, wheezing, or you cannot keep fluids down. Go to the ED or call 911 for difficulty breathing, chest pain, confusion, bluish lips, a stiff neck with fever, or inability to swallow saliva. Home care: rest, fluids, saline nasal spray or rinses, honey or throat lozenges, and over-the-counter options like acetaminophen or a decongestant/antihistamine if suitable for you; check with a pharmacist if you have other conditions or take other medicines.",
+    "patient_message": "Home care is appropriate for now, and a Counsel physician will review this advice. If things get worse, contact us again. Seek care sooner (contact the clinic within a day or two or be seen in person) if symptoms last beyond 10 days or worsen after initially improving, fever above 38.5 C (101.3 F) or lasting more than 3 days, severe sore throat or trouble swallowing, facial pain or pressure, ear pain, wheezing, or you cannot keep fluids down. Go to the ED or call 911 for difficulty breathing, chest pain, confusion, bluish lips, a stiff neck with fever, or inability to swallow saliva. Home care: rest, fluids, saline nasal spray or rinses, honey or throat lozenges, and over-the-counter options like acetaminophen or a decongestant/antihistamine if suitable for you; check with a pharmacist if you have other conditions or take other medicines.",
+    "trace": {
+      "input_sha256": "94e2d4ce70799821c113c839ba80ff1fbbcef91a7b079c20db7b732a8ae15ee1",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        },
+        {
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 71253,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[],\"photo_needed\":false,\"time_sensitive\":false}",
+        "primary": [
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat is a typical uncomplicated viral upper respiratory infection. No fever, normal eating and drinking, otherwise healthy. No red flags or modifiers were extracted (none to cite). Not one level higher (routine) because there is no need for a clinical workup, results or admin task and the patient is asking about symptom relief. Cannot go lower than the floor of self_care, which is also the lowest option.\",\"safety_net\":\"Seek care sooner (contact the clinic within a day or two or be seen in person) if symptoms last beyond 10 days or worsen after initially improving, fever above 38.5 C (101.3 F) or lasting more than 3 days, severe sore throat or trouble swallowing, facial pain or pressure, ear pain, wheezing, or you cannot keep fluids down. Go to the ED or call 911 for difficulty breathing, chest pain, confusion, bluish lips, a stiff neck with fever, or inability to swallow saliva. Home care: rest, fluids, saline nasal spray or rinses, honey or throat lozenges, and over-the-counter options like acetaminophen or a decongestant/antihistamine if suitable for you; check with a pharmacist if you have other conditions or take other medicines.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy patient, is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none to cite). Not one level higher (routine) because there is no need for a clinical workup, results review or admin action, and symptoms are mild and self-limited. Cannot go lower than self_care, which is also the floor.\",\"safety_net\":\"Home care: rest, fluids, saline nasal spray or rinses, honey, throat lozenges, and over-the-counter options such as acetaminophen or ibuprofen for discomfort or a decongestant/antihistamine if suitable for you (check labels and with a pharmacist if you have other conditions or take other medicines). Seek care sooner if you develop trouble breathing, shortness of breath, wheezing or chest pain; fever above 38.5C (101.3F) or fever lasting more than 3 days; severe sore throat or trouble swallowing or drooling; severe headache, stiff neck or confusion; facial pain or swelling; ear pain; symptoms lasting beyond 10 days or improving then worsening; or being unable to keep fluids down or becoming dehydrated. Call 911 for severe difficulty breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none present), no fever, and the patient is eating, drinking and otherwise healthy. Not one level higher (routine) because there is no clinical question, result or admin need requiring clinic workup, and symptoms are mild and short-lived. Not lower because self_care is the floor and the lowest available level.\",\"safety_net\":\"Rest, drink plenty of fluids, and consider saline nasal spray or rinses, throat lozenges or warm drinks with honey, and over-the-counter acetaminophen or ibuprofen if needed (follow label directions and check with a pharmacist if you take other medicines or have medical conditions). Seek care sooner if you develop trouble breathing, shortness of breath, chest pain, a stiff neck, confusion, severe headache, or are unable to keep fluids down: call 911 or go to the ED for severe symptoms. Contact the clinic if you develop a fever over 38.5 C (101.3 F) or a fever lasting more than 3 days, severe sore throat or trouble swallowing, facial pain or swelling, ear pain, worsening symptoms after initial improvement, or symptoms that last longer than 10 days.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking and no underlying health problems, is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none present), and the floor is self_care. Not one level higher (routine) because no clinical workup, refill or result is needed; symptomatic home care is sufficient. Not lower because self_care is the lowest available disposition and equals the floor.\",\"safety_net\":\"Home care: rest, fluids, saline nasal spray or rinses, throat lozenges or warm drinks with honey (not for children under 1 year), and acetaminophen or ibuprofen for discomfort if needed. Use decongestants or antihistamines only as directed on the label and if you have no conditions (e.g., high blood pressure) or medications that make them unsafe; ask a pharmacist if unsure. Seek care sooner if you develop shortness of breath, trouble breathing, chest pain, a stiff neck, severe headache, confusion, or inability to keep fluids down (call 911 or go to the ED for these). Contact the clinic if you develop fever above 101°F (38.3°C), severe sore throat or trouble swallowing, facial pain or pressure, ear pain, wheezing, or if symptoms last more than 10 days or worsen after initial improvement.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none present). Not one level higher (routine) because there is no need for a clinical workup, results review or admin follow-up; symptoms are mild, short-lived and manageable at home. Not lower because self_care is the lowest level and also matches the floor.\",\"safety_net\":\"Seek care sooner (call the clinic or be seen in person) if you develop a fever above 101°F (38.3°C) or one lasting more than 3 days, symptoms lasting beyond 10 days or worsening after initial improvement, significant facial pain or swelling, severe sore throat or trouble swallowing, ear pain, wheezing, or you cannot keep fluids down. Go to the ED or call 911 right away for difficulty breathing, shortness of breath, chest pain, confusion, bluish lips, or inability to swallow saliva. Meanwhile: rest, drink fluids, use saline nasal spray or rinses, honey or throat lozenges for the throat (not honey in children under 1), and consider acetaminophen or ibuprofen for discomfort if you have no contraindications; follow label directions and check with a pharmacist before using decongestants if you have high blood pressure, heart disease or take other medications.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none present), no fever, and the patient is eating and drinking normally and otherwise healthy. Not one level higher (routine) because there is no clinical question, workup or admin need and symptoms are mild and short-lived. Not lower because self_care is the lowest level and matches the floor.\",\"safety_net\":\"Rest, drink fluids, and consider saline nasal spray or rinses, throat lozenges, warm drinks with honey (not for children under 1), and over-the-counter acetaminophen or ibuprofen for discomfort if safe for you; check labels and with a pharmacist about decongestants or combination cold products, especially if you have high blood pressure, are pregnant, or take other medicines. Seek care sooner if you develop difficulty breathing, shortness of breath, chest pain, a high fever (above 39 C / 102 F) or fever lasting more than 3 days, severe sore throat or trouble swallowing, facial pain or swelling, ear pain, confusion, dehydration, or if symptoms worsen after initially improving or last more than 10 days. Call 911 for severe trouble breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, and the floor is self_care. Not one level higher (routine): there is no clinical question needing a workup, results or administrative handling, and no concerning features. Not lower: self_care is the lowest available level and matches the floor.\",\"safety_net\":\"Rest, drink fluids, and consider saline nasal spray or rinse, throat lozenges, warm drinks with honey, and a humidifier. Over-the-counter options such as acetaminophen or ibuprofen for aches, or a decongestant or antihistamine, may help if they are safe for you given your other medications and health conditions; ask a pharmacist if unsure. Seek care sooner if you develop trouble breathing, shortness of breath, chest pain, a stiff neck, confusion, severe headache, inability to keep fluids down, or signs of dehydration. Also seek care for a fever above 38.5 C (101.3 F) or one lasting more than 3 days, severe throat pain or difficulty swallowing, facial pain or pressure with thick discolored discharge, ear pain, worsening symptoms after initial improvement, or symptoms lasting more than 10 days. Call 911 for severe breathing difficulty, bluish lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and a mildly scratchy throat in an otherwise healthy adult is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none present), no fever, and the patient is eating and drinking normally. Not one level higher (routine): there is no clinical question or workup needed, and the floor is self_care. There is nothing lower to choose.\",\"safety_net\":\"Seek care sooner (call the clinic or be seen in person) if you develop a fever above 38.5 C (101.3 F) or one lasting more than 3 days, symptoms lasting beyond 10 days or worsening after initial improvement, facial pain or pressure, severe sore throat or trouble swallowing, ear pain, or a persistent cough. Go to the ED or call 911 right away for shortness of breath, trouble breathing, chest pain, confusion, a stiff neck, inability to keep fluids down, or swelling of the lips, tongue or throat. For comfort in the meantime: rest, fluids, saline nasal spray or rinses, honey or throat lozenges, and acetaminophen or ibuprofen as needed if you have no contraindications. Check with a pharmacist before using decongestants or combination cold products if you have high blood pressure, heart disease or take other medicines.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and a mildly scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, so no flags were relied on. Not one level higher (routine) because no clinical workup, refill or administrative need is present and symptoms are mild and self-limited. Not lower because self_care is the lowest option and also matches the floor.\",\"safety_net\":\"Seek care sooner if you develop a fever above 38.5C (101.3F) or a fever lasting more than 3 days, trouble breathing, wheezing, chest pain, severe sore throat or difficulty swallowing, inability to drink fluids, severe headache or stiff neck, facial pain or pressure, ear pain, or symptoms that worsen after initial improvement or last longer than 10 days. Call 911 for severe shortness of breath, confusion, bluish lips, or a swollen tongue or throat. For comfort, rest, fluids, saline nasal spray, honey, throat lozenges, and over-the-counter options like acetaminophen or an antihistamine can help; check labels and with a pharmacist if you take other medicines or have conditions like high blood pressure.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none to cite), and the floor is self_care. Not one level higher (routine): there is no clinical question needing workup or clinician review, only a request for symptom relief advice. Cannot go lower than the floor.\",\"safety_net\":\"Home care: rest, fluids, saline nasal spray or rinses, warm drinks or honey (not for children under 1), throat lozenges, and acetaminophen or ibuprofen for discomfort if you can take them safely. Over-the-counter decongestants or antihistamines may help some people; check labels and ask a pharmacist if you have high blood pressure, heart disease or take other medicines. Seek care sooner if you develop difficulty breathing, shortness of breath, chest pain, a fever above 38.5 C (101.3 F) or fever lasting more than 3 days, severe sore throat or trouble swallowing, severe headache or facial pain, ear pain, symptoms lasting beyond 10 days or worsening after initial improvement, confusion, or you cannot keep fluids down. Call 911 for severe trouble breathing or blue lips.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none to cite), and the floor is self_care. Not one level higher (routine): there is no clinical question needing a workup, result or admin follow-up, only a request for symptom relief. Not lower: self_care is the lowest available level.\",\"safety_net\":\"Rest, drink plenty of fluids, and consider saline nasal spray or rinses, throat lozenges, warm drinks with honey (not for children under 1), and over-the-counter pain or fever relief such as acetaminophen or ibuprofen if appropriate for you. Check with a pharmacist before using decongestants or combination cold products if you have high blood pressure, heart disease, or take other medications. Seek care sooner if you develop trouble breathing, chest pain, or wheezing; a fever above 38.5°C (101.3°F) or fever lasting more than 3 days; severe sore throat or difficulty swallowing; facial pain or swelling; severe headache or stiff neck; confusion or unusual drowsiness; or if symptoms worsen after initial improvement or last beyond 10 days. Call 911 for severe difficulty breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat with no fever, normal eating and drinking, and no pre-existing health conditions fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were identified (none to cite), and the floor is self_care. Not one level higher (routine) because there is no clinical question, result or admin need requiring clinic follow-up, and no symptoms warrant a workup. Cannot go lower than the floor.\",\"safety_net\":\"Rest, drink plenty of fluids, and consider saline nasal spray, throat lozenges or warm drinks; over-the-counter options such as acetaminophen or ibuprofen for discomfort, or a decongestant or antihistamine if appropriate for you and you have no conditions or medications that make them unsafe (check with a pharmacist if unsure). Symptoms usually improve within 7 to 10 days. Seek care sooner if you develop trouble breathing, shortness of breath, chest pain, a high fever (100.4F/38C or higher) or fever lasting more than 3 days, severe throat pain or difficulty swallowing, severe headache or stiff neck, facial pain or pressure, ear pain, symptoms that worsen after initial improvement or last beyond 10 days, or signs of dehydration. Call 911 for severe trouble breathing, confusion, bluish lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, and the floor is self_care. Not one level higher (routine): there is no clinical question needing a workup, result review or admin action, and symptoms are mild and short-lived. Cannot go lower than the floor.\",\"safety_net\":\"Seek care sooner (call the clinic or be seen within a day or two) if you develop fever above 38.5C/101.3F, symptoms lasting more than 10 days or worsening after initial improvement, significant facial pain or pressure, severe sore throat or trouble swallowing, ear pain, or a worsening cough. Go to the ED or call 911 right away for trouble breathing, shortness of breath, chest pain, wheezing, confusion, inability to drink fluids, a stiff neck with severe headache, or drooling/inability to swallow saliva. For comfort at home: rest, fluids, saline nasal spray or rinses, throat lozenges, warm drinks with honey (not for children under 1), and acetaminophen or ibuprofen as directed if needed. Check labels and ask a pharmacist before using decongestants or antihistamines if you have high blood pressure, heart disease or take other medicines.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, and the patient has no fever, is eating and drinking normally and is otherwise healthy. Not one level higher (routine): there is no clinical question needing a workup or visit, only a request for symptom relief that home care covers. Not lower: self_care is the floor and the lowest available level.\",\"safety_net\":\"Home care: rest, plenty of fluids, saline nasal spray or rinses, warm drinks or honey for the throat, throat lozenges, and over-the-counter options such as acetaminophen or ibuprofen if needed, or a decongestant or antihistamine if safe for you given your other conditions and medications; check with a pharmacist if unsure. Contact the clinic within a few days if symptoms are not improving after 10 days, get worse after initially improving, or you develop a fever above 101.5F (38.6C) lasting more than 3 days, facial pain or pressure, severe sore throat, or ear pain. Seek urgent care or the ED now for trouble breathing, shortness of breath, wheezing, chest pain, a stiff neck with severe headache, confusion, inability to keep fluids down, or signs of dehydration. Call 911 for severe difficulty breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat with no fever, normal eating and drinking, and no pre-existing conditions fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none to cite), and the floor is self_care. Not one level higher (routine): there is no clinical question needing a workup, result review or admin handling, and symptoms are mild and short-lived. There is no lower level than self_care.\",\"safety_net\":\"Rest, drink plenty of fluids, and consider saline nasal spray or rinses, throat lozenges, warm drinks with honey (not for children under 1), and a humidifier. Over-the-counter options such as acetaminophen or ibuprofen for aches, or a decongestant or antihistamine, may help if you have no medical reasons to avoid them; check labels and ask a pharmacist if you take other medications or have high blood pressure. Seek care sooner if you develop shortness of breath, trouble breathing, chest pain, a fever above 38.5 C (101.3 F) or any fever lasting more than 3 days, severe sore throat or trouble swallowing, severe headache or facial pain, ear pain, symptoms that worsen after initial improvement, confusion, inability to keep fluids down, or no improvement after 10 days. Call 911 for severe difficulty breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none present), no fever, and the patient is eating, drinking and otherwise healthy. Not one level higher (routine) because no clinical workup, refill or administrative need is required and symptoms are mild and self-limited. Not lower because self_care is the lowest option and matches the floor.\",\"safety_net\":\"Home care: rest, plenty of fluids, saline nasal spray or rinses, warm drinks or honey (adults), throat lozenges, and over-the-counter pain/fever relievers or decongestants/antihistamines as directed on the label and if you have no conditions or medicines that make them unsafe (check with a pharmacist if unsure). Seek care sooner if you develop trouble breathing, shortness of breath, wheezing, chest pain, a fever of 100.4°F (38°C) or higher that persists, severe throat pain or difficulty swallowing or drooling, facial pain or pressure with thick discharge, ear pain, confusion, inability to keep fluids down, or if symptoms worsen after initially improving or last longer than 10 days. Call 911 for severe difficulty breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, so no flags were relied on. The floor is self_care. Not one level higher (routine) because there is no clinical question needing a clinician workup, refill or result review; symptom relief advice is sufficient. Nothing lower exists than self_care.\",\"safety_net\":\"Seek care sooner (call the clinic or be seen in person) if you develop fever above 38.5C/101.3F or fever lasting more than 3 days, symptoms lasting beyond 10 days or worsening after initial improvement, severe sore throat or trouble swallowing, facial pain or pressure, ear pain, or a persistent cough or wheeze. Go to the ED or call 911 right away for shortness of breath, difficulty breathing, chest pain, confusion, severe drowsiness, inability to keep fluids down, or lips turning blue. Home care: rest, fluids, saline nasal spray or rinses, honey or throat lozenges, and over-the-counter options like acetaminophen or ibuprofen as directed. Check with a pharmacist before using decongestants or combination cold products, especially if you have high blood pressure or take other medicines.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy patient, is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, and the floor is self_care. Not one level higher (routine) because there is no clinical question, result or admin need requiring clinic follow-up, and symptoms are mild and self-limited. Not lower because self_care is the lowest available level.\",\"safety_net\":\"Home care: rest, fluids, saline nasal spray or rinses, warm drinks or honey, throat lozenges, and a humidifier. Over-the-counter options such as acetaminophen or ibuprofen for discomfort, or a decongestant or antihistamine, can help if you have no medical reason to avoid them; check labels and ask a pharmacist if you take other medicines or have high blood pressure. Seek care sooner if you develop trouble breathing, shortness of breath, chest pain, a fever above 38.5C (101.3F) or fever lasting more than 3 days, severe sore throat or trouble swallowing, severe headache or stiff neck, facial pain or swelling, ear pain, confusion, or if you cannot keep fluids down. Also contact the clinic if symptoms worsen after initial improvement or last more than 10 days. Call 911 for severe difficulty breathing, blue lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat without fever, with normal eating and drinking in an otherwise healthy person, fits an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted (none to cite). Not one level higher (routine) because there is no clinical question, result or admin need requiring a clinic workup, and symptoms are mild and short-lived. Not lower because self_care is the lowest level and matches the floor.\",\"safety_net\":\"Rest, drink plenty of fluids, and consider saline nasal spray, throat lozenges, warm drinks with honey (not for infants under 1), and over-the-counter pain/fever relievers or decongestants/antihistamines as directed on the label and if safe for you (check with a pharmacist if you have high blood pressure, take other medicines, or are pregnant). Seek care sooner if you develop trouble breathing, shortness of breath, chest pain, a fever of 38.5°C (101.3°F) or higher or fever lasting more than 3 days, severe sore throat or trouble swallowing, severe headache or stiff neck, facial pain/swelling, ear pain, wheezing, inability to keep fluids down, or if symptoms worsen after initially improving or last longer than 10 days. Call 911 for severe difficulty breathing, confusion, bluish lips, or fainting.\"}",
+          "{\"disposition\":\"self_care\",\"justification\":\"Two days of runny nose, sneezing and mild scratchy throat is consistent with an uncomplicated viral upper respiratory infection. No red flags or modifiers were extracted, there is no fever, and the patient is eating and drinking normally and otherwise healthy. Not one level higher (routine) because no clinical workup, refill or administrative need is present and symptoms are mild and short-lived. Not lower because self_care is the lowest option and matches the floor.\",\"safety_net\":\"Home care: rest, fluids, saline nasal spray or rinses, throat lozenges or warm drinks with honey (not for children under 1 year), and over-the-counter options such as acetaminophen or ibuprofen for discomfort or a decongestant or antihistamine if appropriate for you and your other health conditions or medicines (check with a pharmacist if unsure). Seek care sooner if you develop shortness of breath, trouble breathing, chest pain, or are unable to drink or swallow fluids, which need emergency care. Contact the clinic promptly for fever above 38.9 C (102 F) or any fever lasting more than 3 days, severe sore throat or trouble swallowing, ear or facial pain or pressure, wheezing, a worsening cough, or symptoms that get worse after initial improvement or last longer than 10 days.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient reports mild, typical viral upper respiratory infection symptoms with no red flags and normal oral intake. Higher care (routine or clinic visit) is unnecessary for an uncomplicated common cold of short duration. Lower care does not exist.\",\n  \"safety_net\": \"Seek medical attention if you develop difficulty breathing, high or persistent fever, severe throat pain, inability to tolerate liquids, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild, uncomplicated symptoms consistent with a common viral upper respiratory infection without red flags. Higher disposition (routine) is not needed as no formal clinic evaluation is indicated for mild, resolving cold symptoms. Lower disposition does not exist.\",\n  \"safety_net\": \"Seek medical attention if you develop high or persistent fever, difficulty breathing or shortness of breath, severe throat pain or inability to swallow, chest pain, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient has mild, uncomplicated upper respiratory symptoms for 2 days without red flags or fever, and is tolerating oral intake normally. Routine clinical contact is unnecessary as supportive home care is sufficient, and self-care matches the established safety floor.\",\n  \"safety_net\": \"Seek medical attention if you develop shortness of breath, a high or persistent fever, chest pain, difficulty swallowing fluids, or if your symptoms worsen or do not improve after 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient reports classic symptoms of a mild, uncomplicated viral upper respiratory infection lasting 2 days without systemic red flags, fever, or difficulty swallowing/breathing. Meets criteria for self_care. Routine follow-up is not required as symptoms are expected to be self-limiting, and no lower disposition exists.\",\n  \"safety_net\": \"Seek medical evaluation if you develop a high fever, shortness of breath, severe throat pain or difficulty swallowing, chest pain, or if your symptoms worsen or do not improve after 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient describes typical, mild upper respiratory infection symptoms of short duration without fever or warning signs. Routine care is not required as symptoms are manageable with supportive home measures and over-the-counter options. A lower disposition is not possible as self-care is the baseline floor.\",\n  \"safety_net\": \"Seek medical evaluation if you develop difficulty breathing, high or prolonged fever, inability to tolerate fluids, severe throat or facial pain, or if your symptoms worsen or do not improve within 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient reports typical mild viral upper respiratory tract symptoms without fever or systemic distress. No red flags are present. Routine is not required because no physician visit, lab workup, or prescription is indicated. Self-care is the lowest disposition level and matches the assigned floor.\",\n  \"safety_net\": \"Seek medical evaluation if you develop shortness of breath, a high or persistent fever, inability to swallow or stay hydrated, severe throat pain, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"No red flags or complicating modifiers are present. The symptoms are consistent with a mild, uncomplicated viral upper respiratory infection. One level higher (routine) is unnecessary as supportive home care is sufficient, and self_care is the floor.\",\n  \"safety_net\": \"Please seek medical evaluation if you develop shortness of breath, high or persistent fever, severe throat pain with difficulty swallowing fluids, chest pain, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild, acute viral upper respiratory infection symptoms (rhinorrhea, sneezing, mild sore throat) of 2 days duration without fever, systemic distress, or red flags. Routine evaluation is not needed at this stage as these are standard self-limiting cold symptoms appropriate for supportive home care. Self-care is already the lowest disposition level.\",\n  \"safety_net\": \"Seek medical attention if you develop high or persistent fever, shortness of breath, difficulty swallowing, severe throat or facial pain, or if your symptoms worsen or fail to improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"No red flags or complicating modifiers are reported. Symptoms are typical for a mild, acute viral upper respiratory infection without systemic distress. A routine visit (one level higher) is not needed as these symptoms can be safely managed with home care and over-the-counter remedies. Self-care is the floor, so it cannot be placed any lower.\",\n  \"safety_net\": \"Seek medical evaluation if you develop a high fever, difficulty breathing or wheezing, severe throat pain or trouble swallowing fluids, or if your symptoms worsen or do not start to improve after 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild upper respiratory viral symptoms of short duration (2 days) without fever or difficulty tolerating oral intake. No red flags or modifiers are present. Higher acuity like routine appointment is unnecessary given uncomplicated mild viral illness, and self_care matches the minimum floor.\",\n  \"safety_net\": \"Seek medical attention if you develop shortness of breath, difficulty breathing, a high or persistent fever, chest pain, inability to drink fluids, or if your symptoms worsen or do not improve after 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient reports mild viral upper respiratory tract symptoms for 2 days with normal oral intake, no fever, and no red flags identified. One level higher (routine) is unnecessary as symptoms are mild and typical for an uncomplicated viral illness that can be managed at home with supportive measures. One level lower is not applicable as self_care is the baseline.\",\n  \"safety_net\": \"Please seek medical attention if you develop shortness of breath, high fever, difficulty swallowing, severe chest pain, or if your symptoms worsen or fail to improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild common cold symptoms for 2 days without fever or difficulty swallowing/breathing. Self-care with over-the-counter symptomatic management is appropriate. Routine appointment is not required for an uncomplicated self-limiting viral URI without red flags, and self-care is the baseline floor.\",\n  \"safety_net\": \"Seek medical attention if you develop shortness of breath, high fever, severe sore throat, difficulty swallowing or keeping fluids down, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient presents with uncomplicated, mild upper respiratory symptoms for 2 days without fever or difficulty tolerating fluids. No red flags or risk factors are identified. Routine or higher clinical evaluation is unnecessary given the mild self-limited nature of the illness, and self-care is at the safety floor.\",\n  \"safety_net\": \"Seek medical attention if you develop a high fever, shortness of breath, difficulty swallowing, severe sore throat, or if your symptoms worsen or do not begin to improve after 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"Patient reports classic mild viral upper respiratory infection symptoms of short duration without red flags or fever. No red flags are present. Routine or higher clinical evaluation is unnecessary given the mild self-limited nature and normal oral intake, and self_care is the appropriate floor and triage level.\",\n  \"safety_net\": \"Seek medical attention if you develop shortness of breath, high or prolonged fever, inability to keep fluids down, severe throat pain, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild, typical viral upper respiratory symptoms without red flags, fever, or difficulty swallowing/breathing. Self-care with over-the-counter supportive therapy is appropriate. Routine evaluation is not needed at this time as the condition is acutely self-limiting, and self_care is the established floor.\",\n  \"safety_net\": \"Please reach back out or seek in-person medical evaluation if you develop a high or persistent fever, shortness of breath, chest pain, difficulty swallowing or keeping fluids down, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild common cold symptoms (coryza, sneezing, scratchy throat) of short duration with normal oral intake, no fever, and no red flags. Routine evaluation is unnecessary as these symptoms are consistent with an uncomplicated viral upper respiratory infection amenable to supportive home care. Lower care is not possible as self_care is the lowest triage tier.\",\n  \"safety_net\": \"Seek medical attention if you develop shortness of breath, difficulty swallowing, persistent high fever, chest pain, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild, typical viral upper respiratory symptoms of short duration (2 days) without fever or difficulty tolerating oral intake. There are no red flags present. A higher level of care is not required as symptoms are mild and self-limiting, and self_care is the appropriate clinical baseline and minimum floor.\",\n  \"safety_net\": \"Please seek medical attention if you develop shortness of breath, difficulty breathing, a high or persistent fever, chest pain, severe difficulty swallowing, or if your symptoms worsen or do not begin to improve after 7 to 10 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild upper respiratory viral symptoms lasting two days with no fever, normal intake, and no red flags. Supportive home care is sufficient (self_care). A routine clinic appointment is unnecessary as there are no chronic management or prescription needs, and self_care meets the floor.\",\n  \"safety_net\": \"Seek medical evaluation if you develop shortness of breath, high or persistent fever, severe throat pain or difficulty swallowing, severe ear pain, or if your symptoms worsen or do not improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient reports mild common cold symptoms (runny nose, sneezing, scratchy throat) of short duration with no fever, normal oral intake, and no red flags. Higher disposition (routine or within a few days) is unnecessary as supportive home care is appropriate for an uncomplicated viral upper respiratory infection. Floor is self_care.\",\n  \"safety_net\": \"Please seek medical attention if you develop shortness of breath, high or prolonged fever, chest pain, difficulty swallowing fluids, or if your symptoms worsen or do not begin to improve after 10 to 14 days.\"\n}",
+          "{\n  \"disposition\": \"self_care\",\n  \"justification\": \"The patient has typical symptoms of an uncomplicated viral upper respiratory infection without red flags, fever, or systemic symptoms. Routine care is not required as symptoms can be managed with home supportive care and over-the-counter remedies. Self-care is the baseline disposition.\",\n  \"safety_net\": \"Seek medical evaluation if you develop difficulty breathing, high or persistent fever, severe sore throat with difficulty swallowing, or if your symptoms worsen or do not begin to improve after 7 to 10 days.\"\n}"
+        ]
+      }
+    }
+  }
+}

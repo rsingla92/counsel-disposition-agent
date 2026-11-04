@@ -1,0 +1,417 @@
+{
+  "id": "annual-checkup",
+  "label": "Booking a routine check-up",
+  "message": "Hi there, I'd like to book my yearly physical sometime in the next month or two. I feel fine and have no new symptoms. Could we also recheck my cholesterol at the same visit? It was a little high last year.",
+  "recorded_at": "2026-11-04T15:53:10+00:00",
+  "early": null,
+  "result": {
+    "status": "routed",
+    "disposition": "routine",
+    "tier": "async",
+    "brief_label": "ASYNC_PHYSICIAN",
+    "floor": "self_care",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 20,
+        "self_care": 0
+      },
+      "secondary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 19,
+        "self_care": 0
+      }
+    },
+    "confidence": 1,
+    "human_review": {
+      "flagged": false,
+      "reasons": []
+    },
+    "info_requests": {
+      "questions": [],
+      "photo": false
+    },
+    "time_sensitive": false,
+    "justification": "Patient requests a scheduled annual physical in 1-2 months with a repeat cholesterol check for a mildly elevated result last year. No red flags or modifiers were extracted (none present), and the patient reports feeling fine with no new symptoms. Not one level higher (within_few_days) because there is no symptom or clinical concern needing a workup sooner than the routine window. Not one level lower (self_care) because booking a physical and ordering a lipid recheck requires clinic administrative and clinical action, not home care.",
+    "safety_net": "If you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or any other new or worrying symptoms before your visit, call 911 or seek emergency care right away. For milder new concerns, contact the clinic to be seen sooner rather than waiting for your scheduled physical.",
+    "patient_message": "A Counsel physician will review your message in the standard queue. If you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or any other new or worrying symptoms before your visit, call 911 or seek emergency care right away. For milder new concerns, contact the clinic to be seen sooner rather than waiting for your scheduled physical.",
+    "trace": {
+      "input_sha256": "8da6fd17a022cb024fbc7198908f40dc7b9ec66e96f2f10b3036b701a47638f1",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        },
+        {
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 69776,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[],\"photo_needed\":false,\"time_sensitive\":false}",
+        "primary": [
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a scheduled annual physical in 1-2 months with a repeat cholesterol check for a mildly elevated result last year. No red flags or modifiers were extracted (none present), and the patient reports feeling fine with no new symptoms. Not one level higher (within_few_days) because there is no symptom or clinical concern needing a workup sooner than the routine window. Not one level lower (self_care) because booking a physical and ordering a lipid recheck requires clinic administrative and clinical action, not home care.\",\"safety_net\":\"If you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or any other new or worrying symptoms before your visit, call 911 or seek emergency care right away. For milder new concerns, contact the clinic to be seen sooner rather than waiting for your scheduled physical.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months and a cholesterol recheck, with no symptoms. No red flags or modifiers were extracted (none to cite). Not self_care because scheduling a visit and ordering a lipid panel needs clinic administrative/clinical action. Not within_few_days or higher because there is no acute symptom or clinical urgency, and the timeline requested is weeks to months.\",\"safety_net\":\"If you develop new symptoms before your visit, such as chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, or severe headache, call 911 or go to the emergency department. For other new or worsening concerns, contact the clinic sooner rather than waiting for your scheduled physical.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months plus a repeat cholesterol check, feels well with no new symptoms. No red flags or modifiers were extracted (none to cite). Not self_care because the request needs clinic scheduling and a lipid test order that clinic staff must handle. Not within_few_days or higher because there is no symptom, abnormal result needing prompt workup, or time-sensitive concern; the mildly elevated cholesterol last year is appropriately addressed at the routine visit.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness, numbness, trouble speaking, vision changes, or any new concerning symptoms. Call 911 for severe chest pain, stroke symptoms, or trouble breathing.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months and a cholesterol recheck, feels fine with no new symptoms. No red flags or modifiers present (none flagged). Not self_care because booking a visit and ordering a lipid panel require clinic scheduling and clinician orders. Not within_few_days because there is no symptom or clinical issue needing a workup sooner than the routine window.\",\"safety_net\":\"If you develop chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, or any new concerning symptoms before your visit, seek care promptly: call 911 for severe symptoms, or contact the clinic or go to urgent care or the ED as appropriate.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months with a repeat cholesterol check for a mildly elevated result last year. No red flags or modifiers present (extracted findings: none), and the patient reports feeling fine with no new symptoms. Not self_care because scheduling the visit and ordering a lipid recheck require clinic administrative and clinical action. Not within_few_days because there is no symptom or issue needing a workup sooner than the routine window.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, severe headache, or any new concerning symptoms. Call 911 for severe or sudden symptoms like these. If you have not been scheduled within a month or two, message the clinic again.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months and a cholesterol recheck, with no symptoms. No red flags or modifiers present (extracted findings: none). Not self_care because scheduling a physical and ordering a lipid panel needs clinic administrative and clinical action. Not within_few_days or higher because there is no symptom or finding requiring a timely workup, and the mildly elevated cholesterol last year is a non-urgent follow-up.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, or other new concerning symptoms. Call 911 for severe chest pain, stroke symptoms, or trouble breathing.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months with a cholesterol recheck, feels well, and reports no new symptoms. No red flags or modifiers were extracted (none to cite). Not self_care because scheduling the visit and ordering a lipid panel need clinic administration and clinician orders. Not within_few_days because there is no symptom or clinical concern requiring a workup on a shortened timeline.\",\"safety_net\":\"Seek care sooner if you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or sudden severe headache; call 911 for these. Contact the clinic promptly if you develop new or worsening symptoms before your visit.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months with a repeat cholesterol check, reports feeling fine with no new symptoms. No red flags or modifiers present (extracted findings: none). Not self_care because scheduling a visit and ordering a lipid recheck requires clinic administrative and clinical action. Not within_few_days because there are no symptoms or findings requiring a prompt workup, and the requested timeframe is weeks to months.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness, numbness, trouble speaking, severe headache, or other new concerning symptoms. Call 911 for severe chest pain, stroke symptoms, or trouble breathing.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months with a repeat cholesterol check, feels well with no new symptoms. No red flags or modifiers present (none). Not self_care because scheduling a visit and ordering a lipid recheck requires clinic administrative/clinical action; this is at or above the self_care floor. Not within_few_days because there is no symptom or clinical concern needing a workup sooner than the routine window.\",\"safety_net\":\"If you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or any sudden severe symptom, call 911 or go to the emergency department. If you develop new or worsening symptoms before your visit, contact the clinic sooner.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months and a cholesterol recheck, feels fine with no new symptoms. No red flags or modifiers present (extracted findings: none). Not self_care because scheduling a physical and lipid recheck needs clinic administrative action and orders, which is a routine clinical/admin request. Not within_few_days because there is no symptom or clinical concern requiring a workup sooner than the routine window.\",\"safety_net\":\"Seek care sooner if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, severe headache, or any new concerning symptoms. Call 911 for severe or sudden symptoms. Contact the clinic if new symptoms arise before your visit.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in the next 1-2 months with a repeat cholesterol check; feels well with no new symptoms. No red flags or modifiers were extracted (none to cite). Not self_care because scheduling the visit and ordering a lipid recheck needs clinic administration and clinician involvement. Not within_few_days because there is no symptom or finding requiring a prompt workup and the patient is asking for a visit in 1-2 months.\",\"safety_net\":\"Contact the clinic sooner if you develop new symptoms such as chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, severe headache, or unexplained weight loss. Call 911 for chest pain, stroke symptoms, or severe trouble breathing.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months and a repeat cholesterol check after a mildly elevated result last year. No red flags or modifiers were extracted (none present), and the patient reports feeling fine with no new symptoms. Not one level higher (within_few_days) because there is no symptom or finding needing a workup sooner than the routine window. Not one level lower (self_care) because scheduling a physical and lipid recheck requires clinic administrative and clinical action, which self-care cannot provide. Routine is at or above the self_care floor.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, severe headache, or any other new or worrying symptoms. Call 911 for emergency symptoms such as chest pain with shortness of breath or signs of a stroke.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months with a repeat cholesterol check, feels well with no new symptoms. No red flags or modifiers present (extracted findings: none). Not self_care because this requires scheduling a clinic visit and a lipid panel order, which is an administrative/clinical request for the clinic. Not within_few_days or higher because there are no symptoms or findings needing an expedited workup, and the mildly elevated cholesterol last year is not urgent.\",\"safety_net\":\"If you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or any other new or worrying symptoms before your visit, contact the clinic promptly; call 911 for severe chest pain, stroke symptoms, or trouble breathing.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a yearly physical in 1-2 months with a cholesterol recheck; reports feeling fine with no new symptoms. No red flags or modifiers present (extracted findings: none). Not one level higher (within_few_days) because there is no symptom or clinical concern requiring a workup within days. Not one level lower (self_care) because scheduling a physical and ordering a lipid recheck are administrative/clinical tasks that need clinic action, not home care. Routine is at or above the self_care floor.\",\"safety_net\":\"If you develop chest pain or pressure, shortness of breath, fainting, sudden weakness, numbness, trouble speaking, or other new or worsening symptoms before your visit, contact the clinic promptly; call 911 for severe symptoms or emergencies.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in the next 1-2 months and a cholesterol recheck for a mildly elevated result last year. No red flags or modifiers present (extracted findings list none), and the patient reports feeling fine with no new symptoms. Not self_care because scheduling a visit and ordering a lipid panel requires clinic administrative and clinical action. Not within_few_days because there is no symptom or finding needing an expedited workup, and the patient's own timeframe is 1-2 months.\",\"safety_net\":\"If before the visit you develop chest pain or pressure, shortness of breath, fainting, sudden weakness, numbness, trouble speaking, or severe headache, call 911. For other new or worsening symptoms such as unexplained weight loss, persistent fatigue, or palpitations, contact the clinic promptly to be seen sooner than your scheduled physical.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in the next 1-2 months and a cholesterol recheck for mildly elevated lipids last year. No red flags or modifiers were extracted (none present), and the patient reports feeling fine with no new symptoms. Not one level lower (self_care) because scheduling a visit and ordering a lipid panel needs clinic administrative and clinical action. Not one level higher (within_few_days) because there are no symptoms or findings requiring a workup within days.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, severe headache, or any other new or worsening symptoms before your visit. Call 911 for severe chest pain or stroke symptoms.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in the next 1-2 months with a repeat cholesterol check; reports feeling fine with no new symptoms. No red flags or modifiers were extracted (none to cite). Not self_care because scheduling a visit and ordering a lipid recheck requires clinic administrative and clinical action. Not within_few_days because there are no symptoms or urgent concerns and the patient's own timeframe is 1-2 months.\",\"safety_net\":\"If you develop new symptoms before your visit, such as chest pain or pressure, shortness of breath, fainting, sudden weakness or numbness, trouble speaking, or severe headache, call 911 or go to the emergency department. For other new or worsening concerns, contact the clinic sooner rather than waiting for your scheduled physical.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a yearly physical in the next 1-2 months and a cholesterol recheck; no symptoms, no red flags or modifiers present (extracted findings list none). Not self_care because scheduling an annual visit and ordering a lipid panel requires clinic administrative and clinical action. Not within_few_days because there is no new symptom or clinical issue needing an expedited workup; the timeframe requested is 1-2 months.\",\"safety_net\":\"If you develop chest pain or pressure, shortness of breath, sudden weakness or numbness, trouble speaking, fainting, or any new concerning symptom before your visit, seek care promptly: call 911 for severe or sudden symptoms, or contact the clinic the same day for milder new concerns.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months with a repeat cholesterol check for mildly elevated results last year. No red flags or modifiers were extracted (none present), and the patient reports feeling fine with no new symptoms. Not one level higher (within_few_days) because there is no symptom or finding needing a workup sooner than the routine window. Not one level lower (self_care) because scheduling a physical and lipid recheck is an administrative and clinical request that needs clinic action, not home care. This is at or above the self_care floor.\",\"safety_net\":\"If before the visit you develop chest pain or pressure, shortness of breath, fainting, weakness or numbness on one side, trouble speaking, or any other new or worrying symptoms, seek care right away: call 911 for severe symptoms or contact the clinic for an earlier appointment. Please also message us if your health changes or you have new concerns before the scheduled visit.\"}",
+          "{\"disposition\":\"routine\",\"justification\":\"Patient requests a routine annual physical in 1-2 months and a cholesterol recheck, with no symptoms. No red flags or modifiers were extracted (none to cite). Not self_care because scheduling the visit and ordering a lipid panel needs clinic action. Not within_few_days or higher because there is no symptom or clinical concern needing an earlier workup; the mildly elevated cholesterol last year is appropriately followed at the yearly visit.\",\"safety_net\":\"Contact the clinic sooner or seek care if you develop chest pain or pressure, shortness of breath, fainting, sudden weakness, numbness, trouble speaking, or other new concerning symptoms. For severe symptoms such as chest pain with sweating or trouble breathing, or stroke signs, call 911.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient requests scheduling an annual wellness exam and routine cholesterol screening with no active symptoms or acute concerns. Routine is appropriate rather than within_few_days because there is no clinical urgency. Routine is chosen over self_care because administrative/clinical action is needed to schedule an appointment and order labs.\",\n  \"safety_net\": \"If you experience any new or concerning symptoms before your visit, such as chest discomfort, shortness of breath, or dizziness, please seek immediate medical evaluation.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an annual wellness exam and routine lab work with no acute symptoms or red flags reported. Routine is appropriate because it involves standard appointment scheduling and preventive care. Within a few days is not required because there are no pressing clinical symptoms, and self-care is insufficient because clinical scheduling and orders are needed.\",\n  \"safety_net\": \"If you develop any new or concerning symptoms prior to your appointment, such as chest pain, shortness of breath, or severe pain, please seek immediate medical evaluation.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an annual wellness exam and routine cholesterol monitoring within the next 1-2 months, with no acute complaints or symptoms. Within_few_days is not indicated as there are no urgent clinical needs or new symptoms. Self_care is insufficient because scheduling an in-person preventive exam and ordering routine screening labs requires clinic action.\",\n  \"safety_net\": \"Please contact the clinic sooner or seek urgent care if you develop any new or concerning symptoms, such as chest pain, shortness of breath, or unexplained weakness, prior to your scheduled visit.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an annual wellness exam and routine cholesterol screening with no acute concerns or red flags. Routine disposition is appropriate because it involves standard clinical scheduling and preventive care. Within a few days is unnecessary as there are no urgent symptoms or workup required. Self-care is insufficient because scheduling an in-person physical and lab orders requires clinic action.\",\n  \"safety_net\": \"If you develop any new, concerning, or urgent symptoms before your scheduled appointment, please contact the clinic or seek immediate medical attention.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient has no acute symptoms and is requesting an annual physical examination and routine cholesterol screening within the next month or two. This fits routine scheduling and preventive care. Within a few days is not required because there are no urgent or active symptoms. Self-care is insufficient because scheduling an appointment and ordering lab tests requires clinic action.\",\n  \"safety_net\": \"Please reach out sooner or seek immediate medical evaluation if you develop any new or concerning symptoms, such as chest pain, shortness of breath, or severe pain, prior to your scheduled visit.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for a routine yearly physical and follow-up lipid screening in 1-2 months with no acute symptoms or red flags. Routine scheduling and non-urgent lab requests fall under routine care rather than within_few_days, while self_care is insufficient because administrative clinic scheduling and lab ordering are required.\",\n  \"safety_net\": \"If you develop any new or concerning symptoms, such as chest pain, shortness of breath, or dizziness, before your scheduled appointment, please seek immediate medical evaluation.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient has no acute symptoms or red flags and is requesting a routine annual physical and non-urgent cholesterol follow-up. Within_few_days is not indicated because there are no active symptoms requiring prompt clinical workup. Self_care is insufficient because scheduling an appointment and ordering lab tests requires clinic action.\",\n  \"safety_net\": \"If you develop any new, concerning, or sudden symptoms such as chest pain, shortness of breath, or dizziness, please seek emergency medical evaluation immediately.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an annual physical exam and routine repeat lipid panel in 1-2 months, reporting no acute or concerning symptoms. Why not within_few_days: There are no urgent clinical concerns or active symptoms requiring prompt evaluation. Why not self_care: The request requires administrative action to book an appointment and coordinate preventative lab orders.\",\n  \"safety_net\": \"If you develop any new or worsening symptoms prior to your visit, such as chest pain, shortness of breath, or other concerning changes in your health, please reach out sooner or seek immediate medical care.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is asymptomatic and requesting scheduling for an annual preventive exam and routine lipid panel recheck. There are no red flags or acute modifiers. Routine scheduling is appropriate rather than within_few_days because there is no acute clinical need, and routine is appropriate rather than self_care because clinical scheduling and ordering of labs are required.\",\n  \"safety_net\": \"If you develop any new, unexpected, or concerning symptoms before your scheduled appointment, please contact the clinic or seek medical evaluation sooner.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling of an annual physical exam and routine lipid monitoring with no acute complaints or red flags. Higher disposition (within_few_days) is unnecessary given the absence of urgent or acute symptoms. Lower disposition (self_care) is insufficient as clinic action is needed to schedule the appointment and order labs.\",\n  \"safety_net\": \"If you develop any new or concerning symptoms prior to your scheduled visit, such as chest pain, shortness of breath, or other acute changes, please contact the clinic or seek prompt medical evaluation.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient requests scheduling an annual preventive physical and routine repeat cholesterol screening with no acute concerns or symptoms. Within_few_days is not indicated because there are no active symptoms requiring prompt clinical workup. Self_care is insufficient because scheduling an appointment and coordinating routine laboratory tests requires clinic staff action.\",\n  \"safety_net\": \"If you develop any new, concerning, or sudden symptoms—such as chest pain, shortness of breath, severe pain, or other urgent changes in your health—please seek medical attention promptly rather than waiting for your routine visit.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an annual physical exam and routine cholesterol screening with no active or concerning symptoms. No flags are present. Routine is appropriate rather than within_few_days because there is no clinical urgency requiring evaluation within days. Self-care is insufficient because practice action is required to schedule the appointment and order labs.\",\n  \"safety_net\": \"If you develop any new or concerning symptoms, such as chest pain, shortness of breath, or sudden weakness, please seek immediate medical evaluation.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting an annual physical examination and routine follow-up cholesterol screening with no acute concerns or symptoms. A higher disposition like within_few_days is unnecessary as there are no urgent symptoms requiring evaluation soon. A lower disposition of self_care is insufficient because scheduling an appointment and ordering routine laboratory tests requires clinic staff action.\",\n  \"safety_net\": \"If you develop any new or concerning symptoms before your scheduled visit, such as chest pain, shortness of breath, or sudden severe weakness, please contact the clinic sooner or seek emergency medical care.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is asymptomatic and requesting an administrative scheduling of an annual physical exam and routine repeat lab work. Within a few days is not required because there are no acute symptoms or urgent clinical needs. Self-care is insufficient as administrative coordination and clinic scheduling are required.\",\n  \"safety_net\": \"If you develop any new, concerning, or worsening symptoms before your scheduled visit, please contact the clinic or seek immediate medical care.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient requests scheduling a routine annual wellness exam and cholesterol recheck without any acute symptoms, red flags, or modifiers. Why not higher (within_few_days): there are no active symptoms requiring rapid evaluation. Why not lower (self_care): administrative and clinical coordination are required to schedule the appointment and order labs.\",\n  \"safety_net\": \"If you develop any new, unexpected, or worsening symptoms before your scheduled visit, please contact the clinic or seek medical attention promptly.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an annual wellness exam and routine lab recheck with no active symptoms or acute concerns. Routine is appropriate as this involves routine scheduling and preventative care. Self-care is insufficient because the patient needs an appointment booked and lab orders placed. Within a few days is not needed because there are no acute symptoms requiring timely clinical workup.\",\n  \"safety_net\": \"If you develop any new or concerning symptoms before your scheduled appointment, such as chest pain, shortness of breath, palpitations, or severe headaches, please seek medical evaluation right away.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting an appointment for a routine yearly preventive physical and cholesterol check in the next month or two with no acute symptoms. One level higher (within_few_days) is unnecessary as there are no active or urgent clinical concerns. One level lower (self_care) is insufficient because administrative scheduling and provider-ordered laboratory testing are required.\",\n  \"safety_net\": \"If you develop any new, concerning, or acute symptoms before your scheduled appointment, please reach back out to the clinic or seek medical attention promptly.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting scheduling for an asymptomatic annual wellness visit and routine lipid panel recheck. One level higher (within_few_days) is unnecessary because there are no acute complaints or urgent clinical concerns. One level lower (self_care) is insufficient as booking an appointment and placing future lab orders require routine clinic staff coordination.\",\n  \"safety_net\": \"If you experience any new, concerning, or worsening symptoms before your visit—such as chest pain, shortness of breath, or severe headaches—please reach out sooner or seek urgent medical attention.\"\n}",
+          "{\n  \"disposition\": \"routine\",\n  \"justification\": \"The patient is requesting an annual preventive physical exam and routine repeat lab work without any acute symptoms or complaints. Why not within_few_days: Routine preventive care and asymptomatic lab monitoring do not require urgent evaluation within days. Why not self_care: The patient requires clinic coordination to schedule an appointment and order laboratory tests.\",\n  \"safety_net\": \"If you develop any new, unexpected, or concerning symptoms before your scheduled visit, please contact the clinic or seek immediate medical care.\"\n}"
+        ]
+      }
+    }
+  }
+}

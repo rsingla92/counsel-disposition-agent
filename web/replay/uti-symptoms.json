@@ -1,0 +1,416 @@
+{
+  "id": "uti-symptoms",
+  "label": "Burning when passing urine",
+  "message": "I'm 34 and for two days it has burned when I pee and I keep needing to go. No fever, no back pain, not pregnant. I had something like this two years ago and antibiotics cleared it. Can someone help me today?",
+  "recorded_at": "2026-11-04T15:50:07+00:00",
+  "early": null,
+  "result": {
+    "status": "routed",
+    "disposition": "physician_contact_today",
+    "tier": "same_day",
+    "brief_label": "URGENT_ESCALATION",
+    "floor": "self_care",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 20,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      },
+      "secondary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 18,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      }
+    },
+    "confidence": 1,
+    "human_review": {
+      "flagged": false,
+      "reasons": []
+    },
+    "info_requests": {
+      "questions": [],
+      "photo": false
+    },
+    "time_sensitive": false,
+    "justification": "Two days of dysuria and urinary frequency with no fever, no flank/back pain and not pregnant suggests uncomplicated cystitis. No red flags or modifiers were extracted, so no flags are cited. The prior similar episode that cleared with antibiotics supports the diagnosis, and antibiotics cannot be prescribed without a clinician's assessment. The patient asks for help today and the symptoms are already two days old. A same-day virtual physician conversation is therefore reasonable. Not one level higher: there are no signs of pyelonephritis, systemic illness or instability that would need in-person assessment today. Not one level lower: self-care alone will not provide the treatment she likely needs, and waiting days prolongs symptoms and risks progression to the kidneys.",
+    "safety_net": "Seek in-person care or go to the ED promptly if you develop fever or chills, back or flank pain, nausea or vomiting, visible blood in the urine, severe or worsening pelvic pain, or confusion or marked weakness. Also seek care sooner if you cannot pass urine, if you think you may be pregnant, or if symptoms do not improve within 1-2 days of starting treatment. Drink fluids in the meantime and avoid bladder irritants such as caffeine and alcohol.",
+    "patient_message": "A Counsel physician will speak with you today, within 2 to 4 hours. Virtual is fine. Seek in-person care or go to the ED promptly if you develop fever or chills, back or flank pain, nausea or vomiting, visible blood in the urine, severe or worsening pelvic pain, or confusion or marked weakness. Also seek care sooner if you cannot pass urine, if you think you may be pregnant, or if symptoms do not improve within 1-2 days of starting treatment. Drink fluids in the meantime and avoid bladder irritants such as caffeine and alcohol.",
+    "trace": {
+      "input_sha256": "68890774237b4d50968bfe62b7a25f7f42c1b0b3a253518e1e6061fe3d3dee3c",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        },
+        {
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 83601,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[],\"photo_needed\":false,\"time_sensitive\":false}",
+        "primary": [
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency with no fever, no flank/back pain and not pregnant suggests uncomplicated cystitis. No red flags or modifiers were extracted, so no flags are cited. The prior similar episode that cleared with antibiotics supports the diagnosis, and antibiotics cannot be prescribed without a clinician's assessment. The patient asks for help today and the symptoms are already two days old. A same-day virtual physician conversation is therefore reasonable. Not one level higher: there are no signs of pyelonephritis, systemic illness or instability that would need in-person assessment today. Not one level lower: self-care alone will not provide the treatment she likely needs, and waiting days prolongs symptoms and risks progression to the kidneys.\",\"safety_net\":\"Seek in-person care or go to the ED promptly if you develop fever or chills, back or flank pain, nausea or vomiting, visible blood in the urine, severe or worsening pelvic pain, or confusion or marked weakness. Also seek care sooner if you cannot pass urine, if you think you may be pregnant, or if symptoms do not improve within 1-2 days of starting treatment. Drink fluids in the meantime and avoid bladder irritants such as caffeine and alcohol.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none cited), and the patient denies fever, back pain and pregnancy. This needs a prescriber to confirm the diagnosis and decide on antibiotic treatment, which a virtual conversation can do, so self_care alone is not enough because home care will not clear a bacterial UTI and she asks for help today. It does not need in_person_today or ed_now since there are no systemic signs, flank pain, or pregnancy to suggest pyelonephritis or complicated infection.\",\"safety_net\":\"Seek in-person care or the ED the same day if you develop fever or chills, back or flank pain, nausea or vomiting, blood in the urine, inability to urinate, severe lower abdominal pain, vaginal discharge or new sores, or if symptoms worsen or have not improved within 2 to 3 days of treatment. Drink fluids in the meantime, and tell us if you become pregnant or might be pregnant.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite). The patient denies fever, back pain and pregnancy. Antibiotics need a prescription, so self_care alone would not resolve this and the patient asks for help today. Not one level higher (in_person_today): there are no signs of pyelonephritis, systemic illness or complicating factors, and a virtual visit can assess and prescribe. Not one level lower (within_few_days): symptoms are already bothersome and treatable, and prompt treatment is reasonable.\",\"safety_net\":\"Seek in-person care or the ED promptly if you develop fever or chills, flank or back pain, nausea or vomiting, visible blood in the urine, inability to urinate, severe abdominal pain, or confusion, or if symptoms are not improving within 2-3 days of starting treatment. Call 911 for fainting, severe weakness, or trouble breathing. Drink fluids and tell the clinician if you could be pregnant, develop vaginal discharge, or have new symptoms.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none present), and the patient denies fever, back pain and pregnancy. Why not one level higher (in_person_today): there are no signs of pyelonephritis, systemic illness or other complications, and a virtual conversation can assess and treat. Why not lower (within_few_days or self_care): symptoms are already two days old and the patient asks for help today. Antibiotics need a prescriber, so self-care alone is not adequate, and a same-day virtual visit gets effective treatment started promptly.\",\"safety_net\":\"Seek in-person care today or go to the ED if you develop fever or chills, flank or back pain, nausea or vomiting, visible blood in the urine, inability to urinate, severe pelvic or abdominal pain, confusion, or feel very unwell. Also seek care sooner if you become pregnant or symptoms worsen or do not start improving within 2 to 3 days of treatment. Drink fluids in the meantime.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency with no fever, no flank/back pain and not pregnant suggests uncomplicated cystitis. No red flags or modifiers were extracted, so none are cited. The floor is self_care. Antibiotics are usually needed for symptomatic UTI and the patient asks for help today, so a same-day virtual physician conversation is appropriate. Not one level higher (in_person_today) because there are no systemic symptoms, flank pain, or pregnancy, and a virtual assessment is sufficient. Not one level lower (within_few_days or self_care) because the symptoms have lasted two days, probably need prescription treatment, and delay would prolong discomfort and risk progression.\",\"safety_net\":\"Seek care urgently (ED or in person today) if you develop fever or chills, back or flank pain, nausea or vomiting, blood in the urine, inability to urinate, severe lower abdominal pain, or confusion. Also seek care if symptoms are not improving within 2 to 3 days of starting treatment, if they worsen, or if you think you could be pregnant. Call 911 for severe symptoms such as fainting, trouble breathing, or severe confusion.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite). She denies fever, back pain and pregnancy. Not in_person_today or higher: there are no systemic signs, flank pain or pyelonephritis features, and no instability. Not within_few_days or lower: symptoms are active, she asks for help today, and treatment generally needs a clinician's assessment (possibly a urinalysis or culture) and a prescription, so a same-day virtual conversation is appropriate and avoids delay. Self-care alone is not enough because prior episodes needed antibiotics.\",\"safety_net\":\"Seek care sooner, in person or at the ED, if you develop fever or chills, back or flank pain, nausea or vomiting, visible blood in the urine, inability to urinate, severe pelvic pain, confusion, or symptoms that worsen or do not improve within 2 to 3 days of starting treatment. Tell us right away if you become pregnant or think you might be, or if you notice unusual vaginal discharge. Drink fluids in the meantime. Call 911 for severe symptoms such as fainting or trouble breathing.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none present), and the patient denies fever, flank/back pain and pregnancy. Not higher (in_person_today or ED): there are no signs of pyelonephritis, sepsis, or systemic illness, and a virtual evaluation is enough. Not lower (within_few_days, routine, or self_care): symptoms are bothersome and likely need prescription antibiotics, the patient asked for help today, and same-day clinician contact allows confirmation of the history, exclusion of STI or vaginal causes, and treatment without delay. Self-care alone is unlikely to be adequate.\",\"safety_net\":\"Seek in-person or emergency care sooner if you develop fever or chills, back or side (flank) pain, nausea or vomiting, visible blood in the urine, inability to urinate, severe lower abdominal pain, confusion, or feel very unwell. Also seek care if symptoms are not improving within 48 hours of starting treatment, if they worsen, or if you think you may be pregnant or have new vaginal discharge or genital symptoms.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"No red flags or modifiers were extracted (none to cite). The picture is consistent with uncomplicated cystitis: 2 days of dysuria and urinary frequency, no fever, no flank or back pain, not pregnant, and a prior similar episode that resolved with antibiotics. Antibiotics need a clinician's assessment and prescription, and the patient asked for help today, so a same-day virtual physician contact fits. Not one level higher (in_person_today): there are no signs of pyelonephritis, systemic illness, or complicated infection, so a virtual conversation is enough. Not one level lower (within_few_days or self_care): symptoms are already 2 days in and likely need prescription treatment, and delaying prolongs discomfort and risks ascending infection. Self-care alone would not treat a probable bacterial UTI.\",\"safety_net\":\"Seek in-person care or go to the ED sooner if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, severe or worsening pain, inability to urinate, confusion, or feeling very unwell. Also contact the clinic if symptoms do not start improving within 48 hours of starting treatment, if they come back soon after finishing it, or if you become pregnant or think you might be. Drink fluids in the meantime.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests an uncomplicated lower UTI. No red flags or modifiers were extracted (no fever, no flank or back pain, not pregnant). The floor is self_care, but this will probably need a prescription antibiotic, and the patient asked for help today, so a same-day virtual physician contact is appropriate. Not in_person_today or ed_now: no systemic symptoms, no upper tract signs, no pregnancy, and no sign of instability. Not within_few_days or self_care: symptoms are active, antibiotic treatment is likely needed, and same-day evaluation relieves symptoms and lowers the risk of progression.\",\"safety_net\":\"Seek in-person or emergency care promptly if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, inability to urinate, severe lower abdominal pain, confusion, or unusual weakness. Also seek care if symptoms are not improving within 2 to 3 days of starting treatment, if they worsen, or if you think you might be pregnant. Drink fluids and avoid delaying care if anything changes.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite). The patient denies fever, back pain and pregnancy, so there is no sign of pyelonephritis or a complicated infection, and in-person assessment today or ED is not needed. Self-care alone is not enough because antibiotics cleared the last episode and the patient asks for help today. A same-day virtual physician contact can confirm the diagnosis and arrange urine testing and treatment, and that is also why this is not a routine or few-days visit.\",\"safety_net\":\"Seek care sooner (same-day in person or ED) if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, inability to urinate, severe lower abdominal pain, confusion, or if symptoms are not improving within 48 hours of starting treatment. Call 911 for fainting, severe weakness, or trouble breathing. Drink fluids, and tell the clinic if you could be pregnant or new symptoms such as vaginal discharge appear.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency with no fever, back pain or pregnancy fits probable uncomplicated cystitis, and she has a prior similar episode. No red flags or modifiers were extracted (none cited). Floor is self_care, but dysuria this likely needs a prescription antibiotic, which home care cannot provide, and she asks for help today. Not self_care because symptoms are likely bacterial and need clinician assessment and treatment. Not in_person_today or higher because there is no fever, flank pain, vomiting, pregnancy or other complicating feature, so a virtual physician conversation (with urine testing as the physician decides) is enough. Not within_few_days because she is symptomatic now and can be treated today.\",\"safety_net\":\"Seek in-person care or the ED promptly if you develop fever or chills, back or flank pain, nausea or vomiting, inability to urinate or keep fluids down, visible blood in the urine, severe or worsening pelvic pain, confusion, or feel very unwell. Also seek care sooner if symptoms do not begin improving within 1 to 2 days of starting treatment, or if you become pregnant or think you might be. Drink fluids in the meantime.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite). The patient denies fever, back pain and pregnancy, so there is no sign of pyelonephritis or a complicated infection. Symptoms are bothersome and need prescription antibiotics, which self-care cannot provide, and the patient asked for help today, so a same-day virtual physician conversation is appropriate. Not higher: no systemic symptoms, flank pain or instability that would require in-person or ED evaluation. Not lower: self-care alone will not treat a likely bacterial UTI, and a within-few-days timeframe would leave the patient symptomatic and risk progression.\",\"safety_net\":\"Seek in-person or emergency care sooner if you develop fever or chills, flank or back pain, nausea or vomiting, visible blood in urine, inability to urinate, severe abdominal or pelvic pain, confusion, or if symptoms worsen or do not improve within 48 hours of starting treatment. Tell the clinic if you could be pregnant or have new vaginal discharge. Drink fluids in the meantime.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none present), and she reports no fever, no back pain and no pregnancy. Not higher (in_person_today or ED): there are no signs of pyelonephritis, sepsis, or retention, and a virtual evaluation is enough. Not lower (within_few_days, routine or self_care): she is symptomatic now and asks for help today, and symptoms of this kind generally need a clinician to assess and decide on testing and antibiotic treatment. Same-day virtual contact is appropriate and above the floor.\",\"safety_net\":\"Seek care sooner, in person or in the ED, if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, inability to urinate, severe pelvic or abdominal pain, confusion, or feel very unwell. Also contact the clinic if you might be pregnant, have new vaginal discharge, or symptoms do not start improving within 1 to 2 days of treatment. Drink fluids in the meantime.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"No red flags or modifiers were extracted (none to cite). The 2-day dysuria and frequency with no fever, no back pain and no pregnancy fit uncomplicated cystitis in a 34-year-old with a prior similar episode. This is a symptomatic condition that usually needs a prescription (antibiotics) and a clinician's assessment, and the patient asks for help today. Not one level higher (in_person_today): there are no signs of pyelonephritis, systemic illness or complicating factors, so a virtual evaluation is enough. Not one level lower (within_few_days or self_care): symptoms are active and uncomfortable, home care alone is unlikely to clear a bacterial infection, and a same-day virtual conversation lets the physician confirm it is uncomplicated and treat it promptly.\",\"safety_net\":\"Seek in-person or emergency care sooner if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, inability to urinate, severe lower abdominal pain, vaginal or penile discharge, confusion or feeling very unwell, or if you are or may be pregnant. Also call back if symptoms are not improving within 48 hours of starting treatment or if they worsen.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite). She denies fever, back pain and pregnancy. Why not one level higher (in_person_today): there is no fever, flank pain, systemic symptoms or other sign of pyelonephritis or complicated infection, and a virtual evaluation is enough. Why not lower (within_few_days, routine or self_care): she has symptoms now, asks for help today, and likely needs a prescription for antibiotics, which self-care cannot provide. Same-day clinician contact can confirm the history, check for allergies, other risks and vaginal symptoms, and decide on treatment or a urine test.\",\"safety_net\":\"Seek in-person care the same day or go to the ED if you develop fever or chills, back or flank pain, nausea or vomiting, blood in the urine, or severe pain, if you cannot keep fluids down or cannot urinate, or if you become pregnant or suspect you are. Contact the clinic again if symptoms do not begin to improve within 2 to 3 days of starting treatment or if they get worse or come back.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite). The patient denies fever, back pain and pregnancy. Antibiotics need a prescription, so home care alone (one level lower, self_care) will not resolve it, and she asked for help today. A virtual physician conversation can assess, consider a urinalysis or culture, and prescribe if appropriate. In-person care today (one level higher) is not needed because there are no signs of pyelonephritis, systemic illness or complicated features.\",\"safety_net\":\"Seek in-person or emergency care sooner if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, inability to urinate, severe or worsening pain, confusion, or if symptoms do not improve within 48 hours of starting treatment. Call 911 for fainting, very rapid heartbeat, or severe weakness. Drink fluids, and tell us right away if you become pregnant or think you might be.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none present): no fever, no back/flank pain, not pregnant. Antibiotics need a prescription, so self_care alone would not address her symptoms, and she asks for help today. A same-day virtual physician conversation is enough to confirm the history and arrange treatment, with a urinalysis or culture if needed. Not one level higher (in_person_today) because there are no systemic signs, flank pain or pregnancy and a virtual assessment can be enough. Not one level lower (within_few_days) because symptoms are ongoing and uncomfortable, treatment is time-sensitive for comfort, and she asks for same-day help.\",\"safety_net\":\"Seek in-person care or the ED promptly if you develop fever or chills, back or flank pain, nausea or vomiting, visible blood in the urine, inability to urinate, severe lower abdominal pain, confusion, or feel very unwell. Contact us sooner if you become pregnant or suspect you are, or if symptoms do not start improving within 2 to 3 days of starting treatment. Call 911 for fainting, trouble breathing, or severe worsening illness.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none present); no fever, no flank/back pain, and she reports not being pregnant. The floor is self_care. Antibiotics require a clinician's assessment, and the patient asks for help today, so a same-day virtual physician conversation is appropriate. I did not choose in_person_today because there are no signs of pyelonephritis, systemic illness, or retention, and a virtual visit is enough. I did not choose within_few_days or self_care because symptoms are already 2 days in and likely need prescription treatment, so waiting offers little benefit and prolongs discomfort.\",\"safety_net\":\"Seek in-person care or the ED promptly if you develop fever or chills, back or flank pain, nausea or vomiting, visible blood in the urine, severe pelvic pain, or inability to urinate. Also seek care if you think you could be pregnant, develop unusual vaginal discharge, or if symptoms are not improving within 2 to 3 days of starting treatment. Drink fluids and avoid bladder irritants while waiting.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests an uncomplicated lower UTI. No red flags or modifiers were extracted (none to cite), and she reports no fever, no back pain and no pregnancy. Why not one level higher (in_person_today): there are no signs of pyelonephritis or systemic illness, and a virtual evaluation is enough. Why not lower (within_few_days, routine or self_care): she asks for help today, and symptoms are ongoing and uncomfortable. Treatment usually needs a clinician to assess and prescribe antibiotics, so self-care alone is not adequate and delay offers no benefit. A same-day virtual physician conversation can confirm the history, decide whether a urinalysis or culture is needed, and prescribe treatment.\",\"safety_net\":\"Seek in-person care or go to the ED promptly if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, inability to urinate, severe lower abdominal pain, vaginal discharge, or confusion or feeling very unwell. Also seek care if you become pregnant or symptoms do not improve within 2 to 3 days of starting treatment. Drink fluids in the meantime.\"}",
+          "{\"disposition\":\"physician_contact_today\",\"justification\":\"Two days of dysuria and urinary frequency in a 34-year-old with a prior similar episode that responded to antibiotics suggests uncomplicated cystitis. No red flags or modifiers were extracted (none to cite), and the patient reports no fever, no back pain and no pregnancy. Not one level higher (in_person_today): there are no signs of pyelonephritis, systemic illness or instability, so an in-person visit today is not required. Not one level lower (within_few_days or self_care): symptoms are already 2 days old and need prescription antibiotics, which self-care cannot provide, and the patient asked for help today. A same-day virtual physician contact can confirm the history and arrange treatment, with urinalysis or culture if indicated. The floor of self_care is met.\",\"safety_net\":\"Seek in-person care the same day or go to the ED if you develop fever or chills, flank or back pain, nausea or vomiting, blood in the urine, severe or worsening pain, or are unable to urinate. Also contact us if symptoms are not improving within 2 to 3 days of starting treatment, if they come back soon after finishing it, or if you become pregnant or think you might be. Call 911 for confusion, fainting or severe weakness.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute symptoms consistent with an uncomplicated urinary tract infection (dysuria, urinary frequency) without red flags such as fever, flank pain, or pregnancy. Physician contact today is appropriate to evaluate for antimicrobial treatment virtually, avoiding unnecessary delay in symptom relief. In-person evaluation today is not required as there are no signs of upper tract infection or complicating factors. Waiting within a few days or self-care is inappropriate due to the risk of progression to pyelonephritis and the need for prompt symptom control.\",\n  \"safety_net\": \"Please seek urgent in-person medical care or visit the nearest emergency department immediately if you develop a fever, chills, severe back or side (flank) pain, nausea and vomiting, or if you see blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and urinary frequency consistent with uncomplicated cystitis without fever or flank pain. Physician contact today is appropriate to evaluate and prescribe antibiotic therapy virtually. In-person care today is not required as there are no red flags for pyelonephritis or complicated infection. Waiting for routine care or self-care alone is insufficient as bacterial cystitis requires timely evaluation and treatment to resolve symptoms.\",\n  \"safety_net\": \"Please seek immediate emergency or in-person medical attention if you develop a high fever, chills, severe lower back or flank pain, nausea and vomiting, or visible blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient describes acute symptoms characteristic of an uncomplicated urinary tract infection (dysuria, urinary frequency) without red flags such as fever, flank pain, or pregnancy. In-person today is unnecessary because classic uncomplicated cystitis can be safely evaluated and managed remotely (e.g., via telehealth prescription or protocolized lab order). Within a few days is inadequate because untreated symptomatic dysuria causes significant pain and carries a risk of ascending infection if delayed.\",\n  \"safety_net\": \"Please seek immediate emergency medical care if you develop a fever, chills, severe back or flank pain, nausea and vomiting, confusion, or visible blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"Symptoms are consistent with an acute uncomplicated lower urinary tract infection without systemic signs or red flags (no fever, no flank pain, not pregnant). In-person today is unnecessary given the absence of pyelonephritis signs, but self-care is insufficient as symptomatic bacterial cystitis requires prompt antibiotic therapy and clinical evaluation today.\",\n  \"safety_net\": \"Seek immediate medical attention or go to the nearest emergency department if you develop a fever, chills, nausea/vomiting, severe back or flank pain, or visible blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and frequency consistent with an uncomplicated urinary tract infection without systemic red flags (no fever, back pain, or pregnancy). Physician contact today is appropriate to confirm diagnosis and prescribe antibiotics. In-person today is unnecessary given the absence of fever, flank pain, or signs of pyelonephritis. Within a few days or self-care is insufficient because acute cystitis requires timely assessment to relieve symptoms and avoid progression.\",\n  \"safety_net\": \"Seek immediate medical care or go to an emergency room if you develop fever, chills, severe back or flank pain, nausea, vomiting, or if you are unable to keep fluids down.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and frequency consistent with an uncomplicated UTI, without red flags such as fever or flank pain. Physician contact today is appropriate for evaluation and antibiotic management. In-person today is not necessary as there are no systemic signs of pyelonephritis, but delaying to within a few days or self-care is inadequate due to the need for prompt treatment to alleviate discomfort and prevent progression.\",\n  \"safety_net\": \"Seek immediate emergency medical care if you develop a high fever, chills, severe back or flank pain, nausea and vomiting, or if you become unable to pass urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"Patient reports classic symptoms of an acute uncomplicated urinary tract infection (dysuria, urinary frequency) without systemic signs such as fever or flank pain. Same-day physician contact is appropriate to discuss diagnosis and initiate antibiotic therapy. In-person today is not strictly required given the lack of red flags or complications (no fever, flank pain, or pregnancy), but waiting within a few days or self-care is inadequate due to significant discomfort and risk of worsening infection.\",\n  \"safety_net\": \"Please seek immediate medical care if you develop a fever, chills, lower back or flank pain, nausea or vomiting, blood in your urine, or if your symptoms rapidly worsen.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and urinary frequency characteristic of an uncomplicated UTI without systemic symptoms (no fever, no back/flank pain, not pregnant). Same-day physician contact is warranted to evaluate and initiate antibiotic therapy promptly. In-person today is not required given the absence of signs of upper tract infection or complication. Waiting within a few days is inappropriate due to symptom discomfort and the risk of progression.\",\n  \"safety_net\": \"If you develop a fever, chills, severe back or side (flank) pain, nausea, vomiting, or visible blood in your urine, seek emergency medical care immediately.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports classic symptoms of an uncomplicated lower urinary tract infection (dysuria and frequency) without systemic signs such as fever or flank pain. Physician contact today is appropriate to confirm diagnosis and prescribe antimicrobial therapy. In-person today is unnecessary given the lack of red flags or signs of upper tract involvement/pyelonephritis, while within a few days or self-care would inappropriately delay treatment for symptomatic cystitis.\",\n  \"safety_net\": \"Please seek immediate emergency medical care if you develop high fevers, shaking chills, severe flank or back pain, nausea and vomiting, or if you become unable to keep fluids down.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"Patient reports classic symptoms of an acute uncomplicated urinary tract infection (dysuria, frequency) without red flags such as fever, flank pain, or pregnancy. Physician contact today is appropriate to evaluate and prescribe targeted antibiotic therapy. In person today is unnecessary as there are no signs of systemic infection or pyelonephritis requiring a physical exam. Lower dispositions (such as within a few days or self-care) are inadequate because acute bacterial cystitis requires prompt antibiotic treatment for symptom resolution and prevention of progression.\",\n  \"safety_net\": \"Seek immediate emergency medical care if you develop a fever, chills, severe back or flank pain, nausea, vomiting, or visible blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and urinary frequency typical of uncomplicated lower urinary tract infection without systemic signs or red flags. Why not higher (in_person_today): she has no fever, flank pain, pregnancy, or signs of pyelonephritis requiring urgent in-person exam. Why not lower (within_few_days / self_care): acute symptomatic bacterial cystitis requires timely clinical evaluation and prescription antibiotics to provide symptom relief and prevent progression.\",\n  \"safety_net\": \"Seek immediate in-person or emergency medical care if you develop fever, chills, lower back or flank pain, nausea, vomiting, confusion, or blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"Patient reports classic symptoms of an uncomplicated lower urinary tract infection (dysuria, frequency) without red flags such as fever, flank pain, or pregnancy. Physician contact today allows for appropriate evaluation and prescription of antibiotics without requiring an emergency or in-person exam (why not in_person_today). Self-care or waiting a few days is inappropriate given active discomfort and the need for timely antimicrobial management (why not self_care or within_few_days).\",\n  \"safety_net\": \"Please seek immediate emergency medical care if you develop high fever, chills, severe flank or back pain, nausea and vomiting, or inability to urinate.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and frequency consistent with an uncomplicated UTI, requiring clinician assessment and likely antibiotic prescription today. In-person assessment is not required because there are no signs of upper tract involvement (no fever or back pain) or pregnancy. Delaying to within a few days or self-care is insufficient given symptomatic dysuria needing timely prescription therapy.\",\n  \"safety_net\": \"Seek immediate medical care at an emergency department or urgent care if you develop a fever, chills, nausea, vomiting, flank or back pain, or if your symptoms rapidly worsen.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient describes acute symptoms consistent with an uncomplicated urinary tract infection (dysuria, frequency) without red flags such as fever or flank pain. Physician contact today is appropriate to evaluate for antibiotic therapy or arrange testing. In-person evaluation today is not strictly required given the absence of systemic symptoms or red flags. Waiting within a few days or self-care alone is inadequate because untreated symptomatic cystitis causes significant discomfort and risks progression.\",\n  \"safety_net\": \"Seek urgent or emergency care immediately if you develop high fever, chills, severe back or flank pain, nausea, vomiting, or if your symptoms rapidly worsen.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and frequency consistent with an uncomplicated UTI, which requires timely evaluation and treatment today to relieve distress and prevent progression. In-person today is not necessary as there are no red flags for pyelonephritis (no fever or back pain). Self-care or waiting a few days is inappropriate because bacterial cystitis typically requires prompt prescription management.\",\n  \"safety_net\": \"Please contact us today for an evaluation and prescription. Seek immediate emergency care if you develop a high fever, chills, severe flank or back pain, nausea and vomiting, or visible blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports classic symptoms of uncomplicated cystitis (dysuria and urinary frequency) without systemic signs such as fever or flank pain. Same-day physician contact is appropriate to confirm the diagnosis and prescribe antibiotic therapy. In-person today is not necessary given the absence of signs of upper tract infection (pyelonephritis) or complications, but self-care or delaying care within a few days is inappropriate due to the need for prompt symptom relief and targeted treatment.\",\n  \"safety_net\": \"Please seek immediate emergency care if you develop a fever, chills, severe lower back or flank pain, nausea, vomiting, or blood in your urine.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports acute dysuria and frequency consistent with an uncomplicated urinary tract infection without systemic features (no fever, no flank pain). An in-person assessment today is unnecessary given the lack of red flags suggesting pyelonephritis or complicated infection, but physician contact today is required for diagnosis and timely antimicrobial therapy, making a delay to within a few days or self-care inappropriate.\",\n  \"safety_net\": \"Please seek immediate emergency or in-person medical care if you develop a fever, chills, severe flank or back pain, nausea and vomiting, visible blood in your urine, or if your symptoms worsen rapidly.\"\n}",
+          "{\n  \"disposition\": \"physician_contact_today\",\n  \"justification\": \"The patient reports classic symptoms of an uncomplicated lower urinary tract infection (dysuria and frequency) without systemic or upper tract signs (no fever, no back pain, not pregnant). Physician contact today is indicated to confirm the diagnosis and prescribe appropriate antibiotic therapy. An in-person visit today is unnecessary because there are no signs of pyelonephritis or pelvic complications. Delaying to within a few days or self-care is inappropriate due to symptom burden and the risk of ascending infection without treatment.\",\n  \"safety_net\": \"Please seek immediate emergency medical care if you develop a high fever, chills, severe back or side (flank) pain, nausea and vomiting, blood in your urine, or confusion.\"\n}"
+        ]
+      }
+    }
+  }
+}
