@@ -1,0 +1,125 @@
+import type {Level} from '../src/levels';
+import {
+  LlmError,
+  type LlmClient,
+  type LlmErrorCode,
+  type LlmRequest,
+  type ModelSpec,
+} from '../src/llm';
+import type {Deps} from '../src/pipeline';
+import {loadPolicy} from '../src/policy';
+import {fakeExtraction, sample, withFlags} from './fixtures';
+
+// Synthetic messages only: the repo is public.
+export const M = 'I have had a sore throat for two days. What should I do?';
+export const REFILL_WITH_CHEST =
+  'Could you refill my blood pressure pills please? Also my chest feels ' +
+  'tight and the pressure is spreading into my left arm.';
+export const SECRET_MSG =
+  'SYNTHETIC-SECRET-7f3a: a mild itchy rash on my forearm since Tuesday.';
+
+export const PRIMARY: ModelSpec = {model: 'test/primary', provider: 'test-a'};
+export const SECONDARY: ModelSpec = {
+  model: 'test/secondary',
+  provider: 'test-b',
+};
+
+export type ScriptOpts = {
+  /** Flags to mark; a present flag's excerpt is the whole message. */
+  flags?: Record<string, 'present' | 'unknown'>;
+  /** Modifiers to mark present. */
+  mods?: string[];
+  /** The level every primary sample proposes (default routine). */
+  samples?: Level;
+  /** The level every secondary sample proposes, or 'fail' (default: samples). */
+  secondary?: Level | 'fail';
+  /** Makes the extraction call fail with this LlmError code. */
+  extractError?: LlmErrorCode;
+  language?: string;
+  care?: boolean;
+  questions?: string[];
+  photo?: boolean;
+  /** How many primary sample calls fail with a timeout. */
+  sampleFailures?: number;
+  /** Every sample call waits on this before it settles. */
+  samplesAwait?: Promise<unknown>;
+  /** Called as each sample call settles. */
+  onSample?: () => void;
+};
+
+/** The patient message inside a request's data delimiters. */
+function messageOf(req: LlmRequest): string {
+  const m = /^<patient_message>\n([\s\S]*)\n<\/patient_message>/.exec(req.user);
+  if (!m) throw new Error('request has no patient_message block');
+  return m[1];
+}
+
+/**
+ * An LlmClient whose extraction call returns an extraction built from opts
+ * and whose sample calls return samples. Counts every call.
+ */
+export function scripted(opts: ScriptOpts): LlmClient & {calls: number} {
+  const policy = loadPolicy();
+  let primarySamples = 0;
+  const client = {
+    calls: 0,
+    async complete(req: LlmRequest) {
+      client.calls++;
+      if (req.schemaName === 'extraction') {
+        if (opts.extractError) {
+          throw new LlmError(opts.extractError, 'scripted extraction failure');
+        }
+        const ex = withFlags(
+          fakeExtraction(policy),
+          opts.flags ?? {},
+          opts.mods ?? [],
+          messageOf(req),
+        );
+        ex.language = opts.language ?? 'en';
+        ex.is_care_request = opts.care ?? true;
+        ex.questions = opts.questions ?? [];
+        ex.photo_needed = opts.photo ?? false;
+        return {json: ex, raw: JSON.stringify(ex), latencyMs: 1};
+      }
+      const isPrimary = req.spec.model !== SECONDARY.model;
+      const i = isPrimary ? primarySamples++ : -1;
+      if (opts.samplesAwait) await opts.samplesAwait;
+      opts.onSample?.();
+      const level = isPrimary
+        ? (opts.samples ?? 'routine')
+        : (opts.secondary ?? opts.samples ?? 'routine');
+      if (isPrimary && i < (opts.sampleFailures ?? 0)) {
+        throw new LlmError('timeout', 'scripted timeout');
+      }
+      if (level === 'fail') throw new LlmError('timeout', 'scripted timeout');
+      const json = sample(level);
+      return {json, raw: JSON.stringify(json), latencyMs: 1};
+    },
+  };
+  return client;
+}
+
+/** Deps around an LlmClient: no secondary model, a silent log. */
+export function deps(llm: LlmClient): Deps {
+  return {
+    llm,
+    policy: loadPolicy(),
+    primary: PRIMARY,
+    secondary: null,
+    log: () => {},
+  };
+}
+
+export function deferred<T = void>(): {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+} {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>(r => (resolve = r));
+  return {promise, resolve};
+}
+
+/** Lets pending microtasks and one macrotask run. */
+export function tick(): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}

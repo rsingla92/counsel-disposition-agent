@@ -1,0 +1,427 @@
+import {extract} from './extract';
+import {ruleFloor, verifyExcerpt, type FloorResult} from './floor';
+import {LEVELS, briefLabelOf, rank, tierOf, type Level} from './levels';
+import type {LlmClient, ModelSpec} from './llm';
+import {traceLine} from './log';
+import type {Policy} from './policy';
+import {chooseLevel, emptyVotes, reviewReasons, type Votes} from './router';
+import {drawSamples, type VoteSet} from './sample';
+import {
+  RouteResultSchema,
+  SampleSchema,
+  type Extraction,
+  type ReasonCode,
+  type RouteResult,
+} from './schema';
+
+export {traceLine};
+
+export type Deps = {
+  llm: LlmClient;
+  policy: Policy;
+  primary: ModelSpec;
+  secondary: ModelSpec | null;
+  log: (line: string) => void;
+};
+
+export type EarlyEvent = {
+  event: 'early';
+  floor: Level;
+  patient_message: string;
+};
+
+export type RouteOptions = {
+  mode?: 'full' | 'floor_only';
+  onEarly?: (e: EarlyEvent) => void;
+};
+
+/** Patient copy for Human review when no disposition is carried. */
+export const HUMAN_REVIEW_MESSAGE =
+  'Thanks for your message. A Counsel physician will review it within 1 ' +
+  'hour. If this is an emergency, call 911 now.';
+
+/** Reasons that put the case in front of a physician for review. */
+const REVIEW_REASONS: ReadonlySet<ReasonCode> = new Set([
+  'too_long',
+  'non_english',
+  'out_of_scope',
+  'extraction_failed',
+  'sampling_failed',
+  'schema_invalid',
+  'split_vote',
+  'wide_spread',
+  'family_disagreement',
+  'unverified_excerpt',
+]);
+
+const EXPLANATIONS: Record<ReasonCode, string> = {
+  too_long: 'The message is longer than the intake limit.',
+  non_english: 'The message is not in English.',
+  out_of_scope: 'The message is not a request for care.',
+  extraction_failed: 'Clinical findings could not be extracted.',
+  sampling_failed: 'Too few valid disposition samples were returned.',
+  schema_invalid: 'The routing result failed validation.',
+  split_vote: 'The samples were split.',
+  wide_spread: 'The samples spread widely.',
+  family_disagreement: 'The two model families disagree on the tier.',
+  unverified_excerpt: 'A red-flag excerpt was not found in the message.',
+  missing_info: 'More information is needed.',
+  photo_needed: 'A photo is needed.',
+};
+
+/** State shared by every exit from route(). */
+type Run = {
+  message: string;
+  deps: Deps;
+  start: number;
+  hash: Promise<string>;
+  models: ModelSpec[];
+  raw: {
+    extraction: string | null;
+    primary: string[];
+    secondary: string[] | null;
+  };
+  extraction: Extraction | null;
+  floor: FloorResult | null;
+};
+
+async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(text),
+  );
+  return Array.from(new Uint8Array(digest), b =>
+    b.toString(16).padStart(2, '0'),
+  ).join('');
+}
+
+function isEmergency(l: Level): boolean {
+  return rank(l) >= rank('ed_now');
+}
+
+/** Instructions of present flags, in policy order. */
+function instructions(run: Run): string[] {
+  const ex = run.extraction;
+  if (!ex) return [];
+  return run.deps.policy.red_flags
+    .filter(f => ex.red_flags[f.id]?.state === 'present' && f.instruction)
+    .map(f => f.instruction as string);
+}
+
+function levelMessage(run: Run, level: Level, safetyNet = ''): string {
+  return [
+    run.deps.policy.levels[level].patient_message,
+    ...instructions(run),
+    safetyNet,
+  ]
+    .filter(s => s !== '')
+    .join(' ');
+}
+
+function floorJustification(run: Run): string {
+  const drivers = run.floor?.drivers ?? [];
+  return `Rule floor: ${drivers.length ? drivers.join(', ') : 'none'}.`;
+}
+
+/** The fields every result shares, derived from the run so far. */
+function common(run: Run) {
+  const ex = run.extraction;
+  const message = run.message;
+  return {
+    floor: run.floor?.floor ?? null,
+    red_flags: run.deps.policy.red_flags.map(f => {
+      const got = ex?.red_flags[f.id];
+      const state = got?.state ?? 'unknown';
+      const excerpt = got?.excerpt ?? null;
+      return {
+        id: f.id,
+        state,
+        excerpt,
+        excerpt_verified:
+          state === 'present' &&
+          excerpt !== null &&
+          verifyExcerpt(message, excerpt),
+      };
+    }),
+    modifiers: run.deps.policy.modifiers
+      .filter(m => ex?.modifiers[m.id]?.present === true)
+      .map(m => ({id: m.id, excerpt: ex?.modifiers[m.id]?.excerpt ?? null})),
+    info_requests: {
+      questions: ex?.questions ?? [],
+      photo: ex?.photo_needed ?? false,
+    },
+    time_sensitive: ex?.time_sensitive ?? false,
+  };
+}
+
+type Outcome = {
+  status: RouteResult['status'];
+  disposition: Level | null;
+  votes: RouteResult['votes'];
+  confidence: number | null;
+  reasons: ReasonCode[];
+  justification: string;
+  safety_net: string;
+  patient_message: string;
+};
+
+async function assemble(run: Run, o: Outcome): Promise<RouteResult> {
+  return {
+    status: o.status,
+    disposition: o.disposition,
+    tier: o.disposition ? tierOf(o.disposition) : null,
+    brief_label: o.disposition ? briefLabelOf(o.disposition) : null,
+    ...common(run),
+    votes: o.votes,
+    confidence: o.confidence,
+    human_review: {
+      flagged:
+        o.status === 'human_review' ||
+        o.reasons.some(r => REVIEW_REASONS.has(r)),
+      reasons: o.reasons,
+    },
+    justification: o.justification,
+    safety_net: o.safety_net,
+    patient_message: o.patient_message,
+    trace: {
+      input_sha256: await run.hash,
+      policy_version: run.deps.policy.policy_version,
+      models: run.models,
+      latency_ms: Date.now() - run.start,
+      raw: run.raw,
+    },
+  };
+}
+
+/**
+ * Human review. Carries the floor as the disposition only when it is
+ * Emergency; otherwise no disposition and the fixed holding message.
+ */
+function humanReview(
+  run: Run,
+  reason: ReasonCode,
+  votes: RouteResult['votes'] = {primary: emptyVotes(), secondary: null},
+): Promise<RouteResult> {
+  const floor = run.floor?.floor ?? null;
+  const carried = floor !== null && isEmergency(floor) ? floor : null;
+  return assemble(run, {
+    status: 'human_review',
+    disposition: carried,
+    votes,
+    confidence: null,
+    reasons: [reason],
+    justification: carried
+      ? `${EXPLANATIONS[reason]} ${floorJustification(run)} Emergency floor kept.`
+      : EXPLANATIONS[reason],
+    safety_net: '',
+    patient_message: carried
+      ? levelMessage(run, carried)
+      : HUMAN_REVIEW_MESSAGE,
+  });
+}
+
+/** The first valid primary sample that itself proposed `level`, unclamped. */
+function proposer(set: VoteSet, level: Level) {
+  for (const raw of set.raw) {
+    let json: unknown;
+    try {
+      json = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+    const s = SampleSchema.safeParse(json);
+    if (s.success && s.data.disposition === level) return s.data;
+  }
+  return null;
+}
+
+function addSpec(run: Run, spec: ModelSpec): void {
+  if (
+    !run.models.some(
+      m => m.model === spec.model && m.provider === spec.provider,
+    )
+  ) {
+    run.models.push(spec);
+  }
+}
+
+async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
+  const {deps, message} = run;
+  const {policy} = deps;
+
+  // 1. Intake.
+  if (message.length > policy.intake.max_chars) {
+    return humanReview(run, 'too_long');
+  }
+
+  // 2. Extraction (an LlmError is the only failure extract() reports).
+  addSpec(run, deps.primary);
+  let ex: Extraction;
+  try {
+    const got = await extract(message, deps.primary, deps.llm, policy);
+    ex = got.extraction;
+    run.raw.extraction = got.raw;
+  } catch {
+    return humanReview(run, 'extraction_failed');
+  }
+  run.extraction = ex;
+
+  // 3. Rule floor, and emergency instructions without waiting for sampling.
+  const floor = ruleFloor(ex, message, policy);
+  run.floor = floor;
+  if (isEmergency(floor.floor) && opts.onEarly) {
+    try {
+      opts.onEarly({
+        event: 'early',
+        floor: floor.floor,
+        patient_message: levelMessage(run, floor.floor),
+      });
+    } catch {
+      // A failed listener must not stop routing.
+    }
+  }
+
+  // 4. Scope.
+  if (ex.language !== 'en') return humanReview(run, 'non_english');
+  if (!ex.is_care_request) return humanReview(run, 'out_of_scope');
+
+  const reasons: ReasonCode[] = [];
+  if (floor.unverified.length > 0) reasons.push('unverified_excerpt');
+
+  // 5. Floor only.
+  if (opts.mode === 'floor_only') {
+    return assemble(run, {
+      status: 'routed',
+      disposition: floor.floor,
+      votes: {primary: emptyVotes(), secondary: null},
+      confidence: null,
+      reasons,
+      justification: floorJustification(run),
+      safety_net: '',
+      patient_message: levelMessage(run, floor.floor),
+    });
+  }
+
+  // 6. Sampling, both families in parallel. drawSamples never throws.
+  const draw = (spec: ModelSpec) =>
+    drawSamples(message, ex, floor.floor, spec, deps.llm, policy);
+  const [primary, secondary] = await Promise.all([
+    draw(deps.primary),
+    deps.secondary ? draw(deps.secondary) : Promise.resolve(null),
+  ]);
+  if (deps.secondary) addSpec(run, deps.secondary);
+  run.raw.primary = primary.raw;
+  run.raw.secondary = secondary?.raw ?? null;
+  const votes = {primary: primary.votes, secondary: secondary?.votes ?? null};
+  if (primary.valid < policy.sampling.min_valid) {
+    return humanReview(run, 'sampling_failed', votes);
+  }
+
+  // 7. Choose and flag.
+  const disposition = chooseLevel(primary.votes, floor.floor, policy);
+  const secondaryVotes: Votes | null =
+    secondary && secondary.valid >= policy.sampling.min_valid
+      ? secondary.votes
+      : null;
+  reasons.unshift(...reviewReasons(primary.votes, secondaryVotes, policy));
+  const needsInfo = ex.questions.length > 0 || ex.photo_needed;
+  if (ex.questions.length > 0) reasons.push('missing_info');
+  if (ex.photo_needed) reasons.push('photo_needed');
+  const top = Math.max(...LEVELS.map(l => primary.votes[l]));
+
+  // 8. Explain.
+  const chosen = proposer(primary, disposition);
+  const safetyNet = chosen?.safety_net ?? '';
+  return assemble(run, {
+    status: needsInfo ? 'needs_info' : 'routed',
+    disposition,
+    votes,
+    confidence: top / primary.valid,
+    reasons,
+    justification:
+      chosen?.justification ??
+      `${floorJustification(run)} No sample proposed this level; routed by expected cost.`,
+    safety_net: safetyNet,
+    patient_message: levelMessage(run, disposition, safetyNet),
+  });
+}
+
+/**
+ * Routes one patient message through the 8-step pipeline (PRD p. 5). Never
+ * throws: every failure ends at Human review, carrying an Emergency floor.
+ * Logs one trace line per call, without the message text.
+ */
+export async function route(
+  message: string,
+  deps: Deps,
+  opts: RouteOptions = {},
+): Promise<RouteResult> {
+  const run: Run = {
+    message,
+    deps,
+    start: Date.now(),
+    // Started now, awaited only when the result is assembled, so hashing
+    // never delays the early event.
+    hash: sha256Hex(message).catch(() => ''),
+    models: [],
+    raw: {extraction: null, primary: [], secondary: null},
+    extraction: null,
+    floor: null,
+  };
+
+  let result: RouteResult;
+  try {
+    const candidate = await pipeline(run, opts);
+    const parsed = RouteResultSchema.safeParse(candidate);
+    result = parsed.success
+      ? parsed.data
+      : await humanReview(run, 'schema_invalid');
+  } catch {
+    result = await humanReview(run, 'schema_invalid').catch(() =>
+      lastResort(run),
+    );
+  }
+
+  try {
+    deps.log(traceLine(result));
+  } catch {
+    // Logging must not change the patient's outcome.
+  }
+  return result;
+}
+
+/** Hand-built Human review for when even assembling a result failed. */
+function lastResort(run: Run): RouteResult {
+  const floor = run.floor?.floor ?? null;
+  const carried = floor !== null && isEmergency(floor) ? floor : null;
+  let patientMessage = HUMAN_REVIEW_MESSAGE;
+  try {
+    if (carried) patientMessage = levelMessage(run, carried);
+  } catch {
+    // Keep the holding message.
+  }
+  return {
+    status: 'human_review',
+    disposition: carried,
+    tier: carried ? tierOf(carried) : null,
+    brief_label: carried ? briefLabelOf(carried) : null,
+    floor,
+    red_flags: [],
+    modifiers: [],
+    votes: {primary: emptyVotes(), secondary: null},
+    confidence: null,
+    human_review: {flagged: true, reasons: ['schema_invalid']},
+    info_requests: {questions: [], photo: false},
+    time_sensitive: false,
+    justification: EXPLANATIONS.schema_invalid,
+    safety_net: '',
+    patient_message: patientMessage,
+    trace: {
+      input_sha256: '',
+      policy_version: run.deps.policy?.policy_version ?? '',
+      models: run.models,
+      latency_ms: Date.now() - run.start,
+      raw: null,
+    },
+  };
+}
