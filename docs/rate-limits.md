@@ -40,10 +40,10 @@ only the Human review message ("if this is an emergency, call 911").
 - At most 3 calls in flight per case, down from 6.
 - Extraction gets the same rate-limit retries as sampling: 4, with backoff
   from 1 s. It used to get 1.
-- When the primary model's extraction fails outright, the secondary model
-  extracts instead. If the primary returned output that failed validation but
-  still had a readable flag list, those flags set the floor and no fallback is
-  made.
+- When the primary model's extraction marks no red flag present (an error, or
+  output that failed validation), the secondary model extracts instead. Red
+  flags read from invalid output still set the floor; across both attempts
+  each flag keeps its most severe state.
 - Each failed extraction call logs the model, error code and HTTP status, so
   the next run shows whether failures are 429s or timeouts. Logs carry no
   message text.
@@ -60,5 +60,9 @@ only the Human review message ("if this is an emergency, call 911").
   primary's samples go ahead of the secondary's.
 - Alerting on the Human review rate and on 429 counts, from the log lines
   above and OpenRouter traces.
+- One deadline for extraction across both models, so the early 911 or ED
+  message is never more than about 20 s late. The fallback can double that
+  today.
+- Record which model extracted in the trace.
 - A deterministic keyword backstop for emergencies when extraction fails
   entirely.

@@ -396,6 +396,21 @@ function extractionErrorLine(spec: ModelSpec, e: unknown): string {
   });
 }
 
+/** Salvaged flags from two attempts: each flag keeps its most severe state. */
+function mergeFlags(
+  a: Extraction['red_flags'] | null,
+  b: Extraction['red_flags'],
+): Extraction['red_flags'] {
+  if (!a) return b;
+  const severity = {unknown: 0, absent: 1, present: 2};
+  return Object.fromEntries(
+    Object.entries(b).map(([id, f]) => [
+      id,
+      severity[a[id].state] >= severity[f.state] ? a[id] : f,
+    ]),
+  );
+}
+
 /** An extraction holding only salvaged red flags: no modifiers or questions. */
 function salvagedExtraction(
   flags: Extraction['red_flags'],
@@ -424,8 +439,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
 
   // 2. Extraction (an LlmError is the only failure extract() reports). When
-  // the primary returns nothing usable, the secondary tries once.
+  // the primary marks no flag present, the secondary tries once.
   let ex: Extraction | null = null;
+  let salvaged: Extraction['red_flags'] | null = null;
   for (const spec of [deps.primary, deps.secondary]) {
     if (!spec) continue;
     addSpec(run, spec);
@@ -435,18 +451,27 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
       run.raw.extraction = got.raw;
       break;
     } catch (e) {
-      deps.log(extractionErrorLine(spec, e));
-      // Output that missed or repeated a flag still floors the flags it did
-      // mark present; the case goes to a physician either way.
+      try {
+        deps.log(extractionErrorLine(spec, e));
+      } catch {
+        // Logging must not change the patient's outcome.
+      }
       if (e instanceof ExtractionInvalidError && e.flags) {
         run.raw.extraction = e.raw;
-        run.extraction = salvagedExtraction(e.flags, policy);
-        setFloor(run, opts);
-        return humanReview(run, 'extraction_failed');
+        salvaged = mergeFlags(salvaged, e.flags);
+        if (Object.values(salvaged).some(f => f.state === 'present')) break;
       }
     }
   }
-  if (!ex) return humanReview(run, 'extraction_failed');
+  if (!ex) {
+    // Output that missed or repeated a flag still floors the flags it did
+    // mark present; the case goes to a physician either way.
+    if (salvaged) {
+      run.extraction = salvagedExtraction(salvaged, policy);
+      setFloor(run, opts);
+    }
+    return humanReview(run, 'extraction_failed');
+  }
   run.extraction = ex;
 
   // 3. Rule floor, and emergency instructions without waiting for sampling.

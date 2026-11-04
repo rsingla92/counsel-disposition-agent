@@ -681,6 +681,115 @@ describe('route: extraction fallback', () => {
     expect(lines.join('\n')).not.toContain('SYNTHETIC-SECRET');
   });
 
+  // Replaces the red_flags of the named model's extraction output.
+  function editFlags(
+    llm: ReturnType<typeof scripted>,
+    model: string,
+    edit: (flags: WireExtraction['red_flags']) => unknown,
+  ) {
+    const inner = llm.complete.bind(llm);
+    llm.complete = async req => {
+      const res = await inner(req);
+      if (req.schemaName !== 'extraction' || req.spec.model !== model) {
+        return res;
+      }
+      const ex = res.json as WireExtraction;
+      const json = {...ex, red_flags: edit(ex.red_flags)};
+      return {...res, json, raw: JSON.stringify(json)};
+    };
+    return llm;
+  }
+
+  it('asks the secondary when the primary returns an empty flag list', async () => {
+    const llm = editFlags(
+      scripted({flags: {cardiac_chest_pain: 'present'}}),
+      PRIMARY.model,
+      () => [],
+    );
+    const r = await route(REFILL_WITH_CHEST, {
+      ...deps(llm),
+      secondary: SECONDARY,
+    });
+    expect(r.human_review.reasons).not.toContain('extraction_failed');
+    expect(r.floor).toBe('call_911');
+  });
+
+  it('asks the secondary when the primary output has no flag list', async () => {
+    const llm = editFlags(
+      scripted({flags: {cardiac_chest_pain: 'present'}}),
+      PRIMARY.model,
+      () => undefined,
+    );
+    const r = await route(REFILL_WITH_CHEST, {
+      ...deps(llm),
+      secondary: SECONDARY,
+    });
+    expect(r.human_review.reasons).not.toContain('extraction_failed');
+    expect(r.floor).toBe('call_911');
+  });
+
+  it('floors salvaged flags from the secondary after a primary error', async () => {
+    const llm = editFlags(
+      scripted({
+        extractError: 'timeout',
+        extractErrorOn: 'primary',
+        flags: {cardiac_chest_pain: 'present'},
+      }),
+      SECONDARY.model,
+      f => f.filter(e => e.id !== 'anaphylaxis'),
+    );
+    const r = await route(REFILL_WITH_CHEST, {
+      ...deps(llm),
+      secondary: SECONDARY,
+    });
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.floor).toBe('call_911');
+    expect(r.disposition).toBe('call_911');
+  });
+
+  it('keeps the floor when the logger throws', async () => {
+    const onEarly = vi.fn();
+    const llm = editFlags(
+      scripted({flags: {cardiac_chest_pain: 'present'}}),
+      PRIMARY.model,
+      f => f.filter(e => e.id !== 'anaphylaxis'),
+    );
+    const r = await route(
+      REFILL_WITH_CHEST,
+      {
+        ...deps(llm),
+        secondary: SECONDARY,
+        log: () => {
+          throw new Error('broken sink');
+        },
+      },
+      {onEarly},
+    );
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.floor).toBe('call_911');
+    expect(onEarly).toHaveBeenCalled();
+  });
+
+  it('logs the HTTP status of a failed extraction with no secondary', async () => {
+    const lines: string[] = [];
+    const llm = scripted({extractError: 'provider_error', extractStatus: 429});
+    const r = await route(M, {...deps(llm), log: l => lines.push(l)});
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(llm.calls).toBe(1);
+    const errors = lines
+      .map(l => JSON.parse(l))
+      .filter(l => l.kind === 'llm_error');
+    expect(errors).toEqual([
+      {
+        kind: 'llm_error',
+        step: 'extraction',
+        model: PRIMARY.model,
+        code: 'provider_error',
+        status: 429,
+      },
+    ]);
+  });
+
   it('keeps salvaged flags from the primary without a fallback call', async () => {
     const llm = scripted({flags: {cardiac_chest_pain: 'present'}});
     const inner = llm.complete.bind(llm);
