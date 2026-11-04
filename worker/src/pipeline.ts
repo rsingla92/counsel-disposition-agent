@@ -141,6 +141,26 @@ function floorJustification(run: Run): string {
   return `Rule floor: ${drivers.length ? drivers.join(', ') : 'none'}.`;
 }
 
+/**
+ * Present modifiers with their excerpt checked against the message. The
+ * one place modifier excerpts are verified: the result and the review
+ * flag both read excerpt_verified from here.
+ */
+function modifierResults(run: Run): RouteResult['modifiers'] {
+  const ex = run.extraction;
+  return run.deps.policy.modifiers
+    .filter(m => ex?.modifiers[m.id]?.present === true)
+    .map(m => {
+      const excerpt = ex?.modifiers[m.id]?.excerpt ?? null;
+      return {
+        id: m.id,
+        excerpt,
+        excerpt_verified:
+          excerpt !== null && verifyExcerpt(run.message, excerpt),
+      };
+    });
+}
+
 /** The fields every result shares, derived from the run so far. */
 function common(run: Run) {
   const ex = run.extraction;
@@ -161,16 +181,7 @@ function common(run: Run) {
           verifyExcerpt(message, excerpt),
       };
     }),
-    modifiers: run.deps.policy.modifiers
-      .filter(m => ex?.modifiers[m.id]?.present === true)
-      .map(m => {
-        const excerpt = ex?.modifiers[m.id]?.excerpt ?? null;
-        return {
-          id: m.id,
-          excerpt,
-          excerpt_verified: excerpt !== null && verifyExcerpt(message, excerpt),
-        };
-      }),
+    modifiers: modifierResults(run),
     info_requests: {
       questions: ex?.questions ?? [],
       photo: ex?.photo_needed ?? false,
@@ -393,14 +404,10 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   const reasons: ReasonCode[] = [];
   // A present modifier whose excerpt is not in the message still counts
   // toward the floor (ruleFloor), but a physician checks it, as for flags.
-  const unverifiedModifiers = policy.modifiers.filter(m => {
-    const got = ex.modifiers[m.id];
-    return (
-      got?.present === true &&
-      (got.excerpt === null || !verifyExcerpt(message, got.excerpt))
-    );
-  });
-  if (floor.unverified.length > 0 || unverifiedModifiers.length > 0) {
+  const unverifiedModifier = modifierResults(run).some(
+    m => !m.excerpt_verified,
+  );
+  if (floor.unverified.length > 0 || unverifiedModifier) {
     reasons.push('unverified_excerpt');
   }
 
