@@ -1,0 +1,396 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "routed",
+        "needs_info",
+        "human_review"
+      ]
+    },
+    "disposition": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "call_911",
+            "ed_now",
+            "in_person_today",
+            "physician_contact_today",
+            "within_few_days",
+            "routine",
+            "self_care"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "tier": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "emergency",
+            "same_day",
+            "async",
+            "self_care"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "brief_label": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "URGENT_ESCALATION",
+            "ASYNC_PHYSICIAN",
+            "SELF_CARE"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "floor": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "call_911",
+            "ed_now",
+            "in_person_today",
+            "physician_contact_today",
+            "within_few_days",
+            "routine",
+            "self_care"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "red_flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "present",
+              "absent",
+              "unknown"
+            ]
+          },
+          "excerpt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "excerpt_verified": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "excerpt",
+          "excerpt_verified"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "modifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "excerpt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "votes": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "object",
+          "properties": {
+            "call_911": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "ed_now": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "in_person_today": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "physician_contact_today": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "within_few_days": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "routine": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "self_care": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "call_911",
+            "ed_now",
+            "in_person_today",
+            "physician_contact_today",
+            "within_few_days",
+            "routine",
+            "self_care"
+          ],
+          "additionalProperties": false
+        },
+        "secondary": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "call_911": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "ed_now": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "in_person_today": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "physician_contact_today": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "within_few_days": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "routine": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "self_care": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "call_911",
+                "ed_now",
+                "in_person_today",
+                "physician_contact_today",
+                "within_few_days",
+                "routine",
+                "self_care"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "primary",
+        "secondary"
+      ],
+      "additionalProperties": false
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "human_review": {
+      "type": "object",
+      "properties": {
+        "flagged": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "too_long",
+              "non_english",
+              "out_of_scope",
+              "extraction_failed",
+              "sampling_failed",
+              "schema_invalid",
+              "split_vote",
+              "wide_spread",
+              "family_disagreement",
+              "unverified_excerpt",
+              "missing_info",
+              "photo_needed"
+            ]
+          }
+        }
+      },
+      "required": [
+        "flagged",
+        "reasons"
+      ],
+      "additionalProperties": false
+    },
+    "info_requests": {
+      "type": "object",
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "photo": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "questions",
+        "photo"
+      ],
+      "additionalProperties": false
+    },
+    "time_sensitive": {
+      "type": "boolean"
+    },
+    "justification": {
+      "type": "string"
+    },
+    "safety_net": {
+      "type": "string"
+    },
+    "patient_message": {
+      "type": "string"
+    },
+    "trace": {
+      "type": "object",
+      "properties": {
+        "input_sha256": {
+          "type": "string"
+        },
+        "policy_version": {
+          "type": "string"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "provider"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "latency_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "raw": {}
+      },
+      "required": [
+        "input_sha256",
+        "policy_version",
+        "models",
+        "latency_ms",
+        "raw"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "status",
+    "disposition",
+    "tier",
+    "brief_label",
+    "floor",
+    "red_flags",
+    "modifiers",
+    "votes",
+    "confidence",
+    "human_review",
+    "info_requests",
+    "time_sensitive",
+    "justification",
+    "safety_net",
+    "patient_message",
+    "trace"
+  ],
+  "additionalProperties": false,
+  "description": "Shape only. Cross-field rules are not expressed here: null disposition only with status human_review, tier and brief_label derived from disposition, disposition never below floor, and human review always carrying a reason code. They are enforced by the Worker's RouteResultSchema (Zod)."
+}
