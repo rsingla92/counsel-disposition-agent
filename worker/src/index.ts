@@ -171,9 +171,41 @@ export function depsFromEnv(env: Env): Deps {
   };
 }
 
-export default {
-  fetch(req: Request, env: Env, ctx?: unknown): Response | Promise<Response> {
-    const app = appFor(depsFromEnv(env));
-    return app.fetch(req, env, ctx as Parameters<typeof app.fetch>[2]);
-  },
-};
+/**
+ * The Worker entry point. Deps are built per request outside the Hono app,
+ * so a failure there (such as a policy that does not parse) is caught here
+ * and answered with a bare 503: no details, and only a minimal log line.
+ */
+export function workerFor(
+  makeDeps: (env: Env) => Deps = depsFromEnv,
+  log: (line: string) => void = line => console.log(line),
+) {
+  return {
+    fetch(req: Request, env: Env, ctx?: unknown): Response | Promise<Response> {
+      let deps: Deps;
+      try {
+        deps = makeDeps(env);
+      } catch {
+        try {
+          log(
+            JSON.stringify({
+              kind: 'error',
+              ts: new Date().toISOString(),
+              where: 'deps',
+            }),
+          );
+        } catch {
+          // Logging must not change the response.
+        }
+        return new Response(JSON.stringify({error: 'service misconfigured'}), {
+          status: 503,
+          headers: {'Content-Type': 'application/json'},
+        });
+      }
+      const app = appFor(deps);
+      return app.fetch(req, env, ctx as Parameters<typeof app.fetch>[2]);
+    },
+  };
+}
+
+export default workerFor();

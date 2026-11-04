@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import schemaJson from '../../schema/route-result.schema.json';
-import worker, {appFor, type Env} from '../src/index';
+import worker, {appFor, workerFor, type Env} from '../src/index';
 import {loadPolicy} from '../src/policy';
 import {
   M,
@@ -157,6 +157,31 @@ describe('POST /v1/route', () => {
     );
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({error: 'model not configured'});
+  });
+});
+
+describe('worker entry', () => {
+  it('returns 503 when building deps throws', async () => {
+    const logged: string[] = [];
+    const w = workerFor(
+      () => {
+        throw new Error('policy failed to parse: secret detail');
+      },
+      l => logged.push(l),
+    );
+    const res = await w.fetch(
+      new Request('http://w/v1/route', post({message: M})),
+      ENV,
+    );
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({error: 'service misconfigured'});
+    expect(logged).toHaveLength(1);
+    expect(JSON.parse(logged[0])).toEqual({
+      kind: 'error',
+      ts: expect.any(String),
+      where: 'deps',
+    });
+    expect(logged[0]).not.toContain('secret detail');
   });
 });
 
