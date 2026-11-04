@@ -6,45 +6,45 @@ const LevelSchema = z.enum(LEVELS);
 const GroupSchema = z.enum(['adult', 'pediatric', 'obstetric']);
 const IdSchema = z.string().regex(/^[a-z][a-z0-9_]*$/);
 
-const LevelCopySchema = z.object({
+const LevelCopySchema = z.strictObject({
   physician_window: z.string().min(1),
   patient_window: z.string().min(1),
   patient_message: z.string().min(1),
 });
 
-export const PolicySchema = z.object({
+export const PolicySchema = z.strictObject({
   policy_version: z.string().regex(/^\d+\.\d+\.\d+$/),
-  intake: z.object({max_chars: z.number().int().positive()}),
-  sampling: z.object({
+  intake: z.strictObject({max_chars: z.number().int().positive()}),
+  sampling: z.strictObject({
     n: z.number().int().positive(),
     temperature: z.number().min(0),
     min_valid: z.number().int().positive(),
     timeout_ms: z.number().int().positive(),
   }),
-  review: z.object({
+  review: z.strictObject({
     min_top_votes: z.number().int().positive(),
     max_span: z.number().int().nonnegative(),
     family_tier_disagreement: z.boolean(),
   }),
   modifier_cap: LevelSchema,
-  loss: z.object({
+  loss: z.strictObject({
     human_review_cost: z.number().positive(),
     boundaries: z.array(
-      z.object({
+      z.strictObject({
         between: z.tuple([LevelSchema, LevelSchema]),
         under: z.number().positive(),
         over: z.number().positive(),
       }),
     ),
   }),
-  levels: z.object(
+  levels: z.strictObject(
     Object.fromEntries(LEVELS.map(l => [l, LevelCopySchema])) as Record<
       (typeof LEVELS)[number],
       typeof LevelCopySchema
     >,
   ),
   red_flags: z.array(
-    z.object({
+    z.strictObject({
       id: IdSchema,
       group: GroupSchema,
       description: z.string().min(1),
@@ -55,7 +55,7 @@ export const PolicySchema = z.object({
     }),
   ),
   modifiers: z.array(
-    z.object({
+    z.strictObject({
       id: IdSchema,
       group: GroupSchema,
       description: z.string().min(1),

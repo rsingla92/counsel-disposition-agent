@@ -44,6 +44,29 @@ describe('policy', () => {
       }),
     ).toThrow());
 
+  it('rejects a misspelled key on a red flag instead of dropping it', () => {
+    const {instruction, ...rest} = policy.red_flags.find(
+      f => f.instruction !== undefined,
+    )!;
+    expect(instruction).toBeDefined();
+    expect(() =>
+      PolicySchema.parse({
+        ...policy,
+        red_flags: [{...rest, instructions: instruction}],
+      }),
+    ).toThrow();
+  });
+
+  it('rejects unknown keys at the top level and on a modifier', () => {
+    expect(() => PolicySchema.parse({...policy, sampeling: {}})).toThrow();
+    expect(() =>
+      PolicySchema.parse({
+        ...policy,
+        modifiers: [{...policy.modifiers[0], descripton: 'x'}],
+      }),
+    ).toThrow();
+  });
+
   it('defines every level with windows and a patient message', () => {
     for (const l of LEVELS) {
       expect(policy.levels[l].physician_window).not.toBe('');
