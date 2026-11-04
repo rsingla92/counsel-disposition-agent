@@ -1,5 +1,10 @@
 import {describe, expect, it, vi} from 'vitest';
-import {MAX_IN_FLIGHT, openRouterClient, type LlmRequest} from '../src/llm';
+import {
+  MAX_IN_FLIGHT,
+  MAX_RETRIES,
+  openRouterClient,
+  type LlmRequest,
+} from '../src/llm';
 import {okJson, okText} from './fixtures';
 
 const req: LlmRequest = {
@@ -157,12 +162,12 @@ describe('openRouterClient retries', () => {
     expect(sleep).toHaveBeenCalledTimes(2);
   });
 
-  it('gives up after two retries', async () => {
+  it('gives up after MAX_RETRIES retries', async () => {
     const impl = vi.fn(tooMany);
     await expect(
       openRouterClient('k', impl, 6, noSleep).complete(req),
     ).rejects.toMatchObject({code: 'provider_error', status: 429});
-    expect(impl).toHaveBeenCalledTimes(3);
+    expect(impl).toHaveBeenCalledTimes(MAX_RETRIES + 1);
   });
 
   it.each([500, 400, 401])('does not retry a %i', async status => {

@@ -42,8 +42,12 @@ const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
  */
 export const MAX_IN_FLIGHT = 6;
 
-/** Retries for a rate-limited (HTTP 429) request. Nothing else is retried. */
-const MAX_RETRIES = 2;
+/**
+ * Retries for a rate-limited (HTTP 429) request; nothing else is retried.
+ * Backoff doubles from 1 s, so four retries wait about 15 s in all. A case
+ * stays far inside the Workers Paid subrequest limit.
+ */
+export const MAX_RETRIES = 4;
 
 /** Runs at most `max` tasks at a time, in the order they arrive. */
 function limiter(max: number) {
