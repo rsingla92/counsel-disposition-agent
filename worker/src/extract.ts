@@ -54,6 +54,15 @@ const OPEN_OR_CLOSE_TAG = new RegExp(
 );
 
 /**
+ * Wraps a patient message in the data delimiters, neutralising any look-alike
+ * of the delimiters inside it.
+ */
+export function wrapPatientMessage(message: string): string {
+  const safe = message.replace(OPEN_OR_CLOSE_TAG, '‹');
+  return `<patient_message>\n${safe}\n</patient_message>`;
+}
+
+/**
  * Extracts red flags and modifiers from a patient message. Throws LlmError;
  * a response that fails the extraction schema is 'invalid_json'.
  */
@@ -66,11 +75,10 @@ export async function extract(
   const schema = extractionSchema(policy);
   const jsonSchema = z.toJSONSchema(schema) as Record<string, unknown>;
   delete jsonSchema.$schema; // some providers reject it
-  const safe = message.replace(OPEN_OR_CLOSE_TAG, '‹');
   const res = await llm.complete({
     spec,
     system: extractionSystemPrompt(policy),
-    user: `<patient_message>\n${safe}\n</patient_message>`,
+    user: wrapPatientMessage(message),
     schemaName: 'extraction',
     jsonSchema,
     temperature: 0,
