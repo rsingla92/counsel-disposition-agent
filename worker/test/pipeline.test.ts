@@ -358,7 +358,24 @@ describe('route: fallback justification', () => {
     );
   });
 
-  it('explains an expected-cost choice between split votes', async () => {
+  it('explains a modifier-raised minimum over lower samples', async () => {
+    const r = await route(
+      M,
+      deps(scripted({mods: ['age_65_plus'], samples: 'self_care'})),
+    );
+    expect(r.floor).toBe('routine');
+    expect(r.disposition).toBe('routine');
+    expect(r.justification).toContain('age_65_plus');
+    expect(r.justification).toContain('Routine');
+    expect(r.justification).not.toContain('split between');
+    expect(r.justification).toBe(
+      'Risk factor age_65_plus raises the minimum to Routine. The samples ' +
+        'proposed Self-care below that, so the minimum applies. Not Within ' +
+        'a few days because no red flag or sample supports it.',
+    );
+  });
+
+  it('explains an expected-cost choice no sample proposed', async () => {
     // 4 x call_911 and 16 x routine: the router picks ed_now, which no
     // sample proposed.
     const r = await route(

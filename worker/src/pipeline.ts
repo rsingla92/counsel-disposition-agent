@@ -282,13 +282,20 @@ function fallbackJustification(
       ? 'This is the most urgent level.'
       : `Not ${label(levelAtRank(rank(chosen) + 1))} because ${because}.`;
   const n = countByLevel(samples);
+  // Most-voted proposal; LEVELS is most acute first, so ties go acute.
+  const top = LEVELS.reduce((a, b) => (n[b] > n[a] ? b : a));
   if (floor.drivers.length > 0) {
-    // Most-voted proposal; LEVELS is most acute first, so ties go acute.
-    const top = LEVELS.reduce((a, b) => (n[b] > n[a] ? b : a));
     return (
       `Red flag(s) ${floor.drivers.join(', ')} set a minimum of ` +
       `${label(floor.floor)}. The samples proposed ${label(top)} below ` +
       `that, so the floor applies. ${ending('no red flag or sample supports it')}`
+    );
+  }
+  if (floor.modifier_applied !== null) {
+    return (
+      `Risk factor ${floor.modifier_applied} raises the minimum to ` +
+      `${label(floor.floor)}. The samples proposed ${label(top)} below ` +
+      `that, so the minimum applies. ${ending('no red flag or sample supports it')}`
     );
   }
   const split = LEVELS.filter(l => n[l] > 0).map(l => `${label(l)} (${n[l]})`);
