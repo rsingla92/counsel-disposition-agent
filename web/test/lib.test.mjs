@@ -14,6 +14,7 @@ import {
   fallbackFor,
   formatPercent,
   highlight,
+  highlightExcerpts,
   isEmergency,
   levelLabel,
   parseNdjson,
@@ -93,6 +94,29 @@ test('highlight marks every occurrence of an excerpt', () => {
 
 test('highlight with no excerpts returns the whole message unmarked', () => {
   assert.deepEqual(highlight('hello', []), [{text: 'hello', mark: false}]);
+});
+
+test('highlightExcerpts uses only verified flag and modifier excerpts', () => {
+  const r = {
+    red_flags: [
+      {id: 'f1', state: 'present', excerpt: 'flag ok', excerpt_verified: true},
+      {id: 'f2', state: 'present', excerpt: 'flag bad', excerpt_verified: false},
+      {id: 'f3', state: 'absent', excerpt: 'absent one', excerpt_verified: false},
+    ],
+    modifiers: [
+      {id: 'm1', excerpt: 'mod ok', excerpt_verified: true},
+      {id: 'm2', excerpt: 'mod bad', excerpt_verified: false},
+      {id: 'm3', excerpt: null, excerpt_verified: false},
+    ],
+  };
+  assert.deepEqual(highlightExcerpts(r), ['flag ok', 'mod ok']);
+  assert.deepEqual(highlightExcerpts(null), []);
+});
+
+test('highlightExcerpts never highlights a modifier without excerpt_verified', () => {
+  // An older saved run without the field must not count as verified.
+  const r = {red_flags: [], modifiers: [{id: 'm', excerpt: 'text'}]};
+  assert.deepEqual(highlightExcerpts(r), []);
 });
 
 // --- NDJSON ----------------------------------------------------------------

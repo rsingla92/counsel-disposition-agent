@@ -79,7 +79,8 @@ const EXPLANATIONS: Record<ReasonCode, string> = {
   split_vote: 'The samples were split.',
   wide_spread: 'The samples spread widely.',
   family_disagreement: 'The two model families disagree on the tier.',
-  unverified_excerpt: 'A red-flag excerpt was not found in the message.',
+  unverified_excerpt:
+    'A red-flag or modifier excerpt was not found in the message.',
   missing_info: 'More information is needed.',
   photo_needed: 'A photo is needed.',
   secondary_unavailable:
@@ -162,7 +163,14 @@ function common(run: Run) {
     }),
     modifiers: run.deps.policy.modifiers
       .filter(m => ex?.modifiers[m.id]?.present === true)
-      .map(m => ({id: m.id, excerpt: ex?.modifiers[m.id]?.excerpt ?? null})),
+      .map(m => {
+        const excerpt = ex?.modifiers[m.id]?.excerpt ?? null;
+        return {
+          id: m.id,
+          excerpt,
+          excerpt_verified: excerpt !== null && verifyExcerpt(message, excerpt),
+        };
+      }),
     info_requests: {
       questions: ex?.questions ?? [],
       photo: ex?.photo_needed ?? false,
@@ -383,7 +391,18 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   if (!ex.is_care_request) return humanReview(run, 'out_of_scope');
 
   const reasons: ReasonCode[] = [];
-  if (floor.unverified.length > 0) reasons.push('unverified_excerpt');
+  // A present modifier whose excerpt is not in the message still counts
+  // toward the floor (ruleFloor), but a physician checks it, as for flags.
+  const unverifiedModifiers = policy.modifiers.filter(m => {
+    const got = ex.modifiers[m.id];
+    return (
+      got?.present === true &&
+      (got.excerpt === null || !verifyExcerpt(message, got.excerpt))
+    );
+  });
+  if (floor.unverified.length > 0 || unverifiedModifiers.length > 0) {
+    reasons.push('unverified_excerpt');
+  }
 
   // 5. Floor only.
   if (opts.mode === 'floor_only') {

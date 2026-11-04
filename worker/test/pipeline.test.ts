@@ -251,6 +251,48 @@ describe('route: result details', () => {
     );
   });
 
+  it('flags an unverified modifier excerpt but keeps the floor', async () => {
+    const verified = await route(
+      M,
+      deps(scripted({mods: ['age_65_plus'], samples: 'self_care'})),
+    );
+    const llm = scripted({mods: ['age_65_plus'], samples: 'self_care'});
+    const inner = llm.complete.bind(llm);
+    llm.complete = async req => {
+      const res = await inner(req);
+      if (req.schemaName !== 'extraction') return res;
+      const ex = res.json as {modifiers: Record<string, {excerpt: string}>};
+      ex.modifiers.age_65_plus.excerpt = 'a paraphrase not in it';
+      return {...res, raw: JSON.stringify(ex)};
+    };
+    const r = await route(M, deps(llm));
+    expect(r.modifiers).toEqual([
+      {
+        id: 'age_65_plus',
+        excerpt: 'a paraphrase not in it',
+        excerpt_verified: false,
+      },
+    ]);
+    expect(r.human_review.flagged).toBe(true);
+    expect(r.human_review.reasons).toContain('unverified_excerpt');
+    // The modifier still counts toward the floor.
+    expect(r.floor).toBe('routine');
+    expect(r.floor).toBe(verified.floor);
+    expect(r.disposition).toBe(verified.disposition);
+  });
+
+  it('does not flag a modifier whose excerpt verifies', async () => {
+    const r = await route(
+      M,
+      deps(scripted({mods: ['age_65_plus'], samples: 'self_care'})),
+    );
+    expect(r.modifiers).toEqual([
+      expect.objectContaining({id: 'age_65_plus', excerpt_verified: true}),
+    ]);
+    expect(r.human_review.reasons).not.toContain('unverified_excerpt');
+    expect(r.human_review.flagged).toBe(false);
+  });
+
   it('human review without a disposition uses the fixed message', async () => {
     const r = await route(M, deps(scripted({care: false})));
     expect(r.patient_message).toBe(HR_MESSAGE);
@@ -715,5 +757,20 @@ describe('traceLine', () => {
     const line = JSON.parse(traceLine(r));
     expect(line.red_flags_present).toEqual(['a_flag', 'b_flag']);
     expect(line.unverified).toEqual(['a_flag']);
+  });
+
+  it('lists modifiers whose excerpt did not verify, by id only', () => {
+    const r = {
+      ...validResult,
+      modifiers: [
+        {id: 'age_65_plus', excerpt: 'secret words', excerpt_verified: false},
+        {id: 'diabetes', excerpt: 'other words', excerpt_verified: true},
+      ],
+    };
+    const raw = traceLine(r);
+    const line = JSON.parse(raw);
+    expect(line.unverified).toEqual(['age_65_plus']);
+    expect(line.modifiers_present).toEqual(['age_65_plus', 'diabetes']);
+    expect(raw).not.toContain('secret words');
   });
 });

@@ -322,7 +322,8 @@
     "modifiers": [
       {
         "id": "diabetes",
-        "excerpt": "renew my metformin"
+        "excerpt": "renew my metformin",
+        "excerpt_verified": true
       }
     ],
     "votes": {

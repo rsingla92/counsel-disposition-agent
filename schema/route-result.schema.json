@@ -127,11 +127,15 @@
               "string",
               "null"
             ]
+          },
+          "excerpt_verified": {
+            "type": "boolean"
           }
         },
         "required": [
           "id",
-          "excerpt"
+          "excerpt",
+          "excerpt_verified"
         ],
         "additionalProperties": false
       }

@@ -177,6 +177,21 @@ export function highlight(message, excerpts) {
   return parts;
 }
 
+/**
+ * The excerpts to highlight in the message: present red flags and
+ * modifiers whose excerpt the Worker verified. An unverified excerpt, or a
+ * modifier from an older result without the field, is never highlighted.
+ */
+export function highlightExcerpts(result) {
+  const flags = (result?.red_flags ?? []).filter(
+    f => f.state === 'present' && f.excerpt_verified === true && f.excerpt,
+  );
+  const mods = (result?.modifiers ?? []).filter(
+    m => m.excerpt_verified === true && m.excerpt,
+  );
+  return [...flags, ...mods].map(x => x.excerpt);
+}
+
 // --- NDJSON ----------------------------------------------------------------
 
 /** Parses newline-delimited JSON. Throws on a malformed line. */

@@ -108,7 +108,11 @@ export const RouteResultSchema = z
       }),
     ),
     modifiers: z.array(
-      z.strictObject({id: z.string(), excerpt: z.string().nullable()}),
+      z.strictObject({
+        id: z.string(),
+        excerpt: z.string().nullable(),
+        excerpt_verified: z.boolean(),
+      }),
     ),
     votes: z.strictObject({
       primary: VotesSchema,

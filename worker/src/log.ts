@@ -25,7 +25,11 @@ export function traceLine(result: RouteResult): string {
     tier: result.tier,
     floor: result.floor,
     red_flags_present: present.map(f => f.id),
-    unverified: present.filter(f => !f.excerpt_verified).map(f => f.id),
+    // Flag and modifier ids whose excerpt did not verify; ids only.
+    unverified: [
+      ...present.filter(f => !f.excerpt_verified).map(f => f.id),
+      ...result.modifiers.filter(m => !m.excerpt_verified).map(m => m.id),
+    ],
     modifiers_present: result.modifiers.map(m => m.id),
     votes: result.votes,
     confidence: result.confidence,

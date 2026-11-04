@@ -13,6 +13,7 @@ import {
   fallbackFor,
   formatPercent,
   highlight,
+  highlightExcerpts,
   levelLabel,
   parseNdjson,
   patientBlocks,
@@ -168,13 +169,7 @@ function presentFlags(result) {
 
 function messageCard(run) {
   const result = run.result;
-  const verified = presentFlags(result)
-    .filter(f => f.excerpt_verified && f.excerpt)
-    .map(f => f.excerpt);
-  const modifierExcerpts = (result?.modifiers ?? [])
-    .map(m => m.excerpt)
-    .filter(Boolean);
-  const parts = highlight(run.message, [...verified, ...modifierExcerpts]);
+  const parts = highlight(run.message, highlightExcerpts(result));
   return el(
     'article',
     {class: 'card', 'aria-labelledby': 'step-1'},
@@ -249,8 +244,17 @@ function flagsCard(run) {
           el(
             'li',
             {class: 'modifier'},
-            el('span', {class: 'mono', text: m.id}),
-            m.excerpt ? el('q', {text: m.excerpt}) : null,
+            el(
+              'div',
+              {class: 'flag-head'},
+              el('span', {class: 'mono', text: m.id}),
+              m.excerpt_verified === true
+                ? null
+                : el('span', {class: 'pill unverified', text: 'unverified'}),
+            ),
+            m.excerpt
+              ? el('q', {text: m.excerpt})
+              : el('span', {class: 'note', text: 'No excerpt given.'}),
           ),
         ),
       ),
