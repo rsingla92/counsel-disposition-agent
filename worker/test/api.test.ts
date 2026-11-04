@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 import schemaJson from '../../schema/route-result.schema.json';
 import worker, {appFor, workerFor, type Env} from '../src/index';
 import {loadPolicy} from '../src/policy';
+import {OverrideReasonCodeSchema} from '../src/schema';
 import {
   M,
   REFILL_WITH_CHEST,
@@ -190,7 +191,7 @@ describe('POST /v1/override', () => {
     input_sha256: 'a'.repeat(64),
     from: 'routine',
     to: 'in_person_today',
-    reason: 'Exam needed for the rash.',
+    reason_code: 'under_triage',
   };
 
   it('logs overrides without client IP', async () => {
@@ -215,19 +216,41 @@ describe('POST /v1/override', () => {
       input_sha256: body.input_sha256,
       from: 'routine',
       to: 'in_person_today',
-      reason: body.reason,
+      reason_code: 'under_triage',
       policy_version: loadPolicy().policy_version,
     });
   });
 
-  it('rejects a bad override body', async () => {
+  it('accepts every reason code', async () => {
+    for (const reason_code of OverrideReasonCodeSchema.options) {
+      const res = await app().request(
+        '/v1/override',
+        post({...body, reason_code}),
+        ENV,
+      );
+      expect(res.status).toBe(204);
+    }
+  });
+
+  it('rejects free text, unknown codes and bad hashes', async () => {
     for (const bad of [
-      {...body, reason: ''},
+      {...body, reason: 'Exam needed for the rash.'},
+      {...body, note: 'Patient said more on the phone.'},
+      {...body, reason_code: 'rash_needs_exam'},
+      {...body, reason_code: undefined},
       {...body, to: 'urgent'},
       {...body, input_sha256: 'xyz'},
+      {...body, input_sha256: 'A'.repeat(64)},
     ]) {
-      const res = await app().request('/v1/override', post(bad), ENV);
+      const logged: string[] = [];
+      const res = await app({}, l => logged.push(l)).request(
+        '/v1/override',
+        post(bad),
+        ENV,
+      );
       expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({error: 'invalid override'});
+      expect(logged).toEqual([]);
     }
   });
 

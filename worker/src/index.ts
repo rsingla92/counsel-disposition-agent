@@ -8,6 +8,7 @@ import {openRouterClient} from './llm';
 import {overrideLine} from './log';
 import {route, type Deps, type EarlyEvent} from './pipeline';
 import {loadPolicy} from './policy';
+import {OverrideReasonCodeSchema} from './schema';
 
 export type Env = {
   OPENROUTER_API_KEY: string;
@@ -26,11 +27,11 @@ const RouteBody = z.object({
   mode: z.enum(['full', 'floor_only']).optional(),
 });
 
-const OverrideBody = z.object({
+const OverrideBody = z.strictObject({
   input_sha256: z.string().regex(/^[0-9a-f]{64}$/),
   from: z.enum(LEVELS),
   to: z.enum(LEVELS),
-  reason: z.string().refine(s => s.trim() !== ''),
+  reason_code: OverrideReasonCodeSchema,
 });
 
 /** Compares two strings in time that depends only on their lengths. */
@@ -136,13 +137,7 @@ export function appFor(deps: Deps): Hono<App> {
   app.post('/v1/override', async c => {
     const parsed = OverrideBody.safeParse(await body(c.req.raw));
     if (!parsed.success) {
-      return c.json(
-        {
-          error:
-            'override needs input_sha256, from, to (levels) and a non-empty reason',
-        },
-        400,
-      );
+      return c.json({error: 'invalid override'}, 400);
     }
     deps.log(overrideLine(parsed.data, deps.policy.policy_version));
     return c.body(null, 204);

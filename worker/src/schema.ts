@@ -29,6 +29,21 @@ export const ReasonCodeSchema = z.enum(REASON_CODES);
 export type ReasonCode = z.infer<typeof ReasonCodeSchema>;
 
 /**
+ * Why a physician overrode a disposition. Fixed codes, never free text, so
+ * an override cannot carry patient details into the logs.
+ */
+export const OverrideReasonCodeSchema = z.enum([
+  'under_triage',
+  'over_triage',
+  'missed_red_flag',
+  'false_red_flag',
+  'history_changes_risk',
+  'needs_info_resolved',
+  'other',
+]);
+export type OverrideReasonCode = z.infer<typeof OverrideReasonCodeSchema>;
+
+/**
  * The structured-output schema sent to the extraction model. Every object is
  * strict and every key required, so the model must answer once per flag and
  * modifier in the policy.
