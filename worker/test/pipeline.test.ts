@@ -367,6 +367,59 @@ describe('route: fallback justification', () => {
     );
   });
 
+  it('uses the fixed safety net when unanimous samples give blank nets', async () => {
+    const r = await route(
+      M,
+      deps(scripted({sampleFor: () => net('routine', '  ')})),
+    );
+    expect(r.status).toBe('routed');
+    expect(r.disposition).toBe('routine');
+    expect(r.human_review.flagged).toBe(false);
+    expect(r.justification).toBe('Argues for routine.');
+    expect(r.safety_net).toBe(FALLBACK_SAFETY_NET);
+    expect(r.patient_message).toBe(
+      `${policy.levels.routine.patient_message} ${FALLBACK_SAFETY_NET}`,
+    );
+  });
+
+  it("falls back to another sample's net when the chosen one is blank", async () => {
+    const r = await route(
+      M,
+      deps(
+        scripted({
+          sampleFor: i =>
+            i === 5
+              ? net('within_few_days', 'Few days net')
+              : net('routine', ' '),
+        }),
+      ),
+    );
+    expect(r.disposition).toBe('routine');
+    expect(r.justification).toBe('Argues for routine.');
+    expect(r.safety_net).toBe('Few days net');
+    expect(r.patient_message).toBe(
+      `${policy.levels.routine.patient_message} Few days net`,
+    );
+  });
+
+  it('skips whitespace-only nets when choosing a fallback', async () => {
+    const r = await route(
+      M,
+      deps(
+        scripted({
+          sampleFor: i =>
+            i === 1
+              ? net('within_few_days', ' \n\t ')
+              : i === 2
+                ? net('routine', 'Later routine net')
+                : net('routine', '\t'),
+        }),
+      ),
+    );
+    expect(r.disposition).toBe('routine');
+    expect(r.safety_net).toBe('Later routine net');
+  });
+
   it('says why not one level higher below call_911', async () => {
     const r = await route(
       M,

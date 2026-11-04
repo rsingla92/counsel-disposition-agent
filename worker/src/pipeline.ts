@@ -319,8 +319,9 @@ export function fallbackJustification(
 }
 
 /**
- * The safety-netting of the most acute proposal with a non-empty safety_net
- * (ties go to the first in call order), else the fixed fallback line.
+ * The safety-netting of the most acute proposal whose safety_net is not
+ * blank after trimming (ties go to the first in call order), else the fixed
+ * fallback line.
  */
 function fallbackSafetyNet(samples: Sample[]): string {
   let best: Sample | null = null;
@@ -437,7 +438,12 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   // 8. Explain.
   const proposed = proposals(primary);
   const chosen = proposed.find(s => s.disposition === disposition);
-  const safetyNet = chosen ? chosen.safety_net : fallbackSafetyNet(proposed);
+  // A blank net from the chosen-level proposer must not leave the patient
+  // without escalation instructions.
+  const safetyNet =
+    chosen && chosen.safety_net.trim() !== ''
+      ? chosen.safety_net
+      : fallbackSafetyNet(proposed);
   return assemble(run, {
     status: needsInfo ? 'needs_info' : 'routed',
     disposition,
