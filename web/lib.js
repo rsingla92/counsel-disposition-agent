@@ -1,0 +1,291 @@
+// Pure helpers for the demo page. No DOM access here, so node --test can
+// cover them (web/test/lib.test.mjs).
+
+/** The seven dispositions, most acute first (worker/src/levels.ts). */
+export const LEVELS = [
+  'call_911',
+  'ed_now',
+  'in_person_today',
+  'physician_contact_today',
+  'within_few_days',
+  'routine',
+  'self_care',
+];
+
+const LEVEL_LABELS = {
+  call_911: 'Call 911',
+  ed_now: 'ED now',
+  in_person_today: 'In person today',
+  physician_contact_today: 'Physician contact today',
+  within_few_days: 'Within a few days',
+  routine: 'Routine',
+  self_care: 'Self-care',
+};
+
+const TIERS = {
+  call_911: 'emergency',
+  ed_now: 'emergency',
+  in_person_today: 'same_day',
+  physician_contact_today: 'same_day',
+  within_few_days: 'async',
+  routine: 'async',
+  self_care: 'self_care',
+};
+
+export const TIER_LABELS = {
+  emergency: 'Emergency',
+  same_day: 'Same day',
+  async: 'Async',
+  self_care: 'Self-care',
+};
+
+export const STATUS_LABELS = {
+  routed: 'Routed',
+  needs_info: 'Needs info',
+  human_review: 'Human review',
+};
+
+/** Physician response windows (policy/policy.yaml, physician_window). */
+export const LEVEL_WINDOWS = {
+  call_911: 'Notified in parallel',
+  ed_now: 'Notified in parallel',
+  in_person_today: 'Within 1 hour',
+  physician_contact_today: 'Within 2-4 hours',
+  within_few_days: 'Within 24 hours',
+  routine: 'Standard queue',
+  self_care: 'Standard queue, for sign-off',
+};
+
+/** Human labels for every ReasonCode (worker/src/schema.ts). */
+export const REASON_LABELS = {
+  too_long: 'Message too long',
+  non_english: 'Not in English',
+  out_of_scope: 'Not a care request',
+  extraction_failed: 'Extraction failed',
+  sampling_failed: 'Too few valid samples',
+  schema_invalid: 'Result failed validation',
+  split_vote: 'Split vote',
+  wide_spread: 'Wide vote spread',
+  family_disagreement: 'Model families disagree',
+  unverified_excerpt: 'Excerpt not verified',
+  secondary_unavailable: 'Second model unavailable',
+  missing_info: 'Missing information',
+  photo_needed: 'Photo needed',
+};
+
+/** Human labels for OverrideReasonCodeSchema. Fixed codes, never free text. */
+export const OVERRIDE_REASON_LABELS = {
+  under_triage: 'Under-triaged: level too low',
+  over_triage: 'Over-triaged: level too high',
+  missed_red_flag: 'Missed a red flag',
+  false_red_flag: 'Red flag not actually present',
+  history_changes_risk: 'History changes the risk',
+  needs_info_resolved: 'Missing information resolved',
+  other: 'Other',
+};
+
+export const TOKEN_KEY = 'counsel-demo-token';
+
+export function levelLabel(level) {
+  if (level === null || level === undefined) return 'No disposition';
+  return LEVEL_LABELS[level] ?? String(level);
+}
+
+export function tierOf(level) {
+  return TIERS[level] ?? null;
+}
+
+export function isEmergency(level) {
+  return tierOf(level) === 'emergency';
+}
+
+// --- highlighting ----------------------------------------------------------
+
+const SINGLE_QUOTES = /[‘’‚‛′]/;
+const DOUBLE_QUOTES = /[“”„‟″]/;
+
+/**
+ * Normalises like the Worker's verifyExcerpt (lowercase, straight quotes,
+ * whitespace runs collapsed) and remembers, for each output character, the
+ * span of the input it came from.
+ */
+function normaliseWithMap(s) {
+  let out = '';
+  const from = [];
+  const to = [];
+  let i = 0;
+  for (const ch of s) {
+    const start = i;
+    i += ch.length;
+    if (/\s/.test(ch)) {
+      if (out.endsWith(' ')) {
+        to[to.length - 1] = i;
+      } else {
+        out += ' ';
+        from.push(start);
+        to.push(i);
+      }
+      continue;
+    }
+    let mapped = ch.toLowerCase();
+    if (SINGLE_QUOTES.test(ch)) mapped = "'";
+    else if (DOUBLE_QUOTES.test(ch)) mapped = '"';
+    for (const c of mapped) {
+      out += c;
+      from.push(start);
+      to.push(i);
+    }
+  }
+  return {out, from, to};
+}
+
+/**
+ * Splits `message` into parts, marking every place an excerpt occurs.
+ * Matching ignores case and whitespace differences, as verifyExcerpt does.
+ * Joining the parts' text gives back the message unchanged.
+ */
+export function highlight(message, excerpts) {
+  const hay = normaliseWithMap(message);
+  const ranges = [];
+  for (const excerpt of excerpts ?? []) {
+    if (typeof excerpt !== 'string') continue;
+    const needle = normaliseWithMap(excerpt).out.trim();
+    if (needle === '') continue;
+    let at = hay.out.indexOf(needle);
+    while (at !== -1) {
+      ranges.push([hay.from[at], hay.to[at + needle.length - 1]]);
+      at = hay.out.indexOf(needle, at + needle.length);
+    }
+  }
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  for (const r of ranges) {
+    const last = merged[merged.length - 1];
+    if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+    else merged.push([...r]);
+  }
+  const parts = [];
+  let pos = 0;
+  for (const [start, end] of merged) {
+    if (start > pos) parts.push({text: message.slice(pos, start), mark: false});
+    parts.push({text: message.slice(start, end), mark: true});
+    pos = end;
+  }
+  if (pos < message.length || parts.length === 0) {
+    parts.push({text: message.slice(pos), mark: false});
+  }
+  return parts;
+}
+
+// --- NDJSON ----------------------------------------------------------------
+
+/** Parses newline-delimited JSON. Throws on a malformed line. */
+export function parseNdjson(text) {
+  return text
+    .split(/\r?\n/)
+    .filter(line => line.trim() !== '')
+    .map(line => JSON.parse(line));
+}
+
+/**
+ * For a streaming read: parses the complete lines in `buffer` and returns the
+ * trailing partial line as `rest`, to be prefixed to the next chunk.
+ */
+export function takeLines(buffer) {
+  const cut = buffer.lastIndexOf('\n');
+  if (cut === -1) return {events: [], rest: buffer};
+  return {
+    events: parseNdjson(buffer.slice(0, cut)),
+    rest: buffer.slice(cut + 1),
+  };
+}
+
+// --- numbers ---------------------------------------------------------------
+
+export function formatPercent(x) {
+  if (typeof x !== 'number' || Number.isNaN(x)) return '—';
+  return `${Math.round(x * 100)}%`;
+}
+
+/** One bar per level, most acute first; null when there are no votes. */
+export function voteBars(votes) {
+  if (!votes) return null;
+  const total = LEVELS.reduce((n, l) => n + (votes[l] ?? 0), 0);
+  return LEVELS.map(level => {
+    const count = votes[level] ?? 0;
+    return {level, count, share: total > 0 ? count / total : 0};
+  });
+}
+
+// --- what leads ------------------------------------------------------------
+
+/**
+ * The Emergency instruction that must lead both views, or null. The result's
+ * own message leads when its disposition is Emergency, whatever its status;
+ * before the result arrives, or if it somehow lacks one, the early event's.
+ */
+export function emergencyLead(result, early) {
+  if (result && isEmergency(result.disposition)) return result.patient_message;
+  if (early && isEmergency(early.floor)) return early.patient_message;
+  return null;
+}
+
+/** Splits a trailing safety net off the patient message, if it is there. */
+function splitSafetyNet(message, safetyNet) {
+  const net = (safetyNet ?? '').trim();
+  const text = (message ?? '').trim();
+  if (net === '') return {body: text, net: ''};
+  if (text.endsWith(net)) {
+    return {body: text.slice(0, text.length - net.length).trim(), net};
+  }
+  return {body: text, net};
+}
+
+/**
+ * The patient view, as ordered blocks of {kind, text}. kind is one of
+ * emergency, draft, message, safety_net, pending. An Emergency instruction
+ * always comes first; Self-care is a draft until a physician signs it off.
+ */
+export function patientBlocks(result, early) {
+  const blocks = [];
+  if (!result) {
+    const lead = emergencyLead(null, early);
+    if (lead) blocks.push({kind: 'emergency', text: lead});
+    blocks.push({kind: 'pending', text: 'Checking the rest of your message.'});
+    return blocks;
+  }
+  const {body, net} = splitSafetyNet(result.patient_message, result.safety_net);
+  if (isEmergency(result.disposition)) {
+    blocks.push({kind: 'emergency', text: body});
+  } else {
+    const lead = emergencyLead(null, early);
+    if (lead) blocks.push({kind: 'emergency', text: lead});
+    if (result.disposition === 'self_care') {
+      blocks.push({kind: 'draft', text: 'Draft — awaiting physician sign-off'});
+    }
+    if (body !== '') blocks.push({kind: 'message', text: body});
+  }
+  if (net !== '') blocks.push({kind: 'safety_net', text: net});
+  return blocks;
+}
+
+// --- token -----------------------------------------------------------------
+
+/** Reads the access token; '' when storage is missing or throws. */
+export function readToken(storage) {
+  try {
+    return storage?.getItem(TOKEN_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+/** Stores the token, or removes it when empty. Never throws. */
+export function writeToken(storage, token) {
+  try {
+    if (token) storage?.setItem(TOKEN_KEY, token);
+    else storage?.removeItem(TOKEN_KEY);
+  } catch {
+    // Private mode or blocked storage: the token lasts for this page only.
+  }
+}

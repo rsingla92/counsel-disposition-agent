@@ -21,6 +21,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - name: Web page helpers
+        run: node --test 'web/test/*.test.mjs'
+        working-directory: .
 
   eval:
     runs-on: ubuntu-latest

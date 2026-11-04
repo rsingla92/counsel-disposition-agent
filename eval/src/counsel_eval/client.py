@@ -53,6 +53,14 @@ class RouteClient:
   def last_meta(self) -> dict[str, Any]:
     return getattr(self._local, "meta", {"early": False, "latency_ms": 0.0})
 
+  @property
+  def last_early(self) -> dict[str, Any] | None:
+    """The calling thread's most recent early event, or None if it had none.
+
+    Kept apart from last_meta so the eval's saved runs keep their shape.
+    """
+    return getattr(self._local, "early", None)
+
   def route(self, message: str, mode: str = "full") -> dict[str, Any]:
     """Routes one message and returns the result object.
 
@@ -66,7 +74,9 @@ class RouteClient:
     """
     started = time.perf_counter()
     early = False
+    early_event = None
     result = None
+    self._local.early = None
     with self._http.stream(
         "POST",
         f"{self._base_url}/v1/route",
@@ -79,12 +89,14 @@ class RouteClient:
         event = json.loads(line)
         if event.get("event") == "early":
           early = True
+          early_event = event
         elif event.get("event") == "result":
           result = event.get("result")
     self._local.meta = {
         "early": early,
         "latency_ms": (time.perf_counter() - started) * 1000.0,
     }
+    self._local.early = early_event
     if result is None:
       raise SchemaMismatch("stream ended without a result event")
     errors = sorted(
