@@ -36,11 +36,12 @@ export class LlmError extends Error {
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 
 /**
- * A Cloudflare Worker request may hold six connections open at once and
- * queues the rest. The client queues requests itself so that each timeout
- * measures the provider's time, not the wait for a connection.
+ * Requests in flight per case. A Cloudflare Worker request may hold six
+ * connections open at once; three keeps a case under the provider's rate
+ * limit. The client queues requests itself so that each timeout measures the
+ * provider's time, not the wait for a connection.
  */
-export const MAX_IN_FLIGHT = 6;
+export const MAX_IN_FLIGHT = 3;
 
 /**
  * Retries for a rate-limited (HTTP 429) request; nothing else is retried.

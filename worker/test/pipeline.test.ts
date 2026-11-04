@@ -120,7 +120,10 @@ describe('route', () => {
       const lines: string[] = [];
       await route(SECRET_MSG, {...deps(llm), log: l => lines.push(l)});
       expect(lines.join()).not.toContain(SECRET_MSG);
-      expect(JSON.parse(lines[0]).input_sha256).toMatch(/^[0-9a-f]{64}$/);
+      const routeLine = lines
+        .map(l => JSON.parse(l))
+        .find(l => l.kind === 'route');
+      expect(routeLine.input_sha256).toMatch(/^[0-9a-f]{64}$/);
     }
   });
 
@@ -619,6 +622,85 @@ describe('route: secondary model', () => {
       expect.objectContaining({routine: 0, ed_now: 0}),
     );
     expect((r.trace.raw as {secondary: string[]}).secondary).toEqual([]);
+  });
+});
+
+describe('route: extraction fallback', () => {
+  it('extracts with the secondary when the primary fails', async () => {
+    const onEarly = vi.fn();
+    const llm = scripted({
+      extractError: 'provider_error',
+      extractErrorOn: 'primary',
+      flags: {cardiac_chest_pain: 'present'},
+      samples: 'routine',
+    });
+    const r = await route(
+      REFILL_WITH_CHEST,
+      {...deps(llm), secondary: SECONDARY},
+      {onEarly},
+    );
+    expect(r.human_review.reasons).not.toContain('extraction_failed');
+    expect(r.floor).toBe('call_911');
+    expect(r.disposition).toBe('call_911');
+    expect(onEarly).toHaveBeenCalledWith(
+      expect.objectContaining({floor: 'call_911'}),
+    );
+    expect(r.trace.models).toEqual([PRIMARY, SECONDARY]);
+  });
+
+  it('gives Human review when both models fail to extract', async () => {
+    const lines: string[] = [];
+    const llm = scripted({extractError: 'timeout'});
+    const r = await route(SECRET_MSG, {
+      ...deps(llm),
+      secondary: SECONDARY,
+      log: l => lines.push(l),
+    });
+    expect(r.status).toBe('human_review');
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.disposition).toBeNull();
+    expect(llm.calls).toBe(2);
+    // Each failed extraction is logged by model and error code, without text.
+    const errors = lines
+      .map(l => JSON.parse(l))
+      .filter(l => l.kind === 'llm_error');
+    expect(errors).toEqual([
+      {
+        kind: 'llm_error',
+        step: 'extraction',
+        model: PRIMARY.model,
+        code: 'timeout',
+      },
+      {
+        kind: 'llm_error',
+        step: 'extraction',
+        model: SECONDARY.model,
+        code: 'timeout',
+      },
+    ]);
+    expect(lines.join('\n')).not.toContain('SYNTHETIC-SECRET');
+  });
+
+  it('keeps salvaged flags from the primary without a fallback call', async () => {
+    const llm = scripted({flags: {cardiac_chest_pain: 'present'}});
+    const inner = llm.complete.bind(llm);
+    llm.complete = async req => {
+      const res = await inner(req);
+      if (req.schemaName !== 'extraction') return res;
+      const ex = res.json as {red_flags: {id: string}[]};
+      const json = {
+        ...ex,
+        red_flags: ex.red_flags.filter(f => f.id !== 'anaphylaxis'),
+      };
+      return {...res, json, raw: JSON.stringify(json)};
+    };
+    const r = await route(REFILL_WITH_CHEST, {
+      ...deps(llm),
+      secondary: SECONDARY,
+    });
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.floor).toBe('call_911');
+    expect(llm.calls).toBe(1);
   });
 });
 

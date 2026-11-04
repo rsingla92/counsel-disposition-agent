@@ -40,6 +40,8 @@ export type ScriptOpts = {
   secondary?: Level | 'fail';
   /** Makes the extraction call fail with this LlmError code. */
   extractError?: LlmErrorCode;
+  /** Limits extractError to the primary model's extraction call. */
+  extractErrorOn?: 'primary';
   language?: string;
   care?: boolean;
   questions?: string[];
@@ -71,7 +73,9 @@ export function scripted(opts: ScriptOpts): LlmClient & {calls: number} {
     async complete(req: LlmRequest) {
       client.calls++;
       if (req.schemaName === 'extraction') {
-        if (opts.extractError) {
+        const failsHere =
+          opts.extractErrorOn !== 'primary' || req.spec.model === PRIMARY.model;
+        if (opts.extractError && failsHere) {
           throw new LlmError(opts.extractError, 'scripted extraction failure');
         }
         const ex = withFlags(

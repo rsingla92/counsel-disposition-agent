@@ -112,7 +112,7 @@ describe('openRouterClient concurrency', () => {
     await Promise.all(Array.from({length: 20}, () => client.complete(req)));
     expect(impl).toHaveBeenCalledTimes(20);
     expect(state.peak).toBe(MAX_IN_FLIGHT);
-    expect(MAX_IN_FLIGHT).toBe(6);
+    expect(MAX_IN_FLIGHT).toBe(3);
   });
 
   it('starts the timeout when a request leaves the queue', async () => {

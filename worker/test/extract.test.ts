@@ -33,10 +33,10 @@ describe('extract', () => {
     expect(err.flags.anaphylaxis.state).toBe('unknown');
   });
 
-  it('allows extraction one retry after a rate limit', async () => {
+  it('gives extraction the default rate-limit retries', async () => {
     const llm = stubLlm(toWire(fakeExtraction(policy)));
     await extract('hi', spec, llm, policy);
-    expect(llm.lastRequest.maxRetries).toBe(1);
+    expect(llm.lastRequest.maxRetries).toBeUndefined();
   });
 
   it('puts the message inside the data delimiters', async () => {

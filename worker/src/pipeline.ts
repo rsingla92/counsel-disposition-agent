@@ -9,7 +9,7 @@ import {
   tierOf,
   type Level,
 } from './levels';
-import type {LlmClient, ModelSpec} from './llm';
+import {LlmError, type LlmClient, type ModelSpec} from './llm';
 import {traceLine} from './log';
 import type {Policy} from './policy';
 import {chooseLevel, emptyVotes, reviewReasons, type Votes} from './router';
@@ -382,6 +382,20 @@ function setFloor(run: Run, opts: RouteOptions): FloorResult {
   return floor;
 }
 
+/**
+ * A log line for a failed extraction call: the model, error code and HTTP
+ * status only.
+ */
+function extractionErrorLine(spec: ModelSpec, e: unknown): string {
+  return JSON.stringify({
+    kind: 'llm_error',
+    step: 'extraction',
+    model: spec.model,
+    code: e instanceof LlmError ? e.code : 'unknown',
+    status: e instanceof LlmError ? e.status : undefined,
+  });
+}
+
 /** An extraction holding only salvaged red flags: no modifiers or questions. */
 function salvagedExtraction(
   flags: Extraction['red_flags'],
@@ -409,23 +423,30 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     return humanReview(run, 'too_long');
   }
 
-  // 2. Extraction (an LlmError is the only failure extract() reports).
-  addSpec(run, deps.primary);
-  let ex: Extraction;
-  try {
-    const got = await extract(message, deps.primary, deps.llm, policy);
-    ex = got.extraction;
-    run.raw.extraction = got.raw;
-  } catch (e) {
-    // Output that missed or repeated a flag still floors the flags it did
-    // mark present; the case goes to a physician either way.
-    if (e instanceof ExtractionInvalidError && e.flags) {
-      run.raw.extraction = e.raw;
-      run.extraction = salvagedExtraction(e.flags, policy);
-      setFloor(run, opts);
+  // 2. Extraction (an LlmError is the only failure extract() reports). When
+  // the primary returns nothing usable, the secondary tries once.
+  let ex: Extraction | null = null;
+  for (const spec of [deps.primary, deps.secondary]) {
+    if (!spec) continue;
+    addSpec(run, spec);
+    try {
+      const got = await extract(message, spec, deps.llm, policy);
+      ex = got.extraction;
+      run.raw.extraction = got.raw;
+      break;
+    } catch (e) {
+      deps.log(extractionErrorLine(spec, e));
+      // Output that missed or repeated a flag still floors the flags it did
+      // mark present; the case goes to a physician either way.
+      if (e instanceof ExtractionInvalidError && e.flags) {
+        run.raw.extraction = e.raw;
+        run.extraction = salvagedExtraction(e.flags, policy);
+        setFloor(run, opts);
+        return humanReview(run, 'extraction_failed');
+      }
     }
-    return humanReview(run, 'extraction_failed');
   }
+  if (!ex) return humanReview(run, 'extraction_failed');
   run.extraction = ex;
 
   // 3. Rule floor, and emergency instructions without waiting for sampling.
