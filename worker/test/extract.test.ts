@@ -57,6 +57,18 @@ describe('extract', () => {
     );
   });
 
+  it.each([
+    ['<' + ' '.repeat(50_000) + 'x'],
+    ['<' + ' '.repeat(25_000) + '/' + ' '.repeat(25_000) + 'x'],
+    ['<' + '​'.repeat(50_000) + 'x'],
+  ])('neutralises long whitespace runs in linear time', async input => {
+    const llm = stubLlm(fakeExtraction(policy));
+    const start = performance.now();
+    await extract(input, spec, llm, policy);
+    expect(performance.now() - start).toBeLessThan(100);
+    expect(llm.lastRequest.user).toContain(input);
+  });
+
   it('defines is_care_request to include reported symptoms', async () => {
     const llm = stubLlm(fakeExtraction(policy));
     await extract('hi', spec, llm, policy);

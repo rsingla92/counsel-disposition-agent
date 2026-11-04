@@ -49,7 +49,7 @@ Answer only with JSON matching the supplied schema.`;
 // "_", "-" or spaces. HTML entities such as "&lt;" are left as they are.
 const ZW = '\u200B-\u200D\uFEFF';
 const OPEN_OR_CLOSE_TAG = new RegExp(
-  `<(?=[\\s${ZW}]*/?[\\s${ZW}]*patient[\\s_\\-${ZW}]*message)`,
+  `<(?=[\\s${ZW}]*(?:/[\\s${ZW}]*)?patient[\\s_\\-${ZW}]*message)`,
   'gi',
 );
 
