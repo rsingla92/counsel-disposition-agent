@@ -4,8 +4,7 @@ Raw per-case results go to data/private/runs/ (gitignored, they carry
 message-derived excerpts). The committed report is aggregate only: case ids,
 counts and rates, never message text, excerpts or justifications.
 
-Exit codes: 0 ok; 1 the `full` system missed an emergency; 2 policy version
-mismatch; 3 insufficient OpenRouter credit; 4 configuration error.
+Exit codes: see EXIT_CODES_HELP.
 """
 
 import argparse
@@ -40,6 +39,17 @@ EXIT_MISSED_EMERGENCY = 1
 EXIT_POLICY_MISMATCH = 2
 EXIT_NO_CREDIT = 3
 EXIT_CONFIG = 4
+EXIT_INTERNAL = 5
+EXIT_CODES_HELP = """\
+exit codes:
+  0  ok
+  1  the full system routed a reference emergency below ed_now in any repeat
+  2  Worker policy version differs from policy/policy.yaml
+  3  insufficient (or unreadable) OpenRouter credit
+  4  configuration or setup error (arguments, token, data, Worker unreachable,
+     report not writable)
+  5  internal error
+"""
 
 _OPENROUTER_KEY_URL = "https://openrouter.ai/api/v1/key"
 _DEFAULT_ENV_FILE = "~/.config/counsel-disposition-agent/openrouter.env"
@@ -59,6 +69,16 @@ Eval reports in this directory are aggregate only: case ids, counts and
 rates. They contain no patient text, no message excerpts and no model
 justification text. Raw per-case results live under `data/private/runs/`,
 which is gitignored.
+
+Headline metrics use the first run of each case. The gate also reports
+cases missed in any repeat. `counsel-eval` exit codes:
+
+- 0 ok
+- 1 the full system routed a reference emergency below ed_now in any repeat
+- 2 Worker policy version differs from `policy/policy.yaml`
+- 3 insufficient (or unreadable) OpenRouter credit
+- 4 configuration or setup error
+- 5 internal error
 """
 
 
@@ -121,8 +141,12 @@ def credit_check(
     )
     response.raise_for_status()
     remaining = response.json()["data"]["limit_remaining"]
-  except (httpx.HTTPError, KeyError, ValueError) as e:
-    return False, f"could not read the OpenRouter balance ({type(e).__name__})"
+  except (httpx.HTTPError, KeyError, TypeError, ValueError) as e:
+    return False, f"could not read credit balance ({type(e).__name__})"
+  if remaining is not None and (
+      isinstance(remaining, bool) or not isinstance(remaining, (int, float))
+  ):
+    return False, "could not read credit balance (non-numeric limit)"
   if remaining is None:
     return True, "OpenRouter key has no spend limit"
   required = _CREDIT_MARGIN * estimate
@@ -231,6 +255,7 @@ def entries_to_frame(
         "questions": [],
         "unverified_excerpt": False,
         "http_error": False,
+        "schema_mismatch": False,
         "p_emergency": np.nan,
         "p_same_day_up": np.nan,
         "early": np.nan,
@@ -241,8 +266,13 @@ def entries_to_frame(
       row["latency_ms"] = float(meta["latency_ms"])
       row["early"] = float(bool(meta.get("early")))
     if "error" in e:
+      mismatch = e["error"] == "SchemaMismatch"
       row.update(
-          status="human_review", disposition=None, flagged=True, http_error=True
+          status="human_review",
+          disposition=None,
+          flagged=True,
+          http_error=not mismatch,
+          schema_mismatch=mismatch,
       )
     elif "result" in e:
       result = e["result"]
@@ -266,7 +296,8 @@ def entries_to_frame(
           flagged=bool(b["flagged"]),
       )
     row["received"] = row["disposition"] or "routine"
-    row["stage"] = None if row["http_error"] else scoring.error_stage(row)
+    failed = row["http_error"] or row["schema_mismatch"]
+    row["stage"] = None if failed else scoring.error_stage(row)
     rows.append(row)
   frame = pd.DataFrame(rows)
   frame["disposition"] = frame["disposition"].astype(object)
@@ -298,6 +329,20 @@ def roc_auc(
   if y.nunique() < 2:
     return None
   return float(metrics.roc_auc_score(y, sub[score_col]))
+
+
+def any_repeat_gate(frame: pd.DataFrame) -> dict[str, Any]:
+  """Returns the gate counting a case missed if any repeat missed it.
+
+  n is the number of distinct emergency cases, so repeats of one message are
+  not treated as independent samples.
+  """
+  worst = frame.loc[
+      frame.groupby("case_id")["received"]
+      .apply(lambda s: s.map(levels.rank).idxmin())
+      .to_numpy()
+  ]
+  return scoring.gate(worst)
 
 
 def repeatability(frame: pd.DataFrame) -> tuple[float, dict[str, float]] | None:
@@ -340,18 +385,25 @@ def _system_section(
     policy: Mapping[str, Any],
     repeat: int,
 ) -> list[str]:
-  frame = entries_to_frame(entries, reference)
+  all_runs = entries_to_frame(entries, reference)
   out = [f"## {system}", ""]
-  if frame.empty:
+  if all_runs.empty:
     return out + ["No scored rows.", ""]
+  frame = all_runs[all_runs["repeat"] == 0]
   g = scoring.gate(frame)
+  a = any_repeat_gate(all_runs)
   out += [
       "### Gate (zero-miss emergencies)",
       "",
       f"- Misses: {g['misses']} of {g['n_emergencies']} reference emergency "
-      "case-runs routed below ed_now",
-      f"- Miss ids: {', '.join(sorted(set(g['miss_ids']))) or 'none'}",
+      "cases routed below ed_now (first run)",
+      f"- Miss ids: {', '.join(sorted(g['miss_ids'])) or 'none'}",
       "- 95% CI upper bound on the miss rate: " + _pct(g["ci_upper"]),
+      f"- Missed in any repeat: {a['misses']} of {a['n_emergencies']} "
+      "reference emergency cases",
+      f"- Any-repeat miss ids: {', '.join(sorted(a['miss_ids'])) or 'none'}",
+      "- 95% CI upper bound on the any-repeat miss rate: "
+      + _pct(a["ci_upper"]),
       "",
   ]
   base, half, double = loss_sensitivity(frame, policy)
@@ -382,7 +434,9 @@ def _system_section(
       f"- Needs-info rate: {_pct(ab['needs_info_rate'])}",
       "",
   ]
-  results = [e["result"] for e in entries if "result" in e]
+  results = [
+      e["result"] for e in entries if "result" in e and e.get("repeat", 0) == 0
+  ]
   if results:
     out += [
         "### Faithfulness",
@@ -400,7 +454,11 @@ def _system_section(
   counts = collections.Counter(s for s in frame["stage"] if s)
   out += ["### Error counts by stage", ""]
   out += [f"- {stage}: {counts.get(stage, 0)}" for stage in _STAGES]
-  out += [f"- HTTP errors: {int(frame['http_error'].sum())}", ""]
+  out += [
+      f"- HTTP errors: {int(frame['http_error'].sum())}",
+      f"- Schema mismatches: {int(frame['schema_mismatch'].sum())}",
+      "",
+  ]
   timed = frame[frame["latency_ms"].notna()]
   if not timed.empty:
     emerg = timed[timed["reference"].isin(_EMERGENCY_TOP)]
@@ -430,7 +488,7 @@ def _system_section(
         "",
     ]
   if repeat > 1:
-    rep = repeatability(frame)
+    rep = repeatability(all_runs)
     out += ["### Repeatability", ""]
     if rep is None:
       out += ["n/a (single run per case)", ""]
@@ -482,8 +540,9 @@ def write_report(
       f"Date: {date}. Reviewed cases: {len(reference)}. "
       f"Repeats per case: {repeat}.",
       "",
-      "Aggregate only: case ids and rates. Counts are case-runs (cases x "
-      "repeats), so a miss in any repeat counts.",
+      "Aggregate only: case ids and rates. Headline metrics use the first "
+      "run of each case; repeats feed the any-repeat gate line and the "
+      "repeatability section only.",
       "",
   ]
   for system in SYSTEMS:
@@ -497,9 +556,23 @@ def write_report(
 # --- CLI --------------------------------------------------------------------
 
 
+class _Parser(argparse.ArgumentParser):
+  """Exits with EXIT_CONFIG on bad arguments (argparse's 2 is taken)."""
+
+  def error(self, message: str):
+    self.print_usage(sys.stderr)
+    print(f"error: {message}", file=sys.stderr)
+    sys.exit(EXIT_CONFIG)
+
+
 def build_parser() -> argparse.ArgumentParser:
   """Returns the CLI argument parser."""
-  p = argparse.ArgumentParser(prog="counsel-eval", description=__doc__)
+  p = _Parser(
+      prog="counsel-eval",
+      description="Run the disposition eval against a Worker.",
+      epilog=EXIT_CODES_HELP,
+      formatter_class=argparse.RawDescriptionHelpFormatter,
+  )
   p.add_argument("--url", required=True, help="Worker base URL")
   p.add_argument("--systems", default="full,floor,always,historical")
   p.add_argument("--cases", choices=["all", "pcp"], default="all")
@@ -521,7 +594,19 @@ def main(
     client_factory: Callable[[str, str], Any] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> int:
-  """Runs the eval and returns the exit code."""
+  """Runs the eval and returns the exit code (see EXIT_CODES_HELP)."""
+  try:
+    return _main(argv, client_factory, env)
+  except Exception as e:  # pylint: disable=broad-exception-caught
+    print(f"internal error ({type(e).__name__})", file=sys.stderr)
+    return EXIT_INTERNAL
+
+
+def _main(
+    argv: Sequence[str] | None,
+    client_factory: Callable[[str, str], Any] | None,
+    env: Mapping[str, str] | None,
+) -> int:
   args = build_parser().parse_args(argv)
   env = os.environ if env is None else env
   token = env.get("COUNSEL_TOKEN")
@@ -534,11 +619,17 @@ def main(
     print(f"bad arguments: systems {unknown}, repeat {args.repeat}")
     return EXIT_CONFIG
 
-  policy = data.load_policy(args.policy)
   data_dir = pathlib.Path(args.data_dir)
-  reference = data.load_reference(data_dir / "reference_labels.csv")
-  cases = data.load_cases(data_dir / "patient_messages_with_dispositions.xlsx")
-  cases = cases[cases["case_id"].isin(reference["case_id"])]
+  try:
+    policy = data.load_policy(args.policy)
+    _ = policy["policy_version"]
+    reference = data.load_reference(data_dir / "reference_labels.csv")
+    cases = data.load_cases(
+        data_dir / "patient_messages_with_dispositions.xlsx"
+    )
+    cases = cases[cases["case_id"].isin(reference["case_id"])]
+  except Exception as e:  # pylint: disable=broad-exception-caught
+    return _config_error("cannot load policy or case data", e)
   if args.cases == "pcp":
     cases = cases[cases["case_id"].isin(PCP_IDS)]
   if cases.empty:
@@ -548,7 +639,10 @@ def main(
 
   factory = client_factory or RouteClient
   client = factory(args.url, token)
-  served = client.policy()["policy_version"]
+  try:
+    served = client.policy()["policy_version"]
+  except Exception as e:  # pylint: disable=broad-exception-caught
+    return _config_error("cannot read the Worker policy version", e)
   if served != policy["policy_version"]:
     print(
         f"policy version mismatch: Worker {served}, local "
@@ -586,20 +680,32 @@ def main(
       for e in entries:
         f.write(json.dumps(e) + "\n")
 
-  report = write_report(
-      runs,
-      args.reports_dir,
-      reference=reference,
-      policy=policy,
-      repeat=args.repeat,
-  )
+  try:
+    report = write_report(
+        runs,
+        args.reports_dir,
+        reference=reference,
+        policy=policy,
+        repeat=args.repeat,
+    )
+  except Exception as e:  # pylint: disable=broad-exception-caught
+    return _config_error("cannot write the report", e)
   print(f"report: {report}")
   if "full" in runs:
-    g = scoring.gate(entries_to_frame(runs["full"], reference))
-    print(f"full gate: {g['misses']} misses of {g['n_emergencies']}")
+    g = any_repeat_gate(entries_to_frame(runs["full"], reference))
+    print(
+        f"full gate (missed in any repeat): {g['misses']} of "
+        f"{g['n_emergencies']}"
+    )
     if g["misses"]:
       return EXIT_MISSED_EMERGENCY
   return 0
+
+
+def _config_error(what: str, error: Exception) -> int:
+  """Prints a fixed one-line message (never the error text) and returns 4."""
+  print(f"error: {what} ({type(error).__name__})", file=sys.stderr)
+  return EXIT_CONFIG
 
 
 def cli() -> None:
