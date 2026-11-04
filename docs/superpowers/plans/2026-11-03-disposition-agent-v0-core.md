@@ -20,7 +20,7 @@
 - Brief's labels: the first four levels → `URGENT_ESCALATION`; `within_few_days`, `routine` → `ASYNC_PHYSICIAN`; `self_care` → `SELF_CARE`.
 - Zero-miss gate: no case referenced `call_911` or `ed_now` may be routed below `ed_now`.
 - Human review with no disposition scores as `routine`.
-- Justification is three sentences or fewer, cites the flags, and says why not one level higher or lower (Req. 4).
+- Justification cites the flags and says why not one level higher or lower. No length limit (author decision 2026-11-03, overriding PRD Req. 4's three-sentence cap).
 - Every excerpt for a present flag must be checked as a verbatim substring of the message.
 - Models are reached through OpenRouter with the provider pinned, `allow_fallbacks: false`, zero-data-retention only (D9).
 - Logs record input SHA-256, policy version, model, provider, latency and raw output; never the message text or an IP address (Req. 9, Privacy).
@@ -236,7 +236,7 @@ git commit -m "Add policy.yaml, level helpers and CI"
   - `SampleSchema`: `{disposition: Level, justification: string, safety_net: string}`; `type Sample`
   - `RouteResultSchema`, `type RouteResult`:
     `{status: 'routed'|'needs_info'|'human_review', disposition: Level|null, tier: Tier|null, brief_label: BriefLabel|null, floor: Level|null, red_flags: {id, state, excerpt, excerpt_verified}[], modifiers: {id, excerpt}[], votes: {primary: Record<Level, number>, secondary: Record<Level, number>|null}, confidence: number|null, human_review: {flagged: boolean, reasons: ReasonCode[]}, info_requests: {questions: string[], photo: boolean}, time_sensitive: boolean, justification: string, safety_net: string, patient_message: string, trace: {input_sha256, policy_version, models: {model, provider}[], latency_ms, raw: unknown}}`
-  - `sentenceCount(s: string): number`; `justification` refines to `sentenceCount ≤ 3`
+  - Safety invariants (superRefine): `disposition` is never below `floor` when both are set; `status === 'human_review'` or `human_review.flagged` implies flagged with at least one reason code
   - `schema/route-result.schema.json` = `z.toJSONSchema(RouteResultSchema)`
 
 - [ ] **Step 1: Write the failing tests**
@@ -249,9 +249,6 @@ it('requires every policy flag in an extraction', () => {
   const {[policy.red_flags[0].id]: _, ...rest} = ok.red_flags;
   expect(s.safeParse({...ok, red_flags: rest}).success).toBe(false);
 });
-it('rejects a four-sentence justification', () =>
-  expect(RouteResultSchema.safeParse(
-    {...validResult, justification: 'A. B. C. D.'}).success).toBe(false));
 it('requires null disposition to pair with human_review', () =>
   expect(RouteResultSchema.safeParse(
     {...validResult, status: 'routed', disposition: null}).success).toBe(false));
@@ -441,7 +438,7 @@ it('puts the message inside the data delimiters', async () => {
   - `type VoteSet = {spec: ModelSpec, votes: Votes, valid: number, samples: Sample[], raw: string[]}`
   - `drawSamples(message: string, ex: Extraction, floor: Level, spec: ModelSpec, llm: LlmClient, policy: Policy): Promise<VoteSet>`: fires `policy.sampling.n` calls in parallel with `Promise.allSettled`, drops rejected and schema-invalid samples, and clamps each disposition up to `floor` before counting. It never throws.
 
-The sample prompt gives the message (same delimiters as Task 5), the extracted present flags and modifiers, the floor, and each level's one-line meaning. It asks for one disposition at or above the floor, a justification of three sentences or fewer that cites flag ids and says why not one level higher or lower, and safety-netting text.
+The sample prompt gives the message (same delimiters as Task 5), the extracted present flags and modifiers, the floor, and each level's one-line meaning. It asks for one disposition at or above the floor, a concise justification that cites flag ids and says why not one level higher or lower, and safety-netting text.
 
 - [ ] **Step 1: Write the failing tests**
 

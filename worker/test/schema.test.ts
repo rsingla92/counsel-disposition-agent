@@ -3,12 +3,7 @@ import {describe, expect, it} from 'vitest';
 import {z} from 'zod';
 import {type Level} from '../src/levels';
 import {loadPolicy} from '../src/policy';
-import {
-  RouteResultSchema,
-  SampleSchema,
-  extractionSchema,
-  sentenceCount,
-} from '../src/schema';
+import {RouteResultSchema, SampleSchema, extractionSchema} from '../src/schema';
 import {fakeExtraction, validResult} from './fixtures';
 
 const policy = loadPolicy();
@@ -69,31 +64,9 @@ describe('SampleSchema', () => {
   });
 });
 
-describe('sentenceCount', () => {
-  it.each([
-    ['', 0],
-    ['   ', 0],
-    ['One.', 1],
-    ['One. Two.', 2],
-    ['A. B. C. D.', 4],
-    ['Really? Yes! Fine.', 3],
-    ['No terminal punctuation', 1],
-    ['One. And a trailing fragment', 2],
-    ['Wait... what?', 2],
-  ])('counts %j as %i', (s, n) => expect(sentenceCount(s)).toBe(n));
-});
-
 describe('RouteResultSchema', () => {
   it('accepts the valid fixture', () =>
     expect(RouteResultSchema.safeParse(validResult).success).toBe(true));
-
-  it('rejects a four-sentence justification', () =>
-    expect(
-      RouteResultSchema.safeParse({
-        ...validResult,
-        justification: 'A. B. C. D.',
-      }).success,
-    ).toBe(false));
 
   it('requires null disposition to pair with human_review', () =>
     expect(

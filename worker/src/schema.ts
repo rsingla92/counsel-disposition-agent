@@ -62,12 +62,6 @@ export function extractionSchema(policy: Policy) {
 
 export type Extraction = z.infer<ReturnType<typeof extractionSchema>>;
 
-/** Counts the sentences in a string; a trailing fragment counts as one. */
-export function sentenceCount(s: string): number {
-  const t = s.trim();
-  return t === '' ? 0 : t.split(/(?<=[.!?])\s+/).length;
-}
-
 export const SampleSchema = z.strictObject({
   disposition: LevelSchema,
   justification: z.string(),
@@ -114,9 +108,7 @@ export const RouteResultSchema = z
       photo: z.boolean(),
     }),
     time_sensitive: z.boolean(),
-    justification: z
-      .string()
-      .refine(s => sentenceCount(s) <= 3, 'at most three sentences'),
+    justification: z.string(),
     safety_net: z.string(),
     patient_message: z.string(),
     trace: z.strictObject({
