@@ -13,6 +13,9 @@ dependencies = [
   "scikit-learn",
 ]
 
+[project.scripts]
+counsel-eval = "counsel_eval.run:cli"
+
 [dependency-groups]
 dev = [
   "pytest",
