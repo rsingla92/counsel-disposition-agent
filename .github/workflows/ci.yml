@@ -21,9 +21,21 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - name: Web page helpers
+        run: node --test 'web/test/*.test.mjs'
+        working-directory: .
 
-  # eval: added in Task 8 (Python eval: lint, tests).
-  # eval:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  eval:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: eval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked
+      - run: uv run pyink --check src tests
+      - run: uv run pylint src
+      - run: uv run pytest

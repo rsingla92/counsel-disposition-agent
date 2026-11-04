@@ -68,6 +68,19 @@ describe('RouteResultSchema', () => {
   it('accepts the valid fixture', () =>
     expect(RouteResultSchema.safeParse(validResult).success).toBe(true));
 
+  it('requires excerpt_verified on every modifier', () => {
+    const mod = {id: 'age_65_plus', excerpt: 'I am 70'};
+    expect(
+      RouteResultSchema.safeParse({...validResult, modifiers: [mod]}).success,
+    ).toBe(false);
+    expect(
+      RouteResultSchema.safeParse({
+        ...validResult,
+        modifiers: [{...mod, excerpt_verified: true}],
+      }).success,
+    ).toBe(true);
+  });
+
   it('requires null disposition to pair with human_review', () =>
     expect(
       RouteResultSchema.safeParse({
@@ -150,6 +163,14 @@ describe('RouteResultSchema', () => {
         },
       }).success,
     ).toBe(false);
+  });
+
+  it('accepts secondary_unavailable as a reason code', () => {
+    const r = RouteResultSchema.safeParse({
+      ...validResult,
+      human_review: {flagged: true, reasons: ['secondary_unavailable']},
+    });
+    expect(r.success).toBe(true);
   });
 
   it('rejects unknown reason codes and unknown top-level keys', () => {

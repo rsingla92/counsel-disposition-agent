@@ -49,9 +49,25 @@ Answer only with JSON matching the supplied schema.`;
 // "_", "-" or spaces. HTML entities such as "&lt;" are left as they are.
 const ZW = '\u200B-\u200D\uFEFF';
 const OPEN_OR_CLOSE_TAG = new RegExp(
-  `<(?=[\\s${ZW}]*(?:/[\\s${ZW}]*)?patient[\\s_\\-${ZW}]*message)`,
+  `<(?=[\\s${ZW}]*(?:/[\\s${ZW}]*)?(?:patient[\\s_\\-${ZW}]*message|extracted[\\s_\\-${ZW}]*findings))`,
   'gi',
 );
+
+/**
+ * Neutralises look-alikes of the data delimiters (patient_message and
+ * extracted_findings) in patient-derived text.
+ */
+export function neutralise(text: string): string {
+  return text.replace(OPEN_OR_CLOSE_TAG, '‹');
+}
+
+/**
+ * Wraps a patient message in the data delimiters, neutralising any look-alike
+ * of the delimiters inside it.
+ */
+export function wrapPatientMessage(message: string): string {
+  return `<patient_message>\n${neutralise(message)}\n</patient_message>`;
+}
 
 /**
  * Extracts red flags and modifiers from a patient message. Throws LlmError;
@@ -66,11 +82,10 @@ export async function extract(
   const schema = extractionSchema(policy);
   const jsonSchema = z.toJSONSchema(schema) as Record<string, unknown>;
   delete jsonSchema.$schema; // some providers reject it
-  const safe = message.replace(OPEN_OR_CLOSE_TAG, '‹');
   const res = await llm.complete({
     spec,
     system: extractionSystemPrompt(policy),
-    user: `<patient_message>\n${safe}\n</patient_message>`,
+    user: wrapPatientMessage(message),
     schemaName: 'extraction',
     jsonSchema,
     temperature: 0,

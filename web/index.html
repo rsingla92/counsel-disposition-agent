@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Disposition agent demo</title>
+    <meta
+      name="description"
+      content="Synthetic demo of a clinical disposition agent: physician and patient views."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <p class="banner" role="note">
+      Synthetic demo. Not medical advice. In an emergency call 911.
+    </p>
+
+    <header class="wrap top">
+      <p class="eyebrow">Disposition agent · v0</p>
+      <h1>Route one patient message</h1>
+      <div class="views" role="group" aria-label="View">
+        <button type="button" id="view-physician" aria-pressed="true">
+          Physician view
+        </button>
+        <button type="button" id="view-patient" aria-pressed="false">
+          Patient view
+        </button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="card controls" aria-labelledby="input-heading">
+        <h2 id="input-heading" class="eyebrow">Message</h2>
+        <label for="demo">Demo message</label>
+        <select id="demo"></select>
+        <label for="message">Patient message</label>
+        <textarea id="message" rows="5" spellcheck="false"></textarea>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" id="replay" />
+            <span>Replay saved runs</span>
+          </label>
+          <button type="button" id="route" class="primary">Route message</button>
+        </div>
+        <p id="replay-note" class="note"></p>
+        <details id="token-box">
+          <summary>Access token</summary>
+          <div class="token-row">
+            <label for="token" class="visually-hidden">Access token</label>
+            <input
+              type="password"
+              id="token"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Paste the demo access token"
+            />
+            <button type="button" id="save-token" class="secondary">Save</button>
+            <button type="button" id="clear-token" class="secondary">Clear</button>
+          </div>
+          <p class="note">
+            Kept in this browser only. Sent to the Worker as a bearer header,
+            never in a URL.
+          </p>
+        </details>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="physician" aria-label="Physician view"></section>
+      <section id="patient" aria-label="Patient view" hidden></section>
+    </main>
+  </body>
+</html>

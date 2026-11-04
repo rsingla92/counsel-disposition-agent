@@ -1,0 +1,725 @@
+/* Design tokens. Warning (#C4841D, 3.06 : 1 on white) is for fills and
+   large type only, never body text. */
+:root {
+  --accent: #1b6b5a;
+  --accent-light: #238c74;
+  --accent-subtle: #e8f5f0;
+  --bg: #fafaf8;
+  --surface: #f5f5f0;
+  --border: #e8e6e1;
+  --muted: #6b6560;
+  --text: #2d2926;
+  --error: #b91c1c;
+  --warning: #c4841d;
+  --success: #2d7a4f;
+  --gold-subtle: #fbf5e8;
+  --gold-text: #7f6124;
+  --white: #ffffff;
+  --error-subtle: #fdf0f0;
+
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --radius: 12px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-light);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --- Banner: always visible --------------------------------------------- */
+
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 10px 16px;
+  background: var(--gold-subtle);
+  color: var(--gold-text);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+/* --- Layout --------------------------------------------------------------- */
+
+.wrap {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.top {
+  padding-top: 28px;
+  padding-bottom: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+main.wrap {
+  padding-bottom: 64px;
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  min-width: 0;
+}
+
+.card > * + * {
+  margin-top: 12px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow .num {
+  color: var(--accent);
+  margin-right: 0.75em;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.note:empty,
+.status:empty {
+  display: none;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+/* --- Buttons and inputs ------------------------------------------------- */
+
+button {
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--white);
+  min-height: 40px;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--white);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent-light);
+  border-color: var(--accent-light);
+}
+
+button.secondary:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button[aria-pressed='true'] {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+select,
+textarea,
+input[type='password'],
+input[type='text'] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  padding: 9px 12px;
+  margin-top: 4px;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+textarea[readonly] {
+  background: var(--surface);
+}
+
+.controls label + select,
+.controls label + textarea {
+  margin-top: 4px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.switch input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+details > * + * {
+  margin-top: 8px;
+}
+
+.token-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.token-row input {
+  flex: 1 1 200px;
+  margin-top: 0;
+}
+
+.status {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.9375rem;
+}
+
+.status.error {
+  background: var(--error-subtle);
+  color: var(--error);
+}
+
+/* --- Labels on results ------------------------------------------------- */
+
+.source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.pill.replay {
+  background: var(--gold-subtle);
+  color: var(--gold-text);
+  border-color: var(--gold-text);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.pill.unverified {
+  background: var(--error-subtle);
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.pill.review {
+  background: var(--gold-subtle);
+  color: var(--gold-text);
+  border-color: #e9dcbc;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Tier fills: the tier is also always written out, never colour alone. */
+.tier-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tier-pill.emergency {
+  background: var(--error);
+  color: var(--white);
+}
+
+.tier-pill.same_day {
+  background: var(--warning);
+  color: var(--text);
+}
+
+.tier-pill.async {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.tier-pill.self_care,
+.tier-pill.none {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* --- Emergency lead ----------------------------------------------------- */
+
+.emergency-lead {
+  border: 2px solid var(--error);
+  background: var(--error-subtle);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+
+.emergency-lead .eyebrow {
+  color: var(--error);
+}
+
+.emergency-lead p.instruction {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--error);
+}
+
+/* --- Physician card stack ---------------------------------------------- */
+
+.stack {
+  display: grid;
+  gap: 0;
+}
+
+.arrow {
+  display: flex;
+  justify-content: center;
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+.arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+.message-text {
+  white-space: pre-wrap;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+mark {
+  background: var(--accent-subtle);
+  color: var(--text);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.flags {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.flags li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.flags li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.5em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.flags li.modifier::before {
+  background: var(--white);
+  border: 2px solid var(--success);
+}
+
+.flags .flag-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.flags q {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  quotes: '“' '”';
+}
+
+.subhead {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 16px;
+}
+
+.disposition {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.disposition .name {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.name.emergency {
+  color: var(--error);
+}
+
+.name.same_day {
+  color: var(--warning);
+}
+
+.name.async {
+  color: var(--accent);
+}
+
+.name.self_care,
+.name.none {
+  color: var(--muted);
+}
+
+dl.rows {
+  margin: 16px 0 0;
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+  border-top: 1px solid var(--border);
+}
+
+dl.rows dt,
+dl.rows dd {
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+
+dl.rows dt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 13px;
+  padding-right: 12px;
+}
+
+dl.rows dd .mono {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--muted);
+}
+
+.questions {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.votes {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.votes .model {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.vote-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 170px) minmax(0, 1fr) 2.5em;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.vote-row .bar {
+  height: 10px;
+  background: var(--surface);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.vote-row .fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.vote-row.chosen .level {
+  font-weight: 700;
+}
+
+.vote-row .count {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  text-align: right;
+}
+
+.prose {
+  margin-top: 4px;
+}
+
+.trace {
+  color: var(--muted);
+}
+
+/* --- Override ----------------------------------------------------------- */
+
+.levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.levels button {
+  text-align: left;
+  font-size: 0.9375rem;
+}
+
+.levels button .current {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* --- Patient view ------------------------------------------------------- */
+
+.phone {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.bubble {
+  border-radius: 16px;
+  padding: 12px 16px;
+  white-space: pre-wrap;
+}
+
+.bubble.from-patient {
+  background: var(--surface);
+  margin-left: 32px;
+  border-bottom-right-radius: 4px;
+}
+
+.reply {
+  display: grid;
+  gap: 10px;
+}
+
+.block {
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+
+.block.emergency {
+  border: 2px solid var(--error);
+  background: var(--error-subtle);
+  color: var(--error);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.block.draft {
+  background: var(--gold-subtle);
+  color: var(--gold-text);
+  border-color: var(--gold-text);
+  font-weight: 700;
+}
+
+.block.draft-body {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.block.safety_net h3 {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.block.failed {
+  border-color: var(--error);
+  font-weight: 500;
+}
+
+.block.pending {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  dl.rows {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  dl.rows dt {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .disposition .name {
+    font-size: 1.875rem;
+  }
+
+  .vote-row {
+    grid-template-columns: minmax(84px, 120px) minmax(0, 1fr) 2.25em;
+  }
+
+  .bubble.from-patient {
+    margin-left: 16px;
+  }
+}

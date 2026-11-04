@@ -1,0 +1,13 @@
+name = "counsel-disposition-agent"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Models are filled in by Task 11. An empty SECONDARY_MODEL or
+# SECONDARY_PROVIDER turns the second model family off.
+# Secrets (set with `wrangler secret put`): OPENROUTER_API_KEY, ACCESS_TOKEN.
+[vars]
+PRIMARY_MODEL = ""
+PRIMARY_PROVIDER = ""
+SECONDARY_MODEL = ""
+SECONDARY_PROVIDER = ""
+ALLOWED_ORIGIN = ""

@@ -1,0 +1,386 @@
+{
+  "id": "refill-buried-flag",
+  "label": "Metformin refill with a buried red flag",
+  "synthetic_fixture": true,
+  "note": "Hand-written placeholder so the page is reviewable before Task 11 records real runs. Not model output.",
+  "message": "Hi, could you please renew my metformin? I have about a week of tablets left and the pharmacy said they need a new prescription. Same dose as before, 500 mg twice a day. Oh and unrelated, there's a red patch on top of my right foot that seems to be spreading since Monday, probably from my new shoes. Thanks!",
+  "early": null,
+  "result": {
+    "status": "needs_info",
+    "disposition": "within_few_days",
+    "tier": "async",
+    "brief_label": "ASYNC_PHYSICIAN",
+    "floor": "within_few_days",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "present",
+        "excerpt": "a red patch on top of my right foot that seems to be spreading",
+        "excerpt_verified": true
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "absent",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [
+      {
+        "id": "diabetes",
+        "excerpt": "renew my metformin",
+        "excerpt_verified": true
+      }
+    ],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 3,
+        "within_few_days": 16,
+        "routine": 1,
+        "self_care": 0
+      },
+      "secondary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 5,
+        "within_few_days": 14,
+        "routine": 1,
+        "self_care": 0
+      }
+    },
+    "confidence": 0.8,
+    "human_review": {
+      "flagged": false,
+      "reasons": [
+        "missing_info",
+        "photo_needed"
+      ]
+    },
+    "info_requests": {
+      "questions": [
+        "Is the red area warm, swollen or painful to touch?",
+        "Is there any break in the skin, blister or discharge?",
+        "Have you had a fever or chills?"
+      ],
+      "photo": true
+    },
+    "time_sensitive": false,
+    "justification": "The refill is routine, but spreading redness on the foot of a patient taking metformin meets the diabetic foot red flag, so the patient needs a physician assessment within 72 hours. No fever or open wound is described; a photo and answers to the questions would show whether this needs to be seen sooner.",
+    "safety_net": "If the redness spreads quickly, the foot becomes hot or very painful, you see pus or an open wound, or you get a fever or feel unwell, contact us right away or go to the nearest emergency department.",
+    "patient_message": "A Counsel physician will review your message within 24 hours, and you will be assessed within 72 hours. If the redness spreads quickly, the foot becomes hot or very painful, you see pus or an open wound, or you get a fever or feel unwell, contact us right away or go to the nearest emergency department.",
+    "trace": {
+      "input_sha256": "ecf36ef7fb05f5f14d4d6e189cac395ae9c4fd446ee8c5ace81ab10e54225a31",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "synthetic/hand-written-primary",
+          "provider": "none"
+        },
+        {
+          "model": "synthetic/hand-written-secondary",
+          "provider": "none"
+        }
+      ],
+      "latency_ms": 0,
+      "raw": null
+    }
+  }
+}

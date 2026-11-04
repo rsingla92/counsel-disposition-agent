@@ -1,0 +1,50 @@
+[
+  {
+    "id": "chest-pressure",
+    "label": "Chest pressure spreading to the jaw",
+    "intended_level": "call_911",
+    "message": "Hi, I'm 58. For the last 30 minutes I've had a heavy pressure in the middle of my chest that's spreading into my jaw and left arm. I'm sweating a lot and feel a bit sick. I took an antacid and it hasn't helped. Should I just wait for my appointment on Friday?"
+  },
+  {
+    "id": "walt-warfarin-head",
+    "label": "Walt, 70, on warfarin, hit his head",
+    "intended_level": "ed_now",
+    "message": "This is Walt. I'm 70 and I take warfarin for my heart rhythm. Yesterday I hit my head on the kitchen cupboard door, pretty hard. There's a bump and a bit of a headache today but it's probably nothing. I didn't pass out. Just thought I'd mention it while I'm here."
+  },
+  {
+    "id": "priya-infant-fever",
+    "label": "Priya's 6-month-old with fever",
+    "intended_level": "in_person_today",
+    "message": "Hello, this is Priya. My daughter is 6 months old and has had a fever since last night, 38.9 C this morning. She's still feeding a little but she's had far fewer wet diapers than usual, only two since yesterday evening. She's fussy but she does wake up and look at me. What should I do?"
+  },
+  {
+    "id": "uti-symptoms",
+    "label": "Burning when passing urine",
+    "intended_level": "physician_contact_today",
+    "message": "I'm 34 and for two days it has burned when I pee and I keep needing to go. No fever, no back pain, not pregnant. I had something like this two years ago and antibiotics cleared it. Can someone help me today?"
+  },
+  {
+    "id": "refill-buried-flag",
+    "label": "Metformin refill with a buried red flag",
+    "intended_level": "within_few_days",
+    "message": "Hi, could you please renew my metformin? I have about a week of tablets left and the pharmacy said they need a new prescription. Same dose as before, 500 mg twice a day. Oh and unrelated, there's a red patch on top of my right foot that seems to be spreading since Monday, probably from my new shoes. Thanks!"
+  },
+  {
+    "id": "annual-checkup",
+    "label": "Booking a routine check-up",
+    "intended_level": "routine",
+    "message": "Hi there, I'd like to book my yearly physical sometime in the next month or two. I feel fine and have no new symptoms. Could we also recheck my cholesterol at the same visit? It was a little high last year."
+  },
+  {
+    "id": "common-cold",
+    "label": "Mild cold for two days",
+    "intended_level": "self_care",
+    "message": "I've had a runny nose, sneezing and a mildly scratchy throat for two days. No fever, I'm eating and drinking normally and I'm otherwise healthy. Is there anything I can take to feel better while it runs its course?"
+  },
+  {
+    "id": "spanish-sore-throat",
+    "label": "Sore throat, written in Spanish",
+    "intended_level": null,
+    "message": "Hola, tengo dolor de garganta desde hace tres días y un poco de fiebre por la noche. Puedo tragar líquidos sin problema. ¿Qué me recomiendan?"
+  }
+]
