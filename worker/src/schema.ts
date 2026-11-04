@@ -21,12 +21,28 @@ export const REASON_CODES = [
   'wide_spread',
   'family_disagreement',
   'unverified_excerpt',
+  'secondary_unavailable',
   'missing_info',
   'photo_needed',
 ] as const;
 
 export const ReasonCodeSchema = z.enum(REASON_CODES);
 export type ReasonCode = z.infer<typeof ReasonCodeSchema>;
+
+/**
+ * Why a physician overrode a disposition. Fixed codes, never free text, so
+ * an override cannot carry patient details into the logs.
+ */
+export const OverrideReasonCodeSchema = z.enum([
+  'under_triage',
+  'over_triage',
+  'missed_red_flag',
+  'false_red_flag',
+  'history_changes_risk',
+  'needs_info_resolved',
+  'other',
+]);
+export type OverrideReasonCode = z.infer<typeof OverrideReasonCodeSchema>;
 
 /**
  * The structured-output schema sent to the extraction model. Every object is

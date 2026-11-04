@@ -152,6 +152,14 @@ describe('RouteResultSchema', () => {
     ).toBe(false);
   });
 
+  it('accepts secondary_unavailable as a reason code', () => {
+    const r = RouteResultSchema.safeParse({
+      ...validResult,
+      human_review: {flagged: true, reasons: ['secondary_unavailable']},
+    });
+    expect(r.success).toBe(true);
+  });
+
   it('rejects unknown reason codes and unknown top-level keys', () => {
     expect(
       RouteResultSchema.safeParse({
