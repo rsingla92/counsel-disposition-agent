@@ -36,7 +36,7 @@ A minimising tone ("probably nothing", "just a little", "I'm sure it's fine") do
 
 Also fill in:
 - language: the ISO 639-1 code of the language the message is written in.
-- is_care_request: true if the patient is asking for clinical care, advice or an appointment, false otherwise (for example spam or a billing question).
+- is_care_request: true when the message asks for care OR reports any symptom, injury or health concern about the patient or someone they care for, even if it asks for nothing. False only for messages with no clinical content at all (for example billing, scheduling with no symptoms, or spam).
 - questions: up to three short questions to ask the patient, only when the answer could change the disposition. Otherwise an empty list.
 - photo_needed: true only when a photo would help a physician assess the problem.
 - time_sensitive: true when the message indicates the situation is changing quickly or cannot wait.
@@ -44,7 +44,14 @@ Also fill in:
 Answer only with JSON matching the supplied schema.`;
 }
 
-const OPEN_OR_CLOSE_TAG = /<(?=\/?patient_message)/gi;
+// Matches the "<" of any opening or closing patient_message look-alike:
+// whitespace or zero-width characters around "/", and the name written with
+// "_", "-" or spaces. HTML entities such as "&lt;" are left as they are.
+const ZW = '\u200B-\u200D\uFEFF';
+const OPEN_OR_CLOSE_TAG = new RegExp(
+  `<(?=[\\s${ZW}]*/?[\\s${ZW}]*patient[\\s_\\-${ZW}]*message)`,
+  'gi',
+);
 
 /**
  * Extracts red flags and modifiers from a patient message. Throws LlmError;
