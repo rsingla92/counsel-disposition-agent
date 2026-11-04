@@ -1,6 +1,12 @@
 import {LEVELS, type Level} from '../src/levels';
 import type {Policy} from '../src/policy';
+import {emptyVotes, type Votes} from '../src/router';
 import type {Extraction, RouteResult} from '../src/schema';
+
+/** Votes with the given counts; levels not named get 0. */
+export function v(partial: Partial<Votes>): Votes {
+  return {...emptyVotes(), ...partial};
+}
 
 /** An extraction in which nothing is flagged. */
 export function fakeExtraction(policy: Policy): Extraction {
