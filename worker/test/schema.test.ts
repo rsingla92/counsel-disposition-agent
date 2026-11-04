@@ -3,8 +3,14 @@ import {describe, expect, it} from 'vitest';
 import {z} from 'zod';
 import {type Level} from '../src/levels';
 import {loadPolicy} from '../src/policy';
-import {RouteResultSchema, SampleSchema, extractionSchema} from '../src/schema';
-import {fakeExtraction, validResult} from './fixtures';
+import {
+  RouteResultSchema,
+  SampleSchema,
+  extractionJsonSchema,
+  extractionSchema,
+  salvageFlags,
+} from '../src/schema';
+import {fakeExtraction, toWire, validResult} from './fixtures';
 
 const policy = loadPolicy();
 
@@ -13,18 +19,27 @@ function readJson(rel: string): unknown {
 }
 
 describe('extractionSchema', () => {
-  it('requires every policy flag in an extraction', () => {
-    const s = extractionSchema(policy);
-    const ok = fakeExtraction(policy);
-    expect(s.safeParse(ok).success).toBe(true);
-    const rest = {...ok.red_flags};
-    delete rest[policy.red_flags[0].id];
-    expect(s.safeParse({...ok, red_flags: rest}).success).toBe(false);
+  const s = extractionSchema(policy);
+  const ok = toWire(fakeExtraction(policy));
+  const first = policy.red_flags[0].id;
+
+  it('parses the list form into flags keyed by id', () => {
+    expect(s.parse(ok)).toEqual(fakeExtraction(policy));
+  });
+
+  it('requires every policy flag exactly once', () => {
+    const missing = ok.red_flags.filter(f => f.id !== first);
+    expect(s.safeParse({...ok, red_flags: missing}).success).toBe(false);
+    const twice = [...ok.red_flags, {...ok.red_flags[0], state: 'present'}];
+    expect(s.safeParse({...ok, red_flags: twice}).success).toBe(false);
+    const unknown = [
+      ...ok.red_flags,
+      {id: 'not_a_flag', state: 'absent', excerpt: ''},
+    ];
+    expect(s.safeParse({...ok, red_flags: unknown}).success).toBe(false);
   });
 
   it('requires every modifier and rejects unknown keys', () => {
-    const s = extractionSchema(policy);
-    const ok = fakeExtraction(policy);
     const rest = {...ok.modifiers};
     delete rest[policy.modifiers[0].id];
     expect(s.safeParse({...ok, modifiers: rest}).success).toBe(false);
@@ -32,25 +47,75 @@ describe('extractionSchema', () => {
   });
 
   it('allows at most three questions', () => {
-    const s = extractionSchema(policy);
-    const ok = fakeExtraction(policy);
     expect(s.safeParse({...ok, questions: ['a', 'b', 'c']}).success).toBe(true);
     expect(s.safeParse({...ok, questions: ['a', 'b', 'c', 'd']}).success).toBe(
       false,
     );
   });
 
-  it('serialises strictly with every key required', () => {
-    const schema = z.toJSONSchema(extractionSchema(policy)) as {
-      additionalProperties: boolean;
-      required: string[];
-      properties: Record<string, unknown>;
+  it('reads a blank excerpt as no excerpt', () => {
+    const mod = policy.modifiers[0].id;
+    const withFirst = (excerpt: string | null) => ({
+      ...ok,
+      red_flags: ok.red_flags.map(f =>
+        f.id === first ? {id: first, state: 'present', excerpt} : f,
+      ),
+      modifiers: {...ok.modifiers, [mod]: {present: true, excerpt}},
+    });
+    for (const excerpt of ['', '  ', null]) {
+      const parsed = s.parse(withFirst(excerpt));
+      expect(parsed.red_flags[first].excerpt).toBeNull();
+      expect(parsed.modifiers[mod].excerpt).toBeNull();
+    }
+    expect(s.parse(withFirst('my chest')).red_flags[first].excerpt).toBe(
+      'my chest',
+    );
+  });
+});
+
+describe('extractionJsonSchema', () => {
+  const schema = extractionJsonSchema(policy) as {
+    additionalProperties: boolean;
+    required: string[];
+    properties: Record<string, unknown> & {
+      red_flags: {
+        type: string;
+        items: {properties: Record<string, {type?: string; enum?: string[]}>};
+      };
     };
+  };
+
+  it('serialises strictly with every key required', () => {
     expect(schema.additionalProperties).toBe(false);
     expect([...schema.required].sort()).toEqual(
       Object.keys(schema.properties).sort(),
     );
     expect(JSON.stringify(schema)).not.toContain('"additionalProperties":true');
+    expect(schema).not.toHaveProperty('$schema');
+  });
+
+  // Anthropic's strict mode rejects a schema with more than 16 fields that are
+  // nullable or union-typed (seen live on Vertex, 2026-11-03).
+  it('stays under the strict-mode limit on union-typed fields', () => {
+    let unions = 0;
+    const walk = (node: unknown): void => {
+      if (Array.isArray(node)) return node.forEach(walk);
+      if (node === null || typeof node !== 'object') return;
+      const o = node as Record<string, unknown>;
+      if ('anyOf' in o || 'oneOf' in o || Array.isArray(o.type)) unions++;
+      Object.values(o).forEach(walk);
+    };
+    walk(schema);
+    expect(unions).toBeLessThanOrEqual(16);
+  });
+
+  it('asks for red flags as a list of policy ids with string excerpts', () => {
+    const flags = schema.properties.red_flags;
+    expect(flags.type).toBe('array');
+    expect(flags.items.properties.id.enum).toEqual(
+      policy.red_flags.map(f => f.id),
+    );
+    expect(flags.items.properties.excerpt).toEqual({type: 'string'});
   });
 });
 
@@ -255,4 +320,63 @@ describe('RouteResultSchema', () => {
     expect(readJson('../../schema/route-result.schema.json')).toEqual(
       z.toJSONSchema(RouteResultSchema),
     ));
+});
+
+describe('salvageFlags', () => {
+  const ok = toWire(fakeExtraction(policy));
+  const ids = policy.red_flags.map(f => f.id);
+
+  it('keeps present flags and reads missing ones as unknown', () => {
+    const list = [
+      {id: 'cardiac_chest_pain', state: 'present', excerpt: 'my chest'},
+    ];
+    const out = salvageFlags(policy, {...ok, red_flags: list})!;
+    expect(Object.keys(out)).toEqual(ids);
+    expect(out.cardiac_chest_pain).toEqual({
+      state: 'present',
+      excerpt: 'my chest',
+    });
+    expect(out.anaphylaxis).toEqual({state: 'unknown', excerpt: null});
+  });
+
+  it('keeps the most severe state of a repeated flag', () => {
+    const list = [
+      {id: 'anaphylaxis', state: 'present', excerpt: 'throat closing'},
+      {id: 'anaphylaxis', state: 'absent', excerpt: ''},
+      {id: 'anaphylaxis', state: 'unknown', excerpt: ''},
+    ];
+    expect(salvageFlags(policy, {red_flags: list})!.anaphylaxis).toEqual({
+      state: 'present',
+      excerpt: 'throat closing',
+    });
+  });
+
+  it.each([[undefined], [42], [{text: 'x'}]])(
+    'keeps a present flag whose excerpt is malformed (%j)',
+    excerpt => {
+      const list = [{id: 'anaphylaxis', state: 'present', excerpt}];
+      expect(salvageFlags(policy, {red_flags: list})!.anaphylaxis).toEqual({
+        state: 'present',
+        excerpt: null,
+      });
+    },
+  );
+
+  it('skips entries it cannot read', () => {
+    const list = [
+      {id: 'not_a_flag', state: 'present', excerpt: ''},
+      {id: 'anaphylaxis', state: 'maybe', excerpt: ''},
+      'anaphylaxis',
+      null,
+    ];
+    const out = salvageFlags(policy, {red_flags: list})!;
+    expect(Object.values(out).every(f => f.state === 'unknown')).toBe(true);
+  });
+
+  it.each([[null], ['text'], [{}], [{red_flags: 'x'}]])(
+    'returns null without a flag list (%j)',
+    json => {
+      expect(salvageFlags(policy, json)).toBeNull();
+    },
+  );
 });

@@ -9,7 +9,7 @@ import {
 import type {Deps} from '../src/pipeline';
 import {loadPolicy} from '../src/policy';
 import type {Sample} from '../src/schema';
-import {fakeExtraction, sample, withFlags} from './fixtures';
+import {fakeExtraction, sample, toWire, withFlags} from './fixtures';
 
 // Synthetic messages only: the repo is public.
 export const M = 'I have had a sore throat for two days. What should I do?';
@@ -84,7 +84,8 @@ export function scripted(opts: ScriptOpts): LlmClient & {calls: number} {
         ex.is_care_request = opts.care ?? true;
         ex.questions = opts.questions ?? [];
         ex.photo_needed = opts.photo ?? false;
-        return {json: ex, raw: JSON.stringify(ex), latencyMs: 1};
+        const json = toWire(ex);
+        return {json, raw: JSON.stringify(json), latencyMs: 1};
       }
       const isPrimary = req.spec.model !== SECONDARY.model;
       const i = isPrimary ? primarySamples++ : -1;

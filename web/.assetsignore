@@ -1,0 +1,8 @@
+# Publish the runtime files only.
+.assetsignore
+.wrangler
+wrangler.toml
+package.json
+package-lock.json
+node_modules
+test

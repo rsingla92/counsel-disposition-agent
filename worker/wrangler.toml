@@ -2,12 +2,13 @@ name = "counsel-disposition-agent"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
-# Models are filled in by Task 11. An empty SECONDARY_MODEL or
-# SECONDARY_PROVIDER turns the second model family off.
+# Both providers are zero-data-retention endpoints on OpenRouter (checked
+# 2026-11-03). An empty SECONDARY_MODEL or SECONDARY_PROVIDER turns the second
+# model family off.
 # Secrets (set with `wrangler secret put`): OPENROUTER_API_KEY, ACCESS_TOKEN.
 [vars]
-PRIMARY_MODEL = ""
-PRIMARY_PROVIDER = ""
-SECONDARY_MODEL = ""
-SECONDARY_PROVIDER = ""
-ALLOWED_ORIGIN = ""
+PRIMARY_MODEL = "anthropic/claude-sonnet-5.5"
+PRIMARY_PROVIDER = "google-vertex"
+SECONDARY_MODEL = "google/gemini-3.8-flash"
+SECONDARY_PROVIDER = "google-vertex"
+ALLOWED_ORIGIN = "https://counsel-disposition-web.counsel-demo.workers.dev"

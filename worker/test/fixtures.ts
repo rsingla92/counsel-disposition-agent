@@ -26,6 +26,32 @@ export function fakeExtraction(policy: Policy): Extraction {
   } as Extraction;
 }
 
+/** An extraction as the model returns it: red flags as a list. */
+export type WireExtraction = Omit<Extraction, 'red_flags'> & {
+  red_flags: {id: string; state: string; excerpt: string}[];
+};
+
+/**
+ * Converts `ex` to the form the extraction model returns: red flags as a
+ * list, and an empty string for no excerpt.
+ */
+export function toWire(ex: Extraction): WireExtraction {
+  return {
+    ...ex,
+    red_flags: Object.entries(ex.red_flags).map(([id, f]) => ({
+      id,
+      state: f.state,
+      excerpt: f.excerpt ?? '',
+    })),
+    modifiers: Object.fromEntries(
+      Object.entries(ex.modifiers).map(([id, m]) => [
+        id,
+        {present: m.present, excerpt: m.excerpt ?? ''},
+      ]),
+    ) as unknown as Extraction['modifiers'],
+  };
+}
+
 function counts(top: Level, n: number): Record<Level, number> {
   return Object.fromEntries(LEVELS.map(l => [l, l === top ? n : 0])) as Record<
     Level,

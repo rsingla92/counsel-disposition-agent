@@ -1,0 +1,7 @@
+# The demo page, served as static assets from a Worker with no script.
+# Deploy from this directory: npx wrangler deploy
+name = "counsel-disposition-web"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "."

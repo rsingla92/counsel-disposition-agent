@@ -12,7 +12,11 @@ sampling:
   n: 20
   temperature: 0.7
   min_valid: 15
-  timeout_ms: 8000
+  timeout_ms: 15000 # samples take 2-8 s; allows for slow providers
+
+# Extraction answers every red flag, so its output is long (about 2,000 tokens).
+extraction:
+  timeout_ms: 20000
 
 review:
   min_top_votes: 12

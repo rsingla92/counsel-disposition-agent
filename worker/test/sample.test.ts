@@ -102,7 +102,7 @@ describe('drawSamples', () => {
     const req = llm.lastRequest;
     expect(req.spec).toBe(spec);
     expect(req.temperature).toBe(0.7);
-    expect(req.timeoutMs).toBe(8000);
+    expect(req.timeoutMs).toBe(policy.sampling.timeout_ms);
     expect(req.schemaName).toBe('sample');
     expect(req.jsonSchema).not.toHaveProperty('$schema');
     expect(req.jsonSchema).toHaveProperty('properties.disposition');

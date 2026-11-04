@@ -37,7 +37,9 @@ class RouteClient:
       base_url: str,
       token: str,
       *,
-      timeout_s: float = 60.0,
+      # The stream is silent while 40 samples share six connections, with
+      # 15 s per call and 429 retries; live cases take 30-55 s.
+      timeout_s: float = 300.0,
       transport: httpx.BaseTransport | None = None,
   ):
     self._base_url = base_url.rstrip("/")
