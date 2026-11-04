@@ -27,6 +27,7 @@
 - Tests are hermetic with the LLM mocked; live-model runs belong to the eval harness (D12).
 - Style: gts for TypeScript; pyink (line length 80) and pylint with Google's `pylintrc` for Python; type hints and Google-format docstrings. Enforced in CI.
 - Git: one branch and PR per task, PR linked to an issue, PR description ≤ 5 lines (summary, what, why, how tested). Commit subject imperative, ~50 chars, body explains why (D12).
+- Second opinion: every task PR gets a Codex review (comment `@codex review` on the PR) in addition to the fresh Claude reviewer. Triage its findings with superpowers:receiving-code-review before merging. Task 1 adds `AGENTS.md` with Codex's review guidelines: the zero-miss gate, fail-safe paths, the verbatim-excerpt rule, and no Counsel data in the repo.
 - **Never commit** `docs/brief/`, `data/private/`, Counsel's messages, or any excerpt from them. The repo is public. Demo and replay content is synthetic only.
 - Headline numbers come only from the 50 reviewed cases.
 
@@ -81,7 +82,7 @@ reports/                        aggregate eval reports (no message text)
 ### Task 1: Scaffold, CI and `policy.yaml` (PRD T1)
 
 **Files:**
-- Create: `policy/policy.yaml`, `policy/cost_fixtures.json`, `worker/package.json`, `worker/tsconfig.json`, `worker/vitest.config.ts`, `worker/scripts/build-policy.mjs`, `worker/src/levels.ts`, `worker/src/policy.ts`, `.github/workflows/ci.yml`
+- Create: `AGENTS.md` (Codex review guidelines, under a `## Review guidelines` heading), `policy/policy.yaml`, `policy/cost_fixtures.json`, `worker/package.json`, `worker/tsconfig.json`, `worker/vitest.config.ts`, `worker/scripts/build-policy.mjs`, `worker/src/levels.ts`, `worker/src/policy.ts`, `.github/workflows/ci.yml`
 - Modify: `.gitignore` (add `worker/src/generated/`, `node_modules/`, `.wrangler/`)
 - Test: `worker/test/policy.test.ts`, `worker/test/levels.test.ts`
 
