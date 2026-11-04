@@ -234,15 +234,44 @@ export function voteBars(votes) {
 
 // --- what leads ------------------------------------------------------------
 
+/** Acuity rank: self_care is 0, call_911 is 6; -1 for no level. */
+function rank(level) {
+  const i = LEVELS.indexOf(level);
+  return i === -1 ? -1 : LEVELS.length - 1 - i;
+}
+
 /**
- * The Emergency instruction that must lead both views, or null. The result's
- * own message leads when its disposition is Emergency, whatever its status;
- * before the result arrives, or if it somehow lacks one, the early event's.
+ * Orders Emergency instructions, given as {level, text, live}: most acute
+ * first, a live instruction first at the same level, duplicates dropped.
  */
+function orderLeads(candidates) {
+  const sorted = candidates
+    .filter(c => isEmergency(c.level) && c.text)
+    .sort((a, b) => rank(b.level) - rank(a.level) || Number(b.live) - Number(a.live));
+  const seen = new Set();
+  return sorted.filter(c => {
+    const key = c.text.trim();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * Every Emergency instruction that must lead both views, most acute first:
+ * the result's own message when its disposition is Emergency (whatever its
+ * status) and the live early event's. Neither ever displaces the other.
+ */
+export function emergencyLeads(result, early) {
+  return orderLeads([
+    {level: result?.disposition, text: result?.patient_message, live: false},
+    {level: early?.floor, text: early?.patient_message, live: true},
+  ]).map(c => c.text);
+}
+
+/** The first Emergency instruction, or null. */
 export function emergencyLead(result, early) {
-  if (result && isEmergency(result.disposition)) return result.patient_message;
-  if (early && isEmergency(early.floor)) return early.patient_message;
-  return null;
+  return emergencyLeads(result, early)[0] ?? null;
 }
 
 const FAILED_MESSAGE =
@@ -280,6 +309,40 @@ export function fallbackFor(message, liveEarly, saved) {
   if (liveEarly) return failedRun(message, liveEarly);
   if (saved) return replayRun(saved);
   return failedRun(message, null);
+}
+
+/**
+ * The pinned live Emergency instruction ({target, early}) if it belongs to
+ * `target` (same demo id and same message text), else null. Editing the
+ * message or choosing another demo therefore clears the pin.
+ */
+export function pinFor(pinned, target) {
+  if (!pinned || !target) return null;
+  return pinned.target.demoId === target.demoId &&
+    pinned.target.message === target.message
+    ? pinned
+    : null;
+}
+
+/**
+ * Applies a pinned live Emergency instruction to a run about to be shown
+ * for `target`. Returns {run, hidden}. For the pinned target, a run whose
+ * disposition is less acute than the pinned floor (or that has none) is
+ * replaced by the failed run led by the live instruction; hidden is true
+ * when that hid a saved replay. A run at or above the floor is shown with
+ * the live instruction kept among its leads. Other targets are unchanged.
+ */
+export function applyPinned(pinned, target, run) {
+  const pin = pinFor(pinned, target);
+  if (!pin) return {run, hidden: false};
+  const disposition = run?.result?.disposition ?? null;
+  if (disposition !== null && rank(disposition) >= rank(pin.early.floor)) {
+    return {run: {...run, early: pin.early}, hidden: false};
+  }
+  return {
+    run: failedRun(target.message, pin.early),
+    hidden: run?.replay === true,
+  };
 }
 
 /**
@@ -323,8 +386,9 @@ function splitSafetyNet(message, safetyNet) {
 export function patientBlocks(result, early, failed = false) {
   const blocks = [];
   if (!result) {
-    const lead = emergencyLead(null, early);
-    if (lead) blocks.push({kind: 'emergency', text: lead});
+    for (const text of emergencyLeads(null, early)) {
+      blocks.push({kind: 'emergency', text});
+    }
     blocks.push(
       failed
         ? {kind: 'failed', text: FAILED_MESSAGE}
@@ -333,11 +397,12 @@ export function patientBlocks(result, early, failed = false) {
     return blocks;
   }
   const {body, net} = splitSafetyNet(result.patient_message, result.safety_net);
-  if (isEmergency(result.disposition)) {
-    blocks.push({kind: 'emergency', text: body});
-  } else {
-    const lead = emergencyLead(null, early);
-    if (lead) blocks.push({kind: 'emergency', text: lead});
+  const leads = orderLeads([
+    {level: result.disposition, text: body, live: false},
+    {level: early?.floor, text: early?.patient_message, live: true},
+  ]);
+  for (const c of leads) blocks.push({kind: 'emergency', text: c.text});
+  if (!isEmergency(result.disposition)) {
     if (result.disposition === 'self_care') {
       blocks.push({kind: 'draft', text: 'Draft — awaiting physician sign-off'});
     }

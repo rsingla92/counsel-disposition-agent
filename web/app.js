@@ -9,7 +9,8 @@ import {
   STATUS_LABELS,
   TIER_LABELS,
   canOverride,
-  emergencyLead,
+  applyPinned,
+  emergencyLeads,
   fallbackFor,
   formatPercent,
   highlight,
@@ -17,6 +18,7 @@ import {
   levelLabel,
   parseNdjson,
   patientBlocks,
+  pinFor,
   readToken,
   replayRun,
   replayTarget,
@@ -55,6 +57,9 @@ const state = {
   // The run on screen: {message, early, result, replay, synthetic}.
   run: null,
   busy: false,
+  // The live Emergency instruction for a routed target, {target, early}.
+  // Kept while the same demo and message text stay selected.
+  pinned: null,
 };
 
 function storage() {
@@ -147,16 +152,17 @@ function sourceLabels(run) {
   return labels.length ? el('div', {class: 'source'}, labels) : null;
 }
 
-function emergencyBox(text, forPhysician) {
+function emergencyBox(text, forPhysician, first = true) {
+  let eyebrow = 'Emergency';
+  if (forPhysician) {
+    eyebrow = first
+      ? 'Emergency · sent to the patient first'
+      : 'Emergency · also sent';
+  }
   return el(
     'div',
     {class: 'emergency-lead', role: 'alert'},
-    el('p', {
-      class: 'eyebrow',
-      text: forPhysician
-        ? 'Emergency · sent to the patient first'
-        : 'Emergency',
-    }),
+    el('p', {class: 'eyebrow', text: eyebrow}),
     el('p', {class: 'instruction', text}),
   );
 }
@@ -529,7 +535,7 @@ function renderPhysician(run) {
     root.append(el('p', {class: 'empty', text: 'Pick a demo message or type one, then route it.'}));
     return;
   }
-  const lead = emergencyLead(run.result, run.early);
+  const leads = emergencyLeads(run.result, run.early);
   const stack = el(
     'div',
     {class: 'stack'},
@@ -542,8 +548,10 @@ function renderPhysician(run) {
   root.append(
     ...[
       sourceLabels(run),
-      lead ? emergencyBox(lead, true) : null,
-      lead ? el('div', {style: 'height: 16px'}) : null,
+      ...leads.flatMap((text, i) => [
+        emergencyBox(text, true, i === 0),
+        el('div', {style: 'height: 16px'}),
+      ]),
       stack,
       run.result ? el('div', {style: 'height: 16px'}) : null,
       overrideCard(run),
@@ -665,12 +673,27 @@ async function loadSaved(routed) {
   }
 }
 
+const HIDDEN_NOTE =
+  'Saved run hidden: a live Emergency instruction was issued for this message.';
+
+/**
+ * Shows `run` for `routed`, after applying any pinned live Emergency
+ * instruction for that target (applyPinned). Returns true if a saved run
+ * was hidden because it was less acute than the live floor.
+ */
+function showRun(routed, run) {
+  const shown = applyPinned(state.pinned, routed, run);
+  state.run = shown.run;
+  render();
+  return shown.hidden;
+}
+
 /** Replay mode: shows the saved run for `routed`, or nothing. */
 async function showReplay(routed) {
   const {saved, why} = await loadSaved(routed);
-  state.run = saved ? replayRun(saved) : null;
-  render();
-  if (why) setStatus(why, true);
+  const hidden = showRun(routed, saved ? replayRun(saved) : null);
+  if (hidden) setStatus(HIDDEN_NOTE, true);
+  else if (why) setStatus(why, true);
 }
 
 function updateReplayUi() {
@@ -716,7 +739,9 @@ async function routeLive(routed) {
   // message no longer on screen never renders.
   const current = () => call === callSeq;
   const run = {message: routed.message, early: null, result: null, replay: false};
-  state.run = run;
+  // While waiting, a pinned live instruction for this message keeps leading.
+  const pin = pinFor(state.pinned, routed);
+  state.run = pin ? {...run, early: pin.early} : run;
   render();
   setStatus('Routing…');
   const ctrl = new AbortController();
@@ -740,7 +765,11 @@ async function routeLive(routed) {
       for (const e of events) {
         if (e.event === 'early') {
           run.early = e;
-          if (current()) render();
+          if (current()) {
+            state.pinned = {target: routed, early: e};
+            state.run = run;
+            render();
+          }
         } else if (e.event === 'result') {
           run.result = e.result;
         }
@@ -756,19 +785,21 @@ async function routeLive(routed) {
     handle(parseNdjson(buffer + decoder.decode()));
     if (!run.result) throw new LiveError('no result in the stream');
     if (!current()) return;
-    render();
+    showRun(routed, run);
     setStatus('Live result.');
   } catch (e) {
     if (!current()) return;
     const why = e instanceof LiveError ? e.message : 'the Worker could not be reached';
-    ui.replay.checked = true;
-    updateReplayUi();
     // After a live early event the call never falls back to a saved run
-    // (fallbackFor), so there is no need to load one.
+    // (fallbackFor), so none is loaded and replay is not switched on: the
+    // live instruction stays pinned for this message.
+    if (!run.early) {
+      ui.replay.checked = true;
+      updateReplayUi();
+    }
     const saved = run.early ? null : (await loadSaved(routed)).saved;
     if (!current()) return;
-    state.run = fallbackFor(routed.message, run.early, saved);
-    render();
+    showRun(routed, fallbackFor(routed.message, run.early, saved));
     setStatus(
       state.run.replay
         ? `Live call failed (${why}). Switched to replay.`
@@ -818,9 +849,15 @@ function fillDemos() {
   );
 }
 
+/** Drops the pinned live instruction once its demo or text is changed. */
+function refreshPin() {
+  state.pinned = pinFor(state.pinned, currentTarget());
+}
+
 function onDemoChange() {
   const demo = selectedDemo();
   ui.message.value = demo ? demo.message : '';
+  refreshPin();
   setStatus('');
   if (ui.replay.checked && demo) onRoute();
 }
@@ -849,6 +886,7 @@ async function init() {
   ui.message.addEventListener('input', () => {
     const demo = selectedDemo();
     if (demo && ui.message.value !== demo.message) ui.demo.value = '';
+    refreshPin();
   });
 
   ui.replay.checked = !WORKER_URL;

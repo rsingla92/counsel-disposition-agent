@@ -8,8 +8,10 @@ import {
   LEVEL_WINDOWS,
   OVERRIDE_REASON_LABELS,
   REASON_LABELS,
+  applyPinned,
   canOverride,
   emergencyLead,
+  emergencyLeads,
   failedRun,
   fallbackFor,
   formatPercent,
@@ -19,6 +21,7 @@ import {
   levelLabel,
   parseNdjson,
   patientBlocks,
+  pinFor,
   readToken,
   replayTarget,
   takeLines,
@@ -461,4 +464,89 @@ test('fallbackFor: with no early event the saved run is shown as a replay', () =
 
 test('fallbackFor: no early event and nothing saved is a failed run', () => {
   assert.deepEqual(fallbackFor('m', null, null), failedRun('m', null));
+});
+
+// --- pinned live Emergency instruction --------------------------------------
+
+const TARGET = {demoId: 'refill', message: 'the routed message'};
+const ED_EARLY = {event: 'early', floor: 'ed_now', patient_message: 'LIVE: go to the ED now.'};
+const PIN = {target: TARGET, early: ED_EARLY};
+
+function replayOf(disposition, patientMessage) {
+  return {
+    message: TARGET.message,
+    early: null,
+    result: result({disposition, patient_message: patientMessage, safety_net: ''}),
+    replay: true,
+    synthetic: true,
+    recordedAt: null,
+  };
+}
+
+test('applyPinned hides a less acute replay for the pinned target', () => {
+  const {run, hidden} = applyPinned(PIN, TARGET, replayOf('within_few_days', 'Within 72 hours.'));
+  assert.equal(hidden, true);
+  assert.deepEqual(run, failedRun(TARGET.message, ED_EARLY));
+  assert.deepEqual(emergencyLeads(run.result, run.early), ['LIVE: go to the ED now.']);
+  const blocks = patientBlocks(run.result, run.early, run.failed);
+  assert.deepEqual(blocks[0], {kind: 'emergency', text: 'LIVE: go to the ED now.'});
+  assert.ok(blocks.every(b => !b.text.includes('72 hours')));
+});
+
+test('applyPinned hides a replay with no disposition, and stands in for a missing run', () => {
+  const none = replayOf(null, 'Holding message.');
+  none.result.status = 'human_review';
+  assert.equal(applyPinned(PIN, TARGET, none).run.failed, true);
+  assert.deepEqual(applyPinned(PIN, TARGET, null).run, failedRun(TARGET.message, ED_EARLY));
+});
+
+test('applyPinned shows a more acute replay with both leads, most acute first', () => {
+  const saved = replayOf('call_911', 'SAVED: call 911 now.');
+  const {run, hidden} = applyPinned(PIN, TARGET, saved);
+  assert.equal(hidden, false);
+  assert.equal(run.replay, true);
+  assert.equal(run.result, saved.result);
+  assert.deepEqual(emergencyLeads(run.result, run.early), [
+    'SAVED: call 911 now.',
+    'LIVE: go to the ED now.',
+  ]);
+  const kinds = patientBlocks(run.result, run.early).map(b => b.kind);
+  assert.deepEqual(kinds.slice(0, 2), ['emergency', 'emergency']);
+});
+
+test('applyPinned keeps the pinned live lead first at the same level', () => {
+  const {run} = applyPinned(PIN, TARGET, replayOf('ed_now', 'SAVED: go to the ED.'));
+  assert.deepEqual(emergencyLeads(run.result, run.early), [
+    'LIVE: go to the ED now.',
+    'SAVED: go to the ED.',
+  ]);
+});
+
+test('applyPinned leaves runs for a different target unchanged', () => {
+  const saved = replayOf('within_few_days', 'Within 72 hours.');
+  for (const other of [
+    {demoId: 'other', message: TARGET.message},
+    {demoId: TARGET.demoId, message: 'edited text'},
+  ]) {
+    const {run, hidden} = applyPinned(PIN, other, saved);
+    assert.equal(run, saved);
+    assert.equal(hidden, false);
+  }
+  assert.equal(applyPinned(null, TARGET, saved).run, saved);
+});
+
+test('pinFor keeps the pin for the same target and clears it otherwise', () => {
+  assert.equal(pinFor(PIN, {...TARGET}), PIN);
+  assert.equal(pinFor(PIN, {...TARGET, message: 'the routed message!'}), null);
+  assert.equal(pinFor(PIN, {...TARGET, demoId: ''}), null);
+  assert.equal(pinFor(null, TARGET), null);
+});
+
+test('emergencyLeads drops duplicates and non-Emergency levels', () => {
+  const r = result({disposition: 'ed_now', patient_message: 'Go now.'});
+  assert.deepEqual(
+    emergencyLeads(r, {event: 'early', floor: 'ed_now', patient_message: 'Go now.'}),
+    ['Go now.'],
+  );
+  assert.deepEqual(emergencyLeads(result(), null), []);
 });
