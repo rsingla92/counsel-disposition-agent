@@ -100,6 +100,23 @@ describe('ruleFloor', () => {
     expect(r.unverified).toEqual(['cardiac_chest_pain']);
   });
 
+  it.each([[''], ['  \n']])(
+    'treats excerpt %j as unverified but still floors',
+    e => {
+      const r = ruleFloor(
+        withExcerpt(
+          ex({cardiac_chest_pain: 'present'}),
+          'cardiac_chest_pain',
+          e,
+        ),
+        MSG,
+        policy,
+      );
+      expect(r.floor).toBe('call_911');
+      expect(r.unverified).toEqual(['cardiac_chest_pain']);
+    },
+  );
+
   it('reports drivers and the modifier applied', () => {
     const r = ruleFloor(
       ex({suicidal_thoughts: 'present'}, ['age_65_plus']),
@@ -139,6 +156,10 @@ describe('verifyExcerpt', () => {
     ['my chest hurts', false],
   ])('verifyExcerpt(%j) is %s', (e, ok) =>
     expect(verifyExcerpt(MSG, e)).toBe(ok),
+  );
+
+  it.each([[''], ['  \n']])('rejects empty excerpt %j', e =>
+    expect(verifyExcerpt(MSG, e)).toBe(false),
   );
 
   it('verifies curly-apostrophe excerpts against straight source', () =>

@@ -23,7 +23,10 @@ function normalise(s: string): string {
 
 /** True when `excerpt` appears verbatim in `message` after normalising both. */
 export function verifyExcerpt(message: string, excerpt: string): boolean {
-  return normalise(message).includes(normalise(excerpt));
+  const needle = normalise(excerpt);
+  // An empty needle is a substring of everything; it verifies nothing.
+  if (needle === '') return false;
+  return normalise(message).includes(needle);
 }
 
 /**
