@@ -22,8 +22,20 @@ is the zero-data-retention route.
   missed 1 of 14 emergencies. The rule floor alone missed none, because it
   makes one call per case.
 
+- **Workers Paid, one case at a time, 3 calls in flight, extraction
+  fallback.** Later on 2026-11-04 the full agent missed 0 of 14 emergencies,
+  with 12% Human review and a cost score of 0.80. Median latency rose from
+  45 s to 79 s. Partway through, the OpenRouter account ran out of credit and
+  calls began returning HTTP 402, so that run's rule-floor numbers were
+  rerun after a top-up.
+
 On the cases that got enough samples, the router behaved as designed. The
 failures come from throughput, not from model judgement.
+
+The 402s are a second lesson. The eval's pre-run credit check read the API
+key's spend limit, which was unset, so it passed while the account itself
+was empty. It now checks the smaller of the key limit and the account
+balance.
 
 ## Why it matters
 
@@ -47,6 +59,8 @@ only the Human review message ("if this is an emergency, call 911").
 - Each failed extraction call logs the model, error code and HTTP status, so
   the next run shows whether failures are 429s or timeouts. Logs carry no
   message text.
+- The trace records which model's extraction was used
+  (`trace.extraction_model`).
 - Sampling stays at 20 calls per model.
 
 ## Roadmap
@@ -63,6 +77,6 @@ only the Human review message ("if this is an emergency, call 911").
 - One deadline for extraction across both models, so the early 911 or ED
   message is never more than about 20 s late. The fallback can double that
   today.
-- Record which model extracted in the trace.
+- Alerting on account credit, since a 402 fails every call at once.
 - A deterministic keyword backstop for emergencies when extraction fails
   entirely.
