@@ -21,6 +21,7 @@ export const PolicySchema = z.strictObject({
     min_valid: z.number().int().positive(),
     timeout_ms: z.number().int().positive(),
   }),
+  extraction: z.strictObject({timeout_ms: z.number().int().positive()}),
   review: z.strictObject({
     min_top_votes: z.number().int().positive(),
     max_span: z.number().int().nonnegative(),

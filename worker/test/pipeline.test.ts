@@ -20,7 +20,7 @@ import {
   scripted,
   tick,
 } from './pipeline-fixtures';
-import {validResult} from './fixtures';
+import {validResult, type WireExtraction} from './fixtures';
 
 const policy = loadPolicy();
 const HR_MESSAGE =
@@ -238,8 +238,9 @@ describe('route: result details', () => {
     llm.complete = async req => {
       const res = await inner(req);
       if (req.schemaName !== 'extraction') return res;
-      const ex = res.json as {red_flags: Record<string, {excerpt: string}>};
-      ex.red_flags.fever_neck_stiffness.excerpt = 'a paraphrase not in it';
+      const ex = res.json as WireExtraction;
+      ex.red_flags.find(f => f.id === 'fever_neck_stiffness')!.excerpt =
+        'a paraphrase not in it';
       return {...res, raw: JSON.stringify(ex)};
     };
     const r = await route(M, deps(llm));

@@ -44,36 +44,89 @@ export const OverrideReasonCodeSchema = z.enum([
 ]);
 export type OverrideReasonCode = z.infer<typeof OverrideReasonCodeSchema>;
 
-/**
- * The structured-output schema sent to the extraction model. Every object is
- * strict and every key required, so the model must answer once per flag and
- * modifier in the policy.
- */
-export function extractionSchema(policy: Policy) {
-  const flags = Object.fromEntries(
-    policy.red_flags.map(f => [
-      f.id,
-      z.strictObject({
-        state: z.enum(['present', 'absent', 'unknown']),
-        excerpt: z.string().nullable(),
-      }),
-    ]),
+// A blank excerpt means none. Null is still accepted on input.
+const ParsedExcerpt = z
+  .string()
+  .nullable()
+  .transform(s => (s === null || s.trim() === '' ? null : s));
+
+const FlagStateSchema = z.enum(['present', 'absent', 'unknown']);
+type FlagState = z.infer<typeof FlagStateSchema>;
+
+// Red flags go to the model as a list of {id, state, excerpt}, not one key per
+// flag: Anthropic's grammar compiler rejects a schema with a strict object per
+// flag as too large.
+function flagList<E extends z.ZodType>(policy: Policy, excerpt: E) {
+  const ids = policy.red_flags.map(f => f.id) as [string, ...string[]];
+  return z.array(
+    z.strictObject({id: z.enum(ids), state: FlagStateSchema, excerpt}),
   );
+}
+
+// The parser requires every policy flag exactly once, then keys them by id.
+function parsedFlags(policy: Policy) {
+  return flagList(policy, ParsedExcerpt)
+    .superRefine((entries, ctx) => {
+      const seen = new Set<string>();
+      for (const e of entries) {
+        if (seen.has(e.id)) ctx.addIssue(`duplicate red flag: ${e.id}`);
+        seen.add(e.id);
+      }
+      for (const f of policy.red_flags) {
+        if (!seen.has(f.id)) ctx.addIssue(`missing red flag: ${f.id}`);
+      }
+    })
+    .transform(
+      entries =>
+        Object.fromEntries(
+          entries.map(e => [e.id, {state: e.state, excerpt: e.excerpt}]),
+        ) as Record<string, {state: FlagState; excerpt: string | null}>,
+    );
+}
+
+// Every object is strict and every key required, so the model must answer
+// once per flag and modifier in the policy.
+function extractionShape<F extends z.ZodType, E extends z.ZodType>(
+  policy: Policy,
+  flags: F,
+  excerpt: E,
+) {
   const modifiers = Object.fromEntries(
     policy.modifiers.map(m => [
       m.id,
-      z.strictObject({present: z.boolean(), excerpt: z.string().nullable()}),
+      z.strictObject({present: z.boolean(), excerpt}),
     ]),
   );
   return z.strictObject({
     language: z.string(),
     is_care_request: z.boolean(),
-    red_flags: z.strictObject(flags),
+    red_flags: flags,
     modifiers: z.strictObject(modifiers),
     questions: z.array(z.string()).max(3),
     photo_needed: z.boolean(),
     time_sensitive: z.boolean(),
   });
+}
+
+/** Parses the extraction model's output. A blank excerpt becomes null. */
+export function extractionSchema(policy: Policy) {
+  return extractionShape(policy, parsedFlags(policy), ParsedExcerpt);
+}
+
+/**
+ * The structured-output schema sent to the extraction model. Excerpts are
+ * plain strings, empty for none, because Anthropic's strict mode allows at
+ * most 16 nullable or union-typed fields and the policy has more flags.
+ */
+export function extractionJsonSchema(policy: Policy): Record<string, unknown> {
+  const wire = extractionShape(
+    policy,
+    flagList(policy, z.string()),
+    z.string(),
+  );
+  const schema = z.toJSONSchema(wire) as Record<string, unknown>;
+  delete schema.$schema; // some providers reject it
+  return schema;
 }
 
 export type Extraction = z.infer<ReturnType<typeof extractionSchema>>;
