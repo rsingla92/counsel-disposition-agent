@@ -1,0 +1,395 @@
+# Versioned clinical policy for the disposition agent.
+# Draft for physician review: every red flag, modifier, window and loss ratio
+# here is read by the Worker at build time (worker/scripts/build-policy.mjs).
+# Levels run from most to least acute: call_911, ed_now, in_person_today,
+# physician_contact_today, within_few_days, routine, self_care.
+policy_version: "0.1.0"
+
+intake:
+  max_chars: 4000
+
+sampling:
+  n: 20
+  temperature: 0.7
+  min_valid: 15
+  timeout_ms: 8000
+
+review:
+  min_top_votes: 12
+  max_span: 2
+  family_tier_disagreement: true
+
+# A modifier raises the disposition one level, never above this level.
+modifier_cap: in_person_today
+
+loss:
+  human_review_cost: 0.2
+  boundaries: # adjacent pairs, most acute first; under : over
+    - {between: [call_911, ed_now], under: 3, over: 1}
+    - {between: [ed_now, in_person_today], under: 20, over: 1}
+    - {between: [in_person_today, physician_contact_today], under: 2, over: 1} # no PRD ratio; author-confirmed 2026-11-03
+    - {between: [physician_contact_today, within_few_days], under: 5, over: 1}
+    - {between: [within_few_days, routine], under: 2, over: 1}
+    - {between: [routine, self_care], under: 1.5, over: 1}
+
+levels:
+  call_911:
+    physician_window: "Notified in parallel"
+    patient_window: "Ambulance now"
+    patient_message: "Call 911 now. Do not drive yourself. A Counsel physician has been notified."
+  ed_now:
+    physician_window: "Notified in parallel"
+    patient_window: "ED now (labour and delivery triage from 20 weeks of pregnancy)"
+    patient_message: "Go to the nearest emergency department now. A Counsel physician has been notified."
+  in_person_today:
+    physician_window: "Within 1 hour"
+    patient_window: "In person within about 6 hours"
+    patient_message: "You need to be seen in person today, within about 6 hours. A Counsel physician will review your message within 1 hour."
+  physician_contact_today:
+    physician_window: "Within 2-4 hours"
+    patient_window: "A physician conversation today"
+    patient_message: "A Counsel physician will speak with you today, within 2 to 4 hours. Virtual is fine."
+  within_few_days:
+    physician_window: "Within 24 hours"
+    patient_window: "Assessed within 72 hours"
+    patient_message: "A Counsel physician will review your message within 24 hours, and you will be assessed within 72 hours."
+  routine:
+    physician_window: "Standard queue"
+    patient_window: "As needed"
+    patient_message: "A Counsel physician will review your message in the standard queue."
+  self_care:
+    physician_window: "Standard queue, for sign-off"
+    patient_window: "Home care now, with safety-netting"
+    patient_message: "Home care is appropriate for now, and a Counsel physician will review this advice. If things get worse, contact us again."
+
+red_flags:
+  # --- Adult ---
+  - id: cardiac_chest_pain
+    group: adult
+    description: "Cardiac-sounding chest pain: pressure, spreading to arm or jaw, sweating"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: [2]
+  - id: anaphylaxis
+    group: adult
+    description: "Severe allergic reaction after an exposure: lip or tongue swelling, throat tightness, hives"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: [14]
+  - id: cauda_equina_signs
+    group: adult
+    description: "Numbness in the saddle area, or new loss of control over bladder or bowels"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: [17]
+  - id: sudden_vision_loss
+    group: adult
+    description: "Sudden loss of vision without pain"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: [21]
+  - id: stroke_signs_now
+    group: adult
+    description: "Stroke signs happening now: drooping face, slurred speech, weakness on one side"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: []
+  - id: airway_breathing_compromise
+    group: adult
+    description: "Airway or breathing compromise: cannot get air in, cannot speak in full words, or turning blue"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: []
+  - id: altered_consciousness
+    group: adult
+    description: "Altered consciousness: unresponsive, cannot be roused, or newly and severely confused"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: []
+  - id: seizure_ongoing
+    group: adult
+    description: "A seizure that is still going or keeps recurring without recovery in between"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: []
+  - id: suicidal_plan_or_intent
+    group: adult
+    description: "Suicidal thoughts with a plan or intent"
+    min_level: call_911
+    instruction: "Call 911 or the 988 Suicide & Crisis Lifeline now."
+    subsumes_modifiers: []
+    cases: []
+  - id: stroke_signs_resolved
+    group: adult
+    description: "Stroke-like symptoms that have since gone away"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [23]
+  - id: thunderclap_headache
+    group: adult
+    description: "Sudden headache that the person calls the worst of their life"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [8]
+  - id: anticoagulated_head_injury
+    group: adult
+    description: "Blow to the head in someone taking a blood thinner"
+    min_level: ed_now
+    subsumes_modifiers: [anticoagulation]
+    cases: [20]
+  - id: fever_neck_stiffness
+    group: adult
+    description: "Fever together with a stiff neck or discomfort from bright light"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [31]
+  - id: gi_bleeding_signs
+    group: adult
+    description: "Black, tar-like stools, or vomiting blood"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [35]
+  - id: acute_testicular_pain
+    group: adult
+    description: "Sudden, severe pain in a testicle"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [37]
+  - id: hyperglycemia_vomiting
+    group: adult
+    description: "Very high blood sugar along with vomiting or being unable to keep fluids down"
+    min_level: ed_now
+    subsumes_modifiers: [diabetes]
+    cases: [33]
+  - id: bowel_obstruction_signs
+    group: adult
+    description: "Severe abdominal pain with vomiting and no bowel movements"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [27]
+  - id: older_adult_fall_no_weight_bearing
+    group: adult
+    description: "Older adult who fell and is now unable to put weight on the leg"
+    min_level: ed_now
+    subsumes_modifiers: [age_65_plus]
+    cases: [48]
+  - id: major_trauma
+    group: adult
+    description: "Major injury: a high-energy mechanism (car crash at speed, pedestrian struck, fall from height), a penetrating wound (stab or gunshot), or bleeding that will not stop. Minor sprains, bumps and everyday falls do not count"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
+  - id: suicidal_thoughts
+    group: adult
+    description: "Suicidal thoughts without a stated plan or intent"
+    min_level: physician_contact_today
+    subsumes_modifiers: []
+    cases: [5]
+  - id: orthopnea_or_leg_swelling
+    group: adult
+    description: "New breathlessness when lying flat, or leg swelling that keeps getting worse"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: [44]
+  - id: chronic_lung_disease_worsening
+    group: adult
+    description: "Breathlessness getting worse in someone with long-term lung disease"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: [12]
+  - id: one_sided_calf_swelling
+    group: adult
+    description: "Pain, swelling and warmth in one calf"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: [25]
+  - id: chronic_cough_constitutional
+    group: adult
+    description: "Cough lasting more than three weeks along with night sweats or unexplained weight loss"
+    min_level: within_few_days
+    subsumes_modifiers: []
+    cases: [43]
+  - id: diabetic_foot_redness
+    group: adult
+    description: "Redness that is spreading on the foot of a person with diabetes"
+    min_level: within_few_days
+    subsumes_modifiers: [diabetes]
+    cases: [4]
+
+  # --- Pediatric ---
+  - id: peds_respiratory_distress
+    group: pediatric
+    description: "Child struggling to breathe (ribs pulling in, grunting, very rapid breathing) or with blue or grey lips"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: []
+  - id: peds_prolonged_seizure
+    group: pediatric
+    description: "Seizure longer than five minutes, or the child does not wake up normally afterwards"
+    min_level: call_911
+    subsumes_modifiers: []
+    cases: []
+  - id: peds_nonblanching_rash_fever
+    group: pediatric
+    description: "Fever with a rash that stays visible when pressed"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: [41]
+  - id: infant_fever_under_3_months
+    group: pediatric
+    description: "Temperature of 100.4 F (38 C) or higher in a baby younger than three months"
+    min_level: ed_now
+    subsumes_modifiers: [under_3_months]
+    cases: []
+  - id: peds_lethargy_or_floppy
+    group: pediatric
+    description: "Child who is unusually drowsy, hard to wake, or limp"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
+  - id: peds_first_seizure_resolved
+    group: pediatric
+    description: "A first seizure that has now stopped"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
+  - id: infant_green_vomit_or_bulging_fontanelle
+    group: pediatric
+    description: "Infant with green vomit, or with a soft spot on the head that bulges"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
+  - id: peds_possible_ingestion
+    group: pediatric
+    description: "Child may have swallowed medicine or a chemical"
+    min_level: ed_now
+    instruction: "Call Poison Control at 1-800-222-1222 on the way."
+    subsumes_modifiers: []
+    cases: []
+  - id: peds_head_injury_red_signs
+    group: pediatric
+    description: "Head injury followed by vomiting, loss of consciousness, or out-of-character behaviour"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
+  - id: fever_sickle_or_immunosuppressed
+    group: pediatric
+    description: "Fever in a child who has sickle cell disease or a weakened immune system"
+    min_level: ed_now
+    subsumes_modifiers: [sickle_cell, immunosuppression]
+    cases: []
+  - id: peds_dehydration
+    group: pediatric
+    description: "Signs of dehydration: far fewer wet diapers, no tears, refusing feeds"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: [16]
+  - id: peds_prolonged_fever
+    group: pediatric
+    description: "Fever that has lasted more than five days"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: []
+  - id: peds_limp_with_fever
+    group: pediatric
+    description: "Limping or refusing to walk, together with fever"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: []
+
+  # --- Obstetric (every flag covers pregnancy and the six weeks after birth) ---
+  - id: obstetric_heavy_bleeding
+    group: obstetric
+    description: "Heavy bleeding, such as soaking a pad every hour, during pregnancy or after birth"
+    min_level: call_911
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: obstetric_seizure
+    group: obstetric
+    description: "Seizure during pregnancy or after birth"
+    min_level: call_911
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: obstetric_chest_pain_or_dyspnea
+    group: obstetric
+    description: "Chest pain or sudden shortness of breath during pregnancy or after birth"
+    min_level: ed_now
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: early_pregnancy_ectopic_signs
+    group: obstetric
+    description: "Early in pregnancy: severe pain on one side of the belly, pain at the shoulder tip, or fainting"
+    min_level: ed_now
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: bleeding_from_20_weeks
+    group: obstetric
+    description: "Any vaginal bleeding at 20 weeks of pregnancy or later"
+    min_level: ed_now
+    instruction: "Go to labour and delivery triage at your hospital now."
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: preterm_labour_signs
+    group: obstetric
+    description: "Leaking fluid, or regular contractions, before 37 weeks"
+    min_level: ed_now
+    instruction: "Go to labour and delivery triage at your hospital now."
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: reduced_fetal_movement
+    group: obstetric
+    description: "Baby moving less than usual at 28 weeks of pregnancy or later"
+    min_level: ed_now
+    instruction: "Go to labour and delivery triage at your hospital now."
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: preeclampsia_signs
+    group: obstetric
+    description: "Headache, vision changes, or new swelling at 20 weeks of pregnancy or later"
+    min_level: in_person_today
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: [9]
+  - id: early_pregnancy_bleeding_cramping
+    group: obstetric
+    description: "Bleeding with cramping before 20 weeks of pregnancy"
+    min_level: in_person_today
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: [28]
+  - id: hyperemesis_no_fluids
+    group: obstetric
+    description: "Vomiting in pregnancy with no fluids kept down for 24 hours"
+    min_level: in_person_today
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: postpartum_fever_or_discharge
+    group: obstetric
+    description: "Fever, or foul-smelling vaginal discharge, after giving birth"
+    min_level: in_person_today
+    subsumes_modifiers: [pregnant, postpartum]
+    cases: []
+  - id: postpartum_harm_thoughts
+    group: obstetric
+    description: "After birth: thoughts of harming oneself or the baby, without confusion, hallucinations or total sleeplessness"
+    min_level: physician_contact_today
+    subsumes_modifiers: [postpartum]
+    cases: [39]
+  - id: postpartum_psychosis_signs
+    group: obstetric
+    description: "After birth: confusion, hallucinations, or not sleeping at all, particularly with thoughts of harm"
+    min_level: ed_now
+    subsumes_modifiers: [postpartum]
+    cases: []
+
+modifiers:
+  - {id: age_65_plus, group: adult, description: "Age 65 or older"}
+  - {id: diabetes, group: adult, description: "Diabetes"}
+  - {id: immunosuppression, group: adult, description: "Weakened immune system (also applies to children)"}
+  - {id: anticoagulation, group: adult, description: "Taking a blood thinner"}
+  - {id: under_3_months, group: pediatric, description: "Baby younger than 3 months"}
+  - {id: born_premature, group: pediatric, description: "Born premature, within the first year of life"}
+  - {id: congenital_heart_disease, group: pediatric, description: "Heart disease present from birth"}
+  - {id: sickle_cell, group: pediatric, description: "Sickle cell disease"}
+  - {id: incomplete_vaccinations, group: pediatric, description: "Vaccinations not up to date"}
+  - {id: pregnant, group: obstetric, description: "Currently pregnant (gestational age decides which obstetric flags apply)"}
+  - {id: postpartum, group: obstetric, description: "Within 6 weeks after giving birth"}
+  - {id: high_risk_pregnancy, group: obstetric, description: "High-risk pregnancy: high blood pressure, diabetes, or twins"}
