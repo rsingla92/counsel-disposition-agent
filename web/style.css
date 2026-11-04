@@ -17,6 +17,13 @@
   --white: #ffffff;
   --error-subtle: #fdf0f0;
 
+  /* Vote chart series (validated against white). Never reuse the warning
+     or error colours here: those are reserved for tiers. */
+  --vote-primary: #1a8f72;
+  --vote-secondary: #6c5fc7;
+  --vote-primary-lead: #007a57;
+  --vote-secondary-lead: #5447b5;
+
   --font-display: 'Source Serif 4', Georgia, serif;
   --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
@@ -549,46 +556,182 @@ dl.rows dd .mono {
   padding-left: 20px;
 }
 
-.votes {
-  display: grid;
-  gap: 4px;
+.votes-chart {
   margin-top: 6px;
 }
 
-.votes .model {
+.votes-chart .model {
   font-size: 0.875rem;
   color: var(--muted);
 }
 
-.vote-row {
+.vote-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 0.875rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.legend-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.swatch {
+  width: 12px;
+  height: 8px;
+  border-radius: 0 4px 4px 0;
+  flex: none;
+  align-self: center;
+}
+
+.swatch.primary,
+.vbar.primary {
+  background: var(--vote-primary);
+}
+
+.swatch.secondary,
+.vbar.secondary {
+  background: var(--vote-secondary);
+}
+
+.vbar.primary.lead {
+  background: var(--vote-primary-lead);
+}
+
+.vbar.secondary.lead {
+  background: var(--vote-secondary-lead);
+}
+
+.vote-chart-rows {
   display: grid;
-  grid-template-columns: minmax(96px, 170px) minmax(0, 1fr) 2.5em;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vote-chart-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(80px, 170px) minmax(72px, 1fr) 4.5em;
   gap: 8px;
   align-items: center;
   font-size: 0.875rem;
 }
 
-.vote-row .bar {
-  height: 10px;
-  background: var(--surface);
-  border-radius: 999px;
-  overflow: hidden;
+.vote-chart-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
-.vote-row .fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 999px;
+.vtip {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 2;
+  max-width: 100%;
+  padding: 6px 10px;
+  background: var(--text);
+  color: var(--white);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-.vote-row.chosen .level {
+.vtip span {
+  display: block;
+}
+
+.vote-chart-row:hover .vtip,
+.vote-chart-row:focus-visible .vtip {
+  display: block;
+}
+
+.vlevel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+}
+
+.vote-chart-row.chosen .vlevel-name {
   font-weight: 700;
 }
 
-.vote-row .count {
+.chosen-tag {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.vbars {
+  display: grid;
+  gap: 2px;
+}
+
+.vtrack {
+  display: block;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 0 4px 4px 0;
+}
+
+.vtrack:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.vbar {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+}
+
+.vcounts {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   text-align: right;
+  white-space: nowrap;
+}
+
+.vcounts .lead-count {
+  font-weight: 700;
+}
+
+.votes-details {
+  margin-top: 10px;
+  font-size: 0.875rem;
+}
+
+.votes-details summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.votes-table {
+  margin-top: 6px;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.votes-table th,
+.votes-table td {
+  padding: 2px 16px 2px 0;
+  text-align: left;
+  font-weight: 400;
+}
+
+.votes-table thead th {
+  font-weight: 600;
 }
 
 .prose {
@@ -715,8 +858,8 @@ dl.rows dd .mono {
     font-size: 1.875rem;
   }
 
-  .vote-row {
-    grid-template-columns: minmax(84px, 120px) minmax(0, 1fr) 2.25em;
+  .vote-chart-row {
+    grid-template-columns: minmax(72px, 110px) minmax(72px, 1fr) 4em;
   }
 
   .bubble.from-patient {

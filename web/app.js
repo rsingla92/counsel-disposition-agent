@@ -26,7 +26,7 @@ import {
   replayTarget,
   takeLines,
   tierOf,
-  voteBars,
+  voteRows,
   writeToken,
 } from './lib.js';
 
@@ -271,34 +271,124 @@ function flagsCard(run) {
   return card;
 }
 
-function voteBlock(title, model, votes, chosen) {
-  const bars = voteBars(votes);
-  if (!bars) return null;
-  return el(
-    'div',
-    {class: 'votes'},
-    el('p', {class: 'model'}, `${title}: `, el('span', {class: 'mono', text: model ?? 'unnamed model'})),
-    bars.map(b =>
+const FAMILY_NAMES = {primary: 'Primary', secondary: 'Second opinion'};
+
+function votesChart(votes, disposition, primaryModel, secondaryModel) {
+  const data = voteRows(votes, disposition);
+  if (data.empty) {
+    return el('p', {class: 'empty', text: 'No samples drawn for this result.'});
+  }
+  const double = data.series.length === 2;
+  const models = {
+    primary: primaryModel ?? 'unnamed model',
+    secondary: secondaryModel ?? 'unnamed model',
+  };
+  const chart = el('div', {class: 'votes-chart'});
+  if (double) {
+    chart.append(
       el(
         'div',
-        {class: `vote-row${b.level === chosen ? ' chosen' : ''}`},
-        el('span', {class: 'level', text: levelLabel(b.level)}),
+        {class: 'vote-legend'},
+        data.series.map(fam =>
+          el(
+            'span',
+            {class: 'legend-item'},
+            el('span', {class: `swatch ${fam}`, 'aria-hidden': 'true'}),
+            el(
+              'span',
+              {class: 'legend-text'},
+              `${FAMILY_NAMES[fam]} · `,
+              el('span', {class: 'mono', text: models[fam]}),
+            ),
+          ),
+        ),
+      ),
+      el('p', {class: 'note', text: 'Darker bar: each model’s most common vote.'}),
+    );
+  } else {
+    chart.append(
+      el('p', {class: 'model'}, 'Votes · ', el('span', {class: 'mono', text: models.primary})),
+    );
+  }
+  const list = el('div', {class: 'vote-chart-rows', role: 'group', 'aria-label': 'Votes by level'});
+  for (const r of data.rows) {
+    const lines = data.series.map(fam => {
+      const v = r[fam];
+      return `${FAMILY_NAMES[fam]}: ${v.count} of ${data.totals[fam]} (${v.pct}%)`;
+    });
+    const bars = data.series.map(fam => {
+      const v = r[fam];
+      return el(
+        'span',
+        {class: 'vtrack'},
+        v.count > 0
+          ? el('span', {
+              class: `vbar ${fam}${v.lead ? ' lead' : ''}`,
+              style: `width: ${((v.count / data.max) * 100).toFixed(1)}%`,
+            })
+          : null,
+      );
+    });
+    const label = `${r.label}. ${lines.join('; ')}${r.chosen ? '; chosen' : ''}`;
+    list.append(
+      el(
+        'div',
+        {
+          class: `vote-chart-row${r.chosen ? ' chosen' : ''}`,
+          role: 'group',
+          tabindex: '0',
+          'aria-label': label,
+        },
         el(
           'span',
-          {
-            class: 'bar',
-            role: 'img',
-            'aria-label': `${b.count} votes for ${levelLabel(b.level)}`,
-          },
-          el('span', {
-            class: 'fill',
-            style: `width: ${(b.share * 100).toFixed(1)}%; display: block`,
-          }),
+          {class: 'vlevel'},
+          el('span', {class: 'vlevel-name', text: r.label}),
+          r.chosen ? el('span', {class: 'chosen-tag', text: 'chosen'}) : null,
         ),
-        el('span', {class: 'count', 'aria-hidden': 'true', text: String(b.count)}),
+        el('span', {class: 'vbars', 'aria-hidden': 'true'}, bars),
+        el(
+          'span',
+          {class: 'vcounts', 'aria-hidden': 'true'},
+          data.series.flatMap((fam, i) => [
+            i > 0 ? ' · ' : null,
+            el('span', {class: r[fam].lead ? 'lead-count' : null, text: String(r[fam].count)}),
+          ]),
+        ),
+        el('span', {class: 'vtip', 'aria-hidden': 'true'}, lines.map(text => el('span', {text}))),
+      ),
+    );
+  }
+  chart.append(list);
+  const table = el(
+    'table',
+    {class: 'votes-table'},
+    el(
+      'thead',
+      {},
+      el(
+        'tr',
+        {},
+        el('th', {scope: 'col', text: 'Level'}),
+        data.series.map(fam => el('th', {scope: 'col', text: FAMILY_NAMES[fam]})),
+      ),
+    ),
+    el(
+      'tbody',
+      {},
+      data.rows.map(r =>
+        el(
+          'tr',
+          {},
+          el('th', {scope: 'row', text: r.label}),
+          data.series.map(fam => el('td', {text: `${r[fam].count} (${r[fam].pct}%)`})),
+        ),
       ),
     ),
   );
+  chart.append(
+    el('details', {class: 'votes-details'}, el('summary', {text: 'Show votes as a table'}), table),
+  );
+  return chart;
 }
 
 function row(term, ...value) {
@@ -397,23 +487,9 @@ function dispositionCard(run) {
   );
   appendAll(card, dl);
 
-  const primary = voteBlock(
-    'Primary',
-    models[0]?.model,
-    result.votes?.primary,
-    result.disposition,
-  );
-  const secondary = voteBlock(
-    'Secondary',
-    models[1]?.model,
-    result.votes?.secondary,
-    result.disposition,
-  );
   appendAll(card, 
     el('h3', {class: 'subhead', text: 'Votes'}),
-    primary ?? el('p', {class: 'empty', text: 'No votes.'}),
-    secondary ??
-      el('p', {class: 'note', text: 'No second-model votes for this result.'}),
+    votesChart(result.votes, result.disposition, models[0]?.model, models[1]?.model),
     el('h3', {class: 'subhead', text: 'Justification'}),
     el('p', {class: 'prose', text: result.justification || '—'}),
     el('h3', {class: 'subhead', text: 'Safety-netting'}),

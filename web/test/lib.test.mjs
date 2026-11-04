@@ -27,7 +27,7 @@ import {
   replayTarget,
   takeLines,
   tierOf,
-  voteBars,
+  voteRows,
   writeToken,
 } from '../lib.js';
 
@@ -231,26 +231,80 @@ test('formatPercent rounds and shows a dash for null', () => {
   assert.equal(formatPercent(null), '—');
 });
 
-test('voteBars lists all seven levels with shares of the total', () => {
-  const bars = voteBars({
-    call_911: 0,
-    ed_now: 0,
-    in_person_today: 0,
-    physician_contact_today: 0,
-    within_few_days: 15,
-    routine: 5,
-    self_care: 0,
-  });
-  assert.deepEqual(
-    bars.map(b => b.level),
-    LEVELS,
+// --- combined vote chart ---------------------------------------------------
+
+const zeroVotes = () => Object.fromEntries(LEVELS.map(l => [l, 0]));
+const withVotes = o => ({...zeroVotes(), ...o});
+const REFILL = {
+  primary: withVotes({physician_contact_today: 3, within_few_days: 16, routine: 1}),
+  secondary: withVotes({physician_contact_today: 5, within_few_days: 14, routine: 1}),
+};
+
+test('voteRows gives one row per level, most acute first, with both families', () => {
+  const v = voteRows(REFILL, 'within_few_days');
+  assert.deepEqual(v.series, ['primary', 'secondary']);
+  assert.deepEqual(v.rows.map(r => r.level), LEVELS);
+  assert.equal(v.rows[0].label, 'Call 911');
+  const few = v.rows.find(r => r.level === 'within_few_days');
+  assert.deepEqual(few.primary, {count: 16, pct: 80, lead: true});
+  assert.deepEqual(few.secondary, {count: 14, pct: 70, lead: true});
+  const contact = v.rows.find(r => r.level === 'physician_contact_today');
+  assert.equal(contact.primary.lead, false);
+  assert.equal(contact.secondary.count, 5);
+});
+
+test('voteRows marks each family modal level separately; ties go to the more acute', () => {
+  const v = voteRows(
+    {
+      primary: withVotes({ed_now: 10, routine: 10}),
+      secondary: withVotes({routine: 12, self_care: 8}),
+    },
+    'routine',
   );
-  assert.equal(bars[4].share, 0.75);
-  assert.equal(bars[5].count, 5);
-  assert.equal(voteBars(null), null);
-  assert.ok(voteBars(Object.fromEntries(LEVELS.map(l => [l, 0]))).every(
-    b => b.share === 0,
-  ));
+  const lead = fam => v.rows.filter(r => r[fam].lead).map(r => r.level);
+  assert.deepEqual(lead('primary'), ['ed_now']);
+  assert.deepEqual(lead('secondary'), ['routine']);
+});
+
+test('voteRows uses one shared max across both families', () => {
+  const v = voteRows(
+    {primary: withVotes({routine: 20}), secondary: withVotes({routine: 12, self_care: 8})},
+    'routine',
+  );
+  assert.equal(v.max, 20);
+  const v2 = voteRows(
+    {primary: withVotes({routine: 6}), secondary: withVotes({routine: 9})},
+    'routine',
+  );
+  assert.equal(v2.max, 9);
+});
+
+test('voteRows flags the chosen disposition, which may differ from the modal vote', () => {
+  const v = voteRows(REFILL, 'physician_contact_today');
+  assert.deepEqual(v.rows.filter(r => r.chosen).map(r => r.level), [
+    'physician_contact_today',
+  ]);
+  assert.equal(v.rows.find(r => r.level === 'within_few_days').primary.lead, true);
+  assert.equal(voteRows(REFILL, null).rows.some(r => r.chosen), false);
+});
+
+test('voteRows with no secondary is single-series', () => {
+  const v = voteRows({primary: REFILL.primary, secondary: null}, 'within_few_days');
+  assert.deepEqual(v.series, ['primary']);
+  assert.ok(v.rows.every(r => r.secondary === undefined));
+  assert.equal(v.max, 16);
+  const v2 = voteRows({primary: REFILL.primary}, 'within_few_days');
+  assert.deepEqual(v2.series, ['primary']);
+});
+
+test('voteRows reports all-zero and missing votes as empty', () => {
+  assert.equal(voteRows({primary: zeroVotes(), secondary: zeroVotes()}, null).empty, true);
+  assert.equal(voteRows({primary: zeroVotes(), secondary: null}, null).empty, true);
+  assert.equal(voteRows(null, null).empty, true);
+  assert.equal(voteRows(REFILL, 'routine').empty, false);
+  // A zero family never gets a lead.
+  const v = voteRows({primary: REFILL.primary, secondary: zeroVotes()}, 'routine');
+  assert.ok(v.rows.every(r => r.secondary.lead === false));
 });
 
 // --- emergency leads -------------------------------------------------------

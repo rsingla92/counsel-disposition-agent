@@ -222,14 +222,48 @@ export function formatPercent(x) {
   return `${Math.round(x * 100)}%`;
 }
 
-/** One bar per level, most acute first; null when there are no votes. */
-export function voteBars(votes) {
-  if (!votes) return null;
-  const total = LEVELS.reduce((n, l) => n + (votes[l] ?? 0), 0);
-  return LEVELS.map(level => {
-    const count = votes[level] ?? 0;
-    return {level, count, share: total > 0 ? count / total : 0};
+/**
+ * Data for the combined vote chart: one row per level, most acute first.
+ * Counts are clamped to non-negative integers. Each family's lead is its
+ * modal level (ties go to the more acute one); a family with no votes has
+ * none. `max` is shared so equal counts draw equal bars. `empty` is true
+ * when there are no votes at all.
+ */
+export function voteRows(votes, disposition) {
+  const families = ['primary'];
+  if (votes?.secondary) families.push('secondary');
+  const counts = {};
+  const totals = {};
+  const tops = {};
+  for (const fam of families) {
+    counts[fam] = LEVELS.map(l => {
+      const n = votes?.[fam]?.[l];
+      return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    });
+    totals[fam] = counts[fam].reduce((a, b) => a + b, 0);
+    tops[fam] = Math.max(...counts[fam]);
+  }
+  const max = Math.max(...families.map(f => tops[f]));
+  const rows = LEVELS.map((level, i) => {
+    const row = {level, label: levelLabel(level), chosen: level === disposition};
+    for (const fam of families) {
+      const count = counts[fam][i];
+      const lead = count > 0 && counts[fam].indexOf(tops[fam]) === i;
+      row[fam] = {
+        count,
+        pct: totals[fam] > 0 ? Math.round((count / totals[fam]) * 100) : 0,
+        lead,
+      };
+    }
+    return row;
   });
+  return {
+    series: families,
+    max,
+    totals,
+    rows,
+    empty: families.every(f => totals[f] === 0),
+  };
 }
 
 // --- what leads ------------------------------------------------------------
