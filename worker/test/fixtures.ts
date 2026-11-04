@@ -1,7 +1,13 @@
 import {LEVELS, type Level} from '../src/levels';
 import type {LlmClient, LlmRequest} from '../src/llm';
 import type {Policy} from '../src/policy';
+import {emptyVotes, type Votes} from '../src/router';
 import type {Extraction, RouteResult} from '../src/schema';
+
+/** Votes with the given counts; levels not named get 0. */
+export function v(partial: Partial<Votes>): Votes {
+  return {...emptyVotes(), ...partial};
+}
 
 /** An extraction in which nothing is flagged. */
 export function fakeExtraction(policy: Policy): Extraction {
@@ -25,6 +31,44 @@ function counts(top: Level, n: number): Record<Level, number> {
     Level,
     number
   >;
+}
+
+/**
+ * Returns a copy of `ex` with the named flags set and the named modifiers
+ * present. A present flag or modifier cites the whole message, so it verifies.
+ * Throws on an id the extraction does not have.
+ */
+export function withFlags(
+  ex: Extraction,
+  flags: Record<string, 'present' | 'unknown'>,
+  mods: string[],
+  message: string,
+): Extraction {
+  const out = structuredClone(ex);
+  for (const [id, state] of Object.entries(flags)) {
+    if (!(id in out.red_flags)) throw new Error(`unknown flag id: ${id}`);
+    out.red_flags[id] = {
+      state,
+      excerpt: state === 'present' ? message : null,
+    };
+  }
+  for (const id of mods) {
+    if (!(id in out.modifiers)) throw new Error(`unknown modifier id: ${id}`);
+    out.modifiers[id] = {present: true, excerpt: message};
+  }
+  return out;
+}
+
+/** Returns a copy of `ex` with one flag's excerpt replaced. */
+export function withExcerpt(
+  ex: Extraction,
+  flagId: string,
+  excerpt: string | null,
+): Extraction {
+  if (!(flagId in ex.red_flags)) throw new Error(`unknown flag id: ${flagId}`);
+  const out = structuredClone(ex);
+  out.red_flags[flagId] = {...out.red_flags[flagId], excerpt};
+  return out;
 }
 
 /** A RouteResult that passes the schema. */
