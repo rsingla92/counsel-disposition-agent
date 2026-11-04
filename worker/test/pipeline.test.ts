@@ -20,6 +20,7 @@ import {
   scripted,
   tick,
 } from './pipeline-fixtures';
+import {validResult} from './fixtures';
 
 const policy = loadPolicy();
 const HR_MESSAGE =
@@ -119,19 +120,44 @@ describe('route', () => {
       const lines: string[] = [];
       await route(SECRET_MSG, {...deps(llm), log: l => lines.push(l)});
       expect(lines.join()).not.toContain(SECRET_MSG);
-      expect(JSON.parse(lines[0]).trace.input_sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(JSON.parse(lines[0]).input_sha256).toMatch(/^[0-9a-f]{64}$/);
     }
   });
 
-  it('logs a present excerpt but not the full message', async () => {
+  it('logs neither a partial excerpt nor the message', async () => {
     const excerpt = 'itchy rash on my forearm';
     expect(SECRET_MSG).toContain(excerpt);
     const lines: string[] = [];
     const llm = scripted({flags: {diabetic_foot_redness: 'present'}, excerpt});
     await route(SECRET_MSG, {...deps(llm), log: l => lines.push(l)});
     expect(lines).toHaveLength(1);
-    expect(lines[0]).toContain(excerpt);
+    expect(lines[0]).not.toContain(excerpt);
     expect(lines[0]).not.toContain(SECRET_MSG);
+    expect(JSON.parse(lines[0]).red_flags_present).toEqual([
+      'diabetic_foot_redness',
+    ]);
+  });
+
+  it('does not log a short message quoted whole as the excerpt', async () => {
+    const short = 'Crushing chest pressure into my jaw.';
+    const lines: string[] = [];
+    const llm = scripted({
+      flags: {cardiac_chest_pain: 'present'},
+      // A sample that repeats the message must not reach the log either.
+      sampleFor: () => ({
+        disposition: 'call_911',
+        justification: `The patient wrote: ${short}`,
+        safety_net: `Because "${short}", call 911.`,
+      }),
+    });
+    const r = await route(short, {...deps(llm), log: l => lines.push(l)});
+    // The excerpt equals the entire message, and it is in the response.
+    expect(r.red_flags.find(f => f.id === 'cardiac_chest_pain')?.excerpt).toBe(
+      short,
+    );
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).not.toContain(short);
+    expect(lines[0]).not.toContain('Crushing');
   });
 });
 
@@ -503,7 +529,93 @@ describe('traceLine', () => {
     const line = JSON.parse(traceLine(r));
     expect(line.kind).toBe('route');
     expect(Date.parse(line.ts)).not.toBeNaN();
-    expect(line.trace.input_sha256).toBe(r.trace.input_sha256);
+    expect(line.input_sha256).toBe(r.trace.input_sha256);
     expect(traceLine(r)).not.toContain(SECRET_MSG);
+  });
+
+  it('logs exactly the metadata allowlist', async () => {
+    const r = await route(
+      REFILL_WITH_CHEST,
+      deps(
+        scripted({
+          flags: {cardiac_chest_pain: 'present'},
+          mods: ['age_65_plus'],
+          questions: ['How long has it lasted?'],
+        }),
+      ),
+    );
+    const line = JSON.parse(traceLine(r));
+    expect(Object.keys(line).sort()).toEqual(
+      [
+        'kind',
+        'ts',
+        'input_sha256',
+        'policy_version',
+        'models',
+        'latency_ms',
+        'status',
+        'disposition',
+        'tier',
+        'floor',
+        'red_flags_present',
+        'unverified',
+        'modifiers_present',
+        'votes',
+        'confidence',
+        'human_review',
+        'info_requests',
+        'time_sensitive',
+      ].sort(),
+    );
+    expect(line).toEqual({
+      kind: 'route',
+      ts: expect.any(String),
+      input_sha256: r.trace.input_sha256,
+      policy_version: r.trace.policy_version,
+      models: r.trace.models,
+      latency_ms: r.trace.latency_ms,
+      status: 'needs_info',
+      disposition: 'call_911',
+      tier: 'emergency',
+      floor: 'call_911',
+      red_flags_present: ['cardiac_chest_pain'],
+      unverified: [],
+      modifiers_present: ['age_65_plus'],
+      votes: r.votes,
+      confidence: r.confidence,
+      human_review: r.human_review,
+      info_requests: {count: 1, photo: false},
+      time_sensitive: false,
+    });
+    expect(traceLine(r)).not.toContain('How long has it lasted?');
+  });
+
+  it('lists present flags whose excerpt did not verify', () => {
+    const r = {
+      ...validResult,
+      red_flags: [
+        {
+          id: 'a_flag',
+          state: 'present' as const,
+          excerpt: 'x',
+          excerpt_verified: false,
+        },
+        {
+          id: 'b_flag',
+          state: 'present' as const,
+          excerpt: 'y',
+          excerpt_verified: true,
+        },
+        {
+          id: 'c_flag',
+          state: 'absent' as const,
+          excerpt: null,
+          excerpt_verified: false,
+        },
+      ],
+    };
+    const line = JSON.parse(traceLine(r));
+    expect(line.red_flags_present).toEqual(['a_flag', 'b_flag']);
+    expect(line.unverified).toEqual(['a_flag']);
   });
 });
