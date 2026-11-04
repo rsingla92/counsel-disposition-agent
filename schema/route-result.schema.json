@@ -391,5 +391,6 @@
     "patient_message",
     "trace"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "description": "Shape only. Cross-field rules are not expressed here: null disposition only with status human_review, tier and brief_label derived from disposition, disposition never below floor, and human review always carrying a reason code. They are enforced by the Worker's RouteResultSchema (Zod)."
 }

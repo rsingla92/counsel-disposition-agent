@@ -230,7 +230,7 @@ describe('RouteResultSchema', () => {
     ).toBe(true);
   });
 
-  it('exported JSON schema is up to date', () =>
+  it('exported JSON schema file matches the current Zod export', () =>
     expect(readJson('../../schema/route-result.schema.json')).toEqual(
       z.toJSONSchema(RouteResultSchema),
     ));

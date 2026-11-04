@@ -187,6 +187,14 @@ export const RouteResultSchema = z
         message: `brief_label must be ${briefLabelOf(r.disposition)}`,
       });
     }
+  })
+  .meta({
+    description:
+      'Shape only. Cross-field rules are not expressed here: null ' +
+      'disposition only with status human_review, tier and brief_label ' +
+      'derived from disposition, disposition never below floor, and human ' +
+      'review always carrying a reason code. They are enforced by the ' +
+      "Worker's RouteResultSchema (Zod).",
   });
 
 export type RouteResult = z.infer<typeof RouteResultSchema>;
