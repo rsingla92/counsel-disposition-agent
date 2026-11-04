@@ -5,17 +5,19 @@
   "type": "module",
   "scripts": {
     "build-policy": "node scripts/build-policy.mjs",
+    "export-schema": "tsx scripts/export-schema.ts",
     "prebuild": "npm run build-policy",
     "pretest": "npm run build-policy",
     "predeploy": "npm run build-policy",
     "test": "vitest run",
     "lint": "gts lint",
     "pretypecheck": "npm run build-policy",
-    "typecheck":"tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "gts": "^7.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0",
     "yaml": "^2.9.1",
