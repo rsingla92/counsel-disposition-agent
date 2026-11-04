@@ -41,18 +41,18 @@ def test_zero_count_ci_for_14_emergencies():
 def test_gate_counts_a_miss_below_ed():
   df = pd.DataFrame(
       {
-          "case_id": ["C08", "C02"],
+          "case_id": ["a", "b"],
           "reference": ["ed_now", "call_911"],
           "received": ["in_person_today", "ed_now"],
       }
   )
-  assert gate(df)["miss_ids"] == ["C08"]
+  assert gate(df)["miss_ids"] == ["a"]
 
 
 def test_gate_zero_misses_uses_zero_count_ci():
   df = pd.DataFrame(
       {
-          "case_id": ["C02", "C08", "C01"],
+          "case_id": ["a", "b", "c"],
           "reference": ["call_911", "ed_now", "self_care"],
           "received": ["call_911", "call_911", "self_care"],
       }
@@ -174,7 +174,17 @@ def test_faithfulness_counts_present_flags_only():
         ),
         (
             {
+                "status": "human_review",
+                "disposition": "ed_now",
+                "reference": "ed_now",
+                "received": "ed_now",
+            },
+            None,
+        ),
+        (
+            {
                 "status": "routed",
+                "disposition": "routine",
                 "reference": "ed_now",
                 "received": "in_person_today",
             },
@@ -183,6 +193,7 @@ def test_faithfulness_counts_present_flags_only():
         (
             {
                 "status": "routed",
+                "disposition": "routine",
                 "reference": "in_person_today",
                 "received": "ed_now",
             },
@@ -191,6 +202,7 @@ def test_faithfulness_counts_present_flags_only():
         (
             {
                 "status": "needs_info",
+                "disposition": None,
                 "reference": "routine",
                 "received": "routine",
                 "info": True,
@@ -201,6 +213,7 @@ def test_faithfulness_counts_present_flags_only():
         (
             {
                 "status": "routed",
+                "disposition": "routine",
                 "reference": "routine",
                 "received": "routine",
                 "unverified_excerpt": True,
@@ -208,10 +221,32 @@ def test_faithfulness_counts_present_flags_only():
             "explanation",
         ),
         (
-            {"status": "routed", "reference": "routine", "received": "routine"},
+            {
+                "status": "routed",
+                "disposition": "routine",
+                "reference": "routine",
+                "received": "routine",
+            },
             None,
         ),
     ],
 )
 def test_error_stage(row, expected):
   assert error_stage(row) == expected
+
+
+def test_error_stage_requires_disposition_key():
+  row = {"status": "routed", "reference": "routine", "received": "routine"}
+  with pytest.raises(KeyError):
+    error_stage(row)
+
+
+def test_gate_ci_is_one_when_every_emergency_is_missed():
+  df = pd.DataFrame(
+      {
+          "case_id": ["a", "b"],
+          "reference": ["ed_now", "call_911"],
+          "received": ["routine", "self_care"],
+      }
+  )
+  assert gate(df)["ci_upper"] == 1.0

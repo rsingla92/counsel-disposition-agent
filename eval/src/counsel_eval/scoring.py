@@ -1,4 +1,9 @@
-"""Pure scoring functions for the disposition eval."""
+"""Pure scoring functions for the disposition eval.
+
+Per-row frames have columns case_id, reference, received, flagged (bool),
+status, disposition (str | None, the result's raw disposition before the
+routine substitution) and, where relevant, questions (list).
+"""
 
 from collections.abc import Iterable, Mapping
 from typing import Any, Literal
@@ -75,6 +80,8 @@ def gate(df: pd.DataFrame) -> dict[str, Any]:
     ci_upper = float("nan")
   elif x == 0:
     ci_upper = zero_count_ci(n)
+  elif x == n:
+    ci_upper = 1.0
   else:
     ci_upper = float(stats.beta.ppf(0.975, x + 1, n - x))
   return {
@@ -189,15 +196,20 @@ def error_stage(row: Mapping[str, Any]) -> str | None:
   """Attributes a miss to a pipeline stage, or None if there is no error.
 
   Args:
-    row: Mapping with status, reference and received, plus optionally
-      disposition, info (reference needs info), questions and
-      unverified_excerpt.
+    row: Mapping with the per-row frame fields status, disposition (the
+      result's raw disposition or None, before the routine substitution),
+      reference and received, plus optionally info (reference needs info),
+      questions and unverified_excerpt.
 
   Returns:
     One of scope, emergency_detection, emergent_vs_same_day,
     missing_information, explanation, or None.
+
+  Raises:
+    KeyError: If the row has no disposition key.
   """
-  if row["status"] == "human_review" and not row.get("disposition"):
+  disposition = row["disposition"]
+  if row["status"] == "human_review" and disposition is None:
     return "scope"
   reference, got = row["reference"], row["received"]
   if reference in _EMERGENCY_REFERENCES and levels.rank(got) < _ED_RANK:
