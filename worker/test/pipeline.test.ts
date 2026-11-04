@@ -2,6 +2,7 @@ import {describe, expect, it, vi} from 'vitest';
 import type {Level} from '../src/levels';
 import {
   FALLBACK_SAFETY_NET,
+  fallbackJustification,
   route,
   traceLine,
   type EarlyEvent,
@@ -372,6 +373,47 @@ describe('route: fallback justification', () => {
       'Risk factor age_65_plus raises the minimum to Routine. The samples ' +
         'proposed Self-care below that, so the minimum applies. Not Within ' +
         'a few days because no red flag or sample supports it.',
+    );
+  });
+
+  it('does not claim the floor applies when routed above it', async () => {
+    // Floor in_person_today from a flag; 2 x call_911 and 18 x routine
+    // proposed. The router picks ed_now, above the floor, and no sample
+    // proposed it.
+    const r = await route(
+      M,
+      deps(
+        scripted({
+          flags: {orthopnea_or_leg_swelling: 'present'},
+          sampleFor: i =>
+            i < 2 ? net('call_911', 'Urgent net') : net('routine', 'R'),
+        }),
+      ),
+    );
+    expect(r.floor).toBe('in_person_today');
+    expect(r.disposition).toBe('ed_now');
+    expect(r.justification).not.toContain('floor applies');
+    expect(r.justification).toBe(
+      'Routed by expected cost: the samples split between Call 911 (2) and ' +
+        'Routine (18), and under-triage costs more than over-triage at this ' +
+        'boundary. Not Call 911 because too few samples supported it.',
+    );
+  });
+
+  it('says "all proposed" when the samples agreed on one level', () => {
+    // Not reachable through route(): one agreed level is either chosen or
+    // clamped to a flag or modifier floor. Checked directly.
+    const floor = {
+      floor: 'self_care' as const,
+      drivers: [],
+      modifier_applied: null,
+      unverified: [],
+    };
+    const samples = Array.from({length: 20}, () => net('routine', ''));
+    expect(fallbackJustification('ed_now', floor, samples)).toBe(
+      'Routed by expected cost: the samples all proposed Routine (20), and ' +
+        'under-triage costs more than over-triage at this boundary. Not ' +
+        'Call 911 because too few samples supported it.',
     );
   });
 

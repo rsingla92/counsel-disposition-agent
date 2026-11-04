@@ -267,11 +267,13 @@ function joinAnd(items: string[]): string {
 }
 
 /**
- * A deterministic justification for when no sample proposed the chosen level:
- * either a red flag's floor overrode the samples, or the expected-cost router
- * chose a level between split votes.
+ * A deterministic justification for when no sample proposed the chosen level.
+ * The floor texts are used only when they are true: the router stayed at the
+ * floor and the samples mostly proposed a lower level. Every other case,
+ * including a choice above the floor, is explained by expected cost.
+ * Exported for tests.
  */
-function fallbackJustification(
+export function fallbackJustification(
   chosen: Level,
   floor: FloorResult,
   samples: Sample[],
@@ -284,23 +286,30 @@ function fallbackJustification(
   const n = countByLevel(samples);
   // Most-voted proposal; LEVELS is most acute first, so ties go acute.
   const top = LEVELS.reduce((a, b) => (n[b] > n[a] ? b : a));
-  if (floor.drivers.length > 0) {
+  const floorHeld = chosen === floor.floor && rank(top) < rank(floor.floor);
+  if (floorHeld && floor.drivers.length > 0) {
     return (
       `Red flag(s) ${floor.drivers.join(', ')} set a minimum of ` +
       `${label(floor.floor)}. The samples proposed ${label(top)} below ` +
       `that, so the floor applies. ${ending('no red flag or sample supports it')}`
     );
   }
-  if (floor.modifier_applied !== null) {
+  if (floorHeld && floor.modifier_applied !== null) {
     return (
       `Risk factor ${floor.modifier_applied} raises the minimum to ` +
       `${label(floor.floor)}. The samples proposed ${label(top)} below ` +
       `that, so the minimum applies. ${ending('no red flag or sample supports it')}`
     );
   }
-  const split = LEVELS.filter(l => n[l] > 0).map(l => `${label(l)} (${n[l]})`);
+  const proposed = LEVELS.filter(l => n[l] > 0).map(
+    l => `${label(l)} (${n[l]})`,
+  );
+  const how =
+    proposed.length === 1
+      ? `all proposed ${proposed[0]}`
+      : `split between ${joinAnd(proposed)}`;
   return (
-    `Routed by expected cost: the samples split between ${joinAnd(split)}, ` +
+    `Routed by expected cost: the samples ${how}, ` +
     'and under-triage costs more than over-triage at this boundary. ' +
     ending('too few samples supported it')
   );
