@@ -617,11 +617,44 @@ dl.rows dd .mono {
 }
 
 .vote-chart-row {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(80px, 170px) minmax(72px, 1fr) 4.5em;
   gap: 8px;
   align-items: center;
   font-size: 0.875rem;
+}
+
+.vote-chart-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.vtip {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 2;
+  max-width: 100%;
+  padding: 6px 10px;
+  background: var(--text);
+  color: var(--white);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.vtip span {
+  display: block;
+}
+
+.vote-chart-row:hover .vtip,
+.vote-chart-row:focus-visible .vtip {
+  display: block;
 }
 
 .vlevel {

@@ -222,16 +222,6 @@ export function formatPercent(x) {
   return `${Math.round(x * 100)}%`;
 }
 
-/** One bar per level, most acute first; null when there are no votes. */
-export function voteBars(votes) {
-  if (!votes) return null;
-  const total = LEVELS.reduce((n, l) => n + (votes[l] ?? 0), 0);
-  return LEVELS.map(level => {
-    const count = votes[level] ?? 0;
-    return {level, count, share: total > 0 ? count / total : 0};
-  });
-}
-
 /**
  * Data for the combined vote chart: one row per level, most acute first.
  * Counts are clamped to non-negative integers. Each family's lead is its

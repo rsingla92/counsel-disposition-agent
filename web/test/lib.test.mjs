@@ -27,7 +27,6 @@ import {
   replayTarget,
   takeLines,
   tierOf,
-  voteBars,
   voteRows,
   writeToken,
 } from '../lib.js';
@@ -230,28 +229,6 @@ test('formatPercent rounds and shows a dash for null', () => {
   assert.equal(formatPercent(0.85), '85%');
   assert.equal(formatPercent(0.666), '67%');
   assert.equal(formatPercent(null), '—');
-});
-
-test('voteBars lists all seven levels with shares of the total', () => {
-  const bars = voteBars({
-    call_911: 0,
-    ed_now: 0,
-    in_person_today: 0,
-    physician_contact_today: 0,
-    within_few_days: 15,
-    routine: 5,
-    self_care: 0,
-  });
-  assert.deepEqual(
-    bars.map(b => b.level),
-    LEVELS,
-  );
-  assert.equal(bars[4].share, 0.75);
-  assert.equal(bars[5].count, 5);
-  assert.equal(voteBars(null), null);
-  assert.ok(voteBars(Object.fromEntries(LEVELS.map(l => [l, 0]))).every(
-    b => b.share === 0,
-  ));
 });
 
 // --- combined vote chart ---------------------------------------------------

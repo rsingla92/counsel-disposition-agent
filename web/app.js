@@ -312,12 +312,15 @@ function votesChart(votes, disposition, primaryModel, secondaryModel) {
   }
   const list = el('div', {class: 'vote-chart-rows', role: 'group', 'aria-label': 'Votes by level'});
   for (const r of data.rows) {
+    const lines = data.series.map(fam => {
+      const v = r[fam];
+      return `${FAMILY_NAMES[fam]}: ${v.count} of ${data.totals[fam]} (${v.pct}%)`;
+    });
     const bars = data.series.map(fam => {
       const v = r[fam];
-      const text = `${FAMILY_NAMES[fam]}: ${v.count} of ${data.totals[fam]} votes (${v.pct}%)`;
       return el(
         'span',
-        {class: 'vtrack', role: 'img', 'aria-label': text, title: text, tabindex: '0'},
+        {class: 'vtrack'},
         v.count > 0
           ? el('span', {
               class: `vbar ${fam}${v.lead ? ' lead' : ''}`,
@@ -326,25 +329,32 @@ function votesChart(votes, disposition, primaryModel, secondaryModel) {
           : null,
       );
     });
+    const label = `${r.label}. ${lines.join('; ')}${r.chosen ? '; chosen' : ''}`;
     list.append(
       el(
         'div',
-        {class: `vote-chart-row${r.chosen ? ' chosen' : ''}`},
+        {
+          class: `vote-chart-row${r.chosen ? ' chosen' : ''}`,
+          role: 'group',
+          tabindex: '0',
+          'aria-label': label,
+        },
         el(
           'span',
           {class: 'vlevel'},
           el('span', {class: 'vlevel-name', text: r.label}),
           r.chosen ? el('span', {class: 'chosen-tag', text: 'chosen'}) : null,
         ),
-        el('span', {class: 'vbars'}, bars),
+        el('span', {class: 'vbars', 'aria-hidden': 'true'}, bars),
         el(
           'span',
-          {class: 'vcounts'},
+          {class: 'vcounts', 'aria-hidden': 'true'},
           data.series.flatMap((fam, i) => [
             i > 0 ? ' · ' : null,
             el('span', {class: r[fam].lead ? 'lead-count' : null, text: String(r[fam].count)}),
           ]),
         ),
+        el('span', {class: 'vtip', 'aria-hidden': 'true'}, lines.map(text => el('span', {text}))),
       ),
     );
   }
