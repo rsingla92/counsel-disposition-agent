@@ -226,3 +226,8 @@ data/private
 .claude/worktrees/
 # Local Worker secrets
 .dev.vars
+
+# Build output and tooling
+worker/src/generated/
+node_modules/
+.wrangler/

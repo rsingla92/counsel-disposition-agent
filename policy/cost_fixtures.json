@@ -1,0 +1,9 @@
+[
+  {"true": "call_911", "chosen": "ed_now", "cost": 3},
+  {"true": "ed_now", "chosen": "in_person_today", "cost": 20},
+  {"true": "call_911", "chosen": "routine", "cost": 32},
+  {"true": "routine", "chosen": "call_911", "cost": 5},
+  {"true": "routine", "chosen": "self_care", "cost": 1.5},
+  {"true": "self_care", "chosen": "routine", "cost": 1},
+  {"true": "ed_now", "chosen": "ed_now", "cost": 0}
+]
