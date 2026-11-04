@@ -11,6 +11,7 @@ import {
   canOverride,
   applyPinned,
   emergencyLeads,
+  failedRun,
   fallbackFor,
   formatPercent,
   highlight,
@@ -18,6 +19,7 @@ import {
   levelLabel,
   parseNdjson,
   patientBlocks,
+  nextPin,
   pinFor,
   readToken,
   replayRun,
@@ -675,23 +677,26 @@ async function loadSaved(routed) {
 
 const HIDDEN_NOTE =
   'Saved run hidden: a live Emergency instruction was issued for this message.';
+const RESULT_HIDDEN_NOTE =
+  'Result hidden: a live Emergency instruction was already issued for this message.';
 
 /**
  * Shows `run` for `routed`, after applying any pinned live Emergency
- * instruction for that target (applyPinned). Returns true if a saved run
- * was hidden because it was less acute than the live floor.
+ * instruction for that target (applyPinned). Returns {hidden, replaced}:
+ * replaced when the pin stood in for a run less acute than the live floor,
+ * hidden when that run was a saved replay.
  */
 function showRun(routed, run) {
   const shown = applyPinned(state.pinned, routed, run);
   state.run = shown.run;
   render();
-  return shown.hidden;
+  return {hidden: shown.hidden, replaced: shown.replaced};
 }
 
 /** Replay mode: shows the saved run for `routed`, or nothing. */
 async function showReplay(routed) {
   const {saved, why} = await loadSaved(routed);
-  const hidden = showRun(routed, saved ? replayRun(saved) : null);
+  const {hidden} = showRun(routed, saved ? replayRun(saved) : null);
   if (hidden) setStatus(HIDDEN_NOTE, true);
   else if (why) setStatus(why, true);
 }
@@ -766,8 +771,9 @@ async function routeLive(routed) {
         if (e.event === 'early') {
           run.early = e;
           if (current()) {
-            state.pinned = {target: routed, early: e};
-            state.run = run;
+            // The pin keeps the most acute live instruction for this message.
+            state.pinned = nextPin(state.pinned, routed, e);
+            state.run = {...run, early: state.pinned.early};
             render();
           }
         } else if (e.event === 'result') {
@@ -785,14 +791,21 @@ async function routeLive(routed) {
     handle(parseNdjson(buffer + decoder.decode()));
     if (!run.result) throw new LiveError('no result in the stream');
     if (!current()) return;
-    showRun(routed, run);
-    setStatus('Live result.');
+    const {replaced} = showRun(routed, run);
+    if (replaced) setStatus(RESULT_HIDDEN_NOTE, true);
+    else setStatus('Live result.');
   } catch (e) {
     if (!current()) return;
     const why = e instanceof LiveError ? e.message : 'the Worker could not be reached';
     // After a live early event the call never falls back to a saved run
     // (fallbackFor), so none is loaded and replay is not switched on: the
-    // live instruction stays pinned for this message.
+    // live instruction stays pinned for this message. The same holds when an
+    // earlier call pinned one for this message: no saved run is shown.
+    if (!run.early && pinFor(state.pinned, routed)) {
+      showRun(routed, failedRun(routed.message, null));
+      setStatus(`Live call failed (${why}). ${RESULT_HIDDEN_NOTE}`, true);
+      return;
+    }
     if (!run.early) {
       ui.replay.checked = true;
       updateReplayUi();

@@ -21,6 +21,7 @@ import {
   levelLabel,
   parseNdjson,
   patientBlocks,
+  nextPin,
   pinFor,
   readToken,
   replayTarget,
@@ -547,6 +548,29 @@ test('pinFor keeps the pin for the same target and clears it otherwise', () => {
   assert.equal(pinFor(PIN, {...TARGET, message: 'the routed message!'}), null);
   assert.equal(pinFor(PIN, {...TARGET, demoId: ''}), null);
   assert.equal(pinFor(null, TARGET), null);
+});
+
+test('nextPin keeps the most acute early event for the same target', () => {
+  const call911 = {event: 'early', floor: 'call_911', patient_message: 'LIVE: call 911.'};
+  const pin911 = {target: TARGET, early: call911};
+  assert.equal(nextPin(pin911, {...TARGET}, ED_EARLY), pin911);
+  assert.deepEqual(nextPin(PIN, TARGET, call911), {target: TARGET, early: call911});
+  const again = {...ED_EARLY, patient_message: 'LIVE: newer ED text.'};
+  assert.deepEqual(nextPin(PIN, TARGET, again), {target: TARGET, early: again});
+  const other = {demoId: 'other', message: 'another message'};
+  assert.deepEqual(nextPin(pin911, other, ED_EARLY), {target: other, early: ED_EARLY});
+  assert.deepEqual(nextPin(null, TARGET, ED_EARLY), PIN);
+});
+
+test('applyPinned reports when it replaced a live run', () => {
+  const live = {...replayOf('within_few_days', 'Within 72 hours.'), replay: false};
+  const less = applyPinned(PIN, TARGET, live);
+  assert.equal(less.replaced, true);
+  assert.equal(less.hidden, false);
+  assert.deepEqual(less.run, failedRun(TARGET.message, ED_EARLY));
+  assert.equal(applyPinned(PIN, TARGET, {...live, result: {...live.result, disposition: 'ed_now'}}).replaced, false);
+  assert.equal(applyPinned(PIN, TARGET, replayOf('within_few_days', 'x')).replaced, true);
+  assert.equal(applyPinned(null, TARGET, live).replaced, false);
 });
 
 test('emergencyLeads drops duplicates and non-Emergency levels', () => {

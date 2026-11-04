@@ -325,23 +325,36 @@ export function pinFor(pinned, target) {
 }
 
 /**
+ * The pin after a live early event `early` for `target`. For the same
+ * target the more acute early event is kept (a later, less acute event never
+ * lowers the floor; at the same level the newer one wins). Another target
+ * replaces the pin.
+ */
+export function nextPin(pinned, target, early) {
+  const pin = pinFor(pinned, target);
+  if (pin && rank(pin.early.floor) > rank(early.floor)) return pin;
+  return {target, early};
+}
+
+/**
  * Applies a pinned live Emergency instruction to a run about to be shown
- * for `target`. Returns {run, hidden}. For the pinned target, a run whose
- * disposition is less acute than the pinned floor (or that has none) is
- * replaced by the failed run led by the live instruction; hidden is true
- * when that hid a saved replay. A run at or above the floor is shown with
+ * for `target`. Returns {run, hidden, replaced}. For the pinned target, a
+ * run whose disposition is less acute than the pinned floor (or that has
+ * none) is replaced by the failed run led by the live instruction: replaced
+ * is then true, and hidden is true when that hid a saved replay. A run at or above the floor is shown with
  * the live instruction kept among its leads. Other targets are unchanged.
  */
 export function applyPinned(pinned, target, run) {
   const pin = pinFor(pinned, target);
-  if (!pin) return {run, hidden: false};
+  if (!pin) return {run, hidden: false, replaced: false};
   const disposition = run?.result?.disposition ?? null;
   if (disposition !== null && rank(disposition) >= rank(pin.early.floor)) {
-    return {run: {...run, early: pin.early}, hidden: false};
+    return {run: {...run, early: pin.early}, hidden: false, replaced: false};
   }
   return {
     run: failedRun(target.message, pin.early),
     hidden: run?.replay === true,
+    replaced: true,
   };
 }
 
