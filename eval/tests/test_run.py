@@ -186,9 +186,7 @@ def test_credit_check_refuses_on_empty_account_with_no_key_limit(
   assert "0.50" in message and "1.20" in message
 
 
-def test_credit_check_uses_the_smaller_of_key_and_account(
-    respx_mock, tmp_path
-):
+def test_credit_check_uses_the_smaller_of_key_and_account(respx_mock, tmp_path):
   _balances(respx_mock, 100.0, total=50.0, usage=45.0)
   ok, message = run.credit_check(10.0, _env_file(tmp_path))
   assert not ok

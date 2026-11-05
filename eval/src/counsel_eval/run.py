@@ -147,12 +147,10 @@ def credit_check(
     limit = response.json()["data"]["limit_remaining"]
     if limit is not None and not _is_number(limit):
       return False, "could not read credit balance (non-numeric limit)"
-    response = httpx.get(
-        _OPENROUTER_CREDITS_URL, headers=headers, timeout=15.0
-    )
+    response = httpx.get(_OPENROUTER_CREDITS_URL, headers=headers, timeout=15.0)
     response.raise_for_status()
-    credits = response.json()["data"]
-    total, usage = credits["total_credits"], credits["total_usage"]
+    account = response.json()["data"]
+    total, usage = account["total_credits"], account["total_usage"]
   except (httpx.HTTPError, KeyError, TypeError, ValueError) as e:
     return False, f"could not read credit balance ({type(e).__name__})"
   if not (_is_number(total) and _is_number(usage)):
