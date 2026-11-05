@@ -55,7 +55,8 @@ only the Human review message ("if this is an emergency, call 911").
 
 ## What changed
 
-- At most 3 calls in flight per case, down from 6.
+- At most 3 calls in flight per case, down from 6 (replaced on 2026-11-05,
+  below).
 - **2026-11-05:** a queue per model, because Vertex limits each model
   separately: Sonnet 2 and Flash 4 in flight, at most 6 in all. Sonnet alone
   had drawn 429s at 3. Flash also runs at reasoning effort `low`: by default
