@@ -11,6 +11,7 @@ import {
 } from './levels';
 import {LlmError, type LlmClient, type ModelSpec} from './llm';
 import {traceLine} from './log';
+import type {RouteOverrides} from './overrides';
 import type {Policy} from './policy';
 import {chooseLevel, emptyVotes, reviewReasons, type Votes} from './router';
 import {drawSamples, type VoteSet} from './sample';
@@ -42,6 +43,16 @@ export type EarlyEvent = {
 export type RouteOptions = {
   mode?: 'full' | 'floor_only';
   onEarly?: (e: EarlyEvent) => void;
+  /**
+   * The request's overrides, recorded in the trace only. The caller applies
+   * them by building Deps (policy and models) before calling route().
+   */
+  overrides?: RouteOverrides;
+  /**
+   * The deployed policy, when deps.policy carries overrides. An emergency
+   * the deployed policy would choose on the same votes is kept (zero-miss).
+   */
+  deployedPolicy?: Policy;
 };
 
 /** Patient copy for Human review when no disposition is carried. */
@@ -95,6 +106,7 @@ type Run = {
   hash: Promise<string>;
   models: ModelSpec[];
   extractionModel: ModelSpec | null;
+  overrides: RouteOverrides | null;
   raw: {
     extraction: string | null;
     primary: string[];
@@ -225,6 +237,7 @@ async function assemble(run: Run, o: Outcome): Promise<RouteResult> {
       policy_version: run.deps.policy.policy_version,
       models: run.models,
       extraction_model: run.extractionModel,
+      overrides: run.overrides,
       latency_ms: Date.now() - run.start,
       raw: run.raw,
     },
@@ -525,7 +538,19 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
 
   // 7. Choose and flag.
-  const disposition = chooseLevel(primary.votes, floor.floor, policy);
+  let disposition = chooseLevel(primary.votes, floor.floor, policy);
+  if (opts.deployedPolicy) {
+    // Overridden weights may not route below an emergency the deployed
+    // policy would choose (AGENTS.md rule 1).
+    const deployed = chooseLevel(
+      primary.votes,
+      floor.floor,
+      opts.deployedPolicy,
+    );
+    if (isEmergency(deployed) && rank(disposition) < rank(deployed)) {
+      disposition = deployed;
+    }
+  }
   // A configured secondary with too few valid samples cannot cross-check
   // the primary. The primary's disposition stands, but a physician looks:
   // a failed cross-check must not pass silently as an agreeing one.
@@ -587,6 +612,7 @@ export async function route(
     hash: sha256Hex(message).catch(() => ''),
     models: [],
     extractionModel: null,
+    overrides: opts.overrides ?? null,
     raw: {extraction: null, primary: [], secondary: null},
     extraction: null,
     floor: null,
@@ -644,6 +670,7 @@ function lastResort(run: Run): RouteResult {
       policy_version: run.deps.policy?.policy_version ?? '',
       models: run.models,
       extraction_model: run.extractionModel,
+      overrides: run.overrides,
       latency_ms: Date.now() - run.start,
       raw: null,
     },

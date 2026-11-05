@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {LEVELS, briefLabelOf, rank, tierOf, type Level} from './levels';
+import {RouteOverridesSchema} from './overrides';
 import type {Policy} from './policy';
 
 const LevelSchema = z.enum(LEVELS);
@@ -231,6 +232,9 @@ export const RouteResultSchema = z
         .strictObject({model: z.string(), provider: z.string()})
         .nullable()
         .optional(),
+      // The request's overrides as applied; null when it sent none.
+      // Optional so results saved before it existed still parse.
+      overrides: RouteOverridesSchema.nullable().optional(),
       latency_ms: z.number().nonnegative(),
       raw: z.unknown(),
     }),
