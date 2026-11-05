@@ -18,6 +18,7 @@ import {
   overridesFromControls,
   overridesText,
   policyDefaults,
+  rescoreOutcome,
   resultsPanel,
   validStoredOverrides,
 } from './lib.js';
@@ -95,7 +96,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     summary: null,
     base: null,
     rescoring: false,
-    rescoreError: '',
+    rescoreError: null,
     seq: 0,
     timer: null,
     readout: '',
@@ -127,7 +128,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
 
   function problemFor(status, what) {
     if (status === 401) return 'The access token was rejected. Enter it again in the Physician view.';
-    if (status === 0) return `Could not reach the Worker to load ${what}.`;
+    if (status === 0) return `Couldn’t reach the Worker to load ${what}. Check the connection.`;
     return `Could not load ${what} (HTTP ${status}).`;
   }
 
@@ -149,22 +150,24 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     s.timer = setTimeout(rescore, RESCORE_DEBOUNCE_MS);
   }
 
+  /** The deployed policy re-scored on `exp`: {summary} or {error}. Only successes are cached. */
   async function baselineFor(exp) {
-    if (s.baseline.has(exp.id)) return s.baseline.get(exp.id);
-    const res = await api(`/v1/experiments/${encodeURIComponent(exp.id)}/rescore`, {
-      method: 'POST',
-      body: JSON.stringify({policy: {}}),
-    });
-    if (!res.ok) return {error: res.status};
-    s.baseline.set(exp.id, res.data.summary);
-    return res.data.summary;
+    if (s.baseline.has(exp.id)) return {summary: s.baseline.get(exp.id)};
+    const outcome = rescoreOutcome(
+      await api(`/v1/experiments/${encodeURIComponent(exp.id)}/rescore`, {
+        method: 'POST',
+        body: JSON.stringify({policy: {}}),
+      }),
+    );
+    if ('summary' in outcome) s.baseline.set(exp.id, outcome.summary);
+    return outcome;
   }
 
   async function rescore() {
     clearTimeout(s.timer);
     const exp = selectedExperiment();
     const seq = ++s.seq;
-    s.rescoreError = '';
+    s.rescoreError = null;
     if (!exp) {
       s.summary = null;
       s.base = null;
@@ -181,42 +184,28 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     s.rescoring = true;
     renderResults();
     const base = await baselineFor(exp);
-    let summary = null;
-    let error = base?.error ?? null;
-    if (!error) {
-      const policy = s.overrides?.policy ?? {};
-      if (Object.keys(policy).length === 0) {
-        summary = base;
-      } else {
-        const res = await api(`/v1/experiments/${encodeURIComponent(exp.id)}/rescore`, {
+    // Each step yields exactly one of {summary} or {error}; status 0 (no
+    // reply) is an error like any other, never a summary.
+    let outcome = base;
+    const policy = s.overrides?.policy ?? {};
+    if ('summary' in base && Object.keys(policy).length > 0) {
+      outcome = rescoreOutcome(
+        await api(`/v1/experiments/${encodeURIComponent(exp.id)}/rescore`, {
           method: 'POST',
           body: JSON.stringify({policy}),
-        });
-        if (res.ok) summary = res.data.summary;
-        else error = res.status;
-      }
+        }),
+      );
     }
     if (seq !== s.seq) return;
     s.rescoring = false;
-    if (error) {
-      s.rescoreError =
-        error === 404
-          ? 'This run is no longer stored on the Worker.'
-          : error === 409
-            ? 'This run cannot be re-scored.'
-            : error === 400
-              ? 'The Worker rejected these settings.'
-              : error === 401
-                ? 'The access token was rejected.'
-                : error === 0
-                  ? 'The Worker could not be reached.'
-                  : `The Worker returned an error (HTTP ${error}).`;
+    if ('error' in outcome) {
+      s.rescoreError = outcome.error;
       // Never leave the previous numbers under settings they do not match.
       s.summary = null;
       s.base = null;
     } else {
-      s.summary = summary;
-      s.base = base;
+      s.summary = outcome.summary;
+      s.base = base.summary;
     }
     renderResults();
   }
@@ -795,7 +784,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
 
   function render() {
     renderHeader();
-    if (s.problem) {
+    if (s.problem !== null) {
       const token = s.problem === 'token';
       replaceAll(root,
         header,
@@ -831,7 +820,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     load,
     /** Loads on first show, or after a problem. */
     show() {
-      if (!s.loaded || s.problem) load();
+      if (!s.loaded || s.problem !== null) load();
     },
     /** What a live route sends: clamped, without the re-score-only field. */
     liveOverrides: () => liveOverrides(s.overrides, s.policy),

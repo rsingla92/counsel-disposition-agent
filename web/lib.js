@@ -723,19 +723,59 @@ export function delta(now, base, kind) {
 }
 
 /**
+ * True for a re-score Summary from the Worker. An error object such as
+ * {error: 0} is not one, so it is never shown as numbers.
+ */
+function isSummary(x) {
+  return (
+    x !== null &&
+    typeof x === 'object' &&
+    Number.isFinite(x.n) &&
+    Number.isFinite(x.emergencies) &&
+    Number.isFinite(x.missed) &&
+    x.confusion !== null &&
+    typeof x.confusion === 'object'
+  );
+}
+
+/** One plain reason for a failed re-score, by HTTP status (0: no reply). */
+function rescoreErrorText(status) {
+  if (status === 0) return 'Couldn’t reach the Worker. Check the connection.';
+  if (status === 404) return 'This run is no longer stored on the Worker.';
+  if (status === 409) return 'This run cannot be re-scored.';
+  if (status === 400) return 'The Worker rejected these settings.';
+  if (status === 401) return 'The access token was rejected.';
+  return `The Worker returned an error (HTTP ${status}).`;
+}
+
+/**
+ * Turns a re-score reply ({ok, status, data}, status 0 for a network
+ * failure) into exactly one of {summary} or {error: message}. Failure is
+ * decided by ok and by the shape of the summary, never by the truthiness
+ * of a status, so status 0 is always an error.
+ */
+export function rescoreOutcome(res) {
+  if (res?.ok !== true) {
+    return {error: rescoreErrorText(Number.isInteger(res?.status) ? res.status : 0)};
+  }
+  const summary = res.data?.summary;
+  return isSummary(summary) ? {summary} : {error: 'The Worker sent an unreadable result.'};
+}
+
+/**
  * What the results panel shows. A failed re-score never keeps the previous
  * numbers on screen: they would read as the result of settings the
  * sliders no longer show.
  */
 export function resultsPanel({summary, error, rescoring}) {
-  if (error) {
+  if (typeof error === 'string' && error !== '') {
     return {
       kind: 'error',
       summary: null,
       text: `Couldn’t re-score these settings — ${error} Move a slider or Reset to try again.`,
     };
   }
-  if (summary) return {kind: 'metrics', summary, busy: rescoring === true};
+  if (isSummary(summary)) return {kind: 'metrics', summary, busy: rescoring === true};
   if (rescoring) return {kind: 'loading', summary: null, text: 'Re-scoring…'};
   return {kind: 'empty', summary: null, text: 'No result yet.'};
 }

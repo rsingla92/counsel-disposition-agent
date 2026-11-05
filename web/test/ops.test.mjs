@@ -15,8 +15,9 @@ import {
   minTopVotes,
   overridesFromControls,
   overridesText,
-  resultsPanel,
   policyDefaults,
+  rescoreOutcome,
+  resultsPanel,
   routingBanner,
   validStoredOverrides,
 } from '../lib.js';
@@ -331,7 +332,7 @@ test('confusionGrid tolerates a missing grid and a missing baseline', () => {
 
 // --- results panel -----------------------------------------------------------
 
-const SUM = {n: 50, missed: 0};
+const SUM = {n: 50, emergencies: 14, missed: 0, confusion: {}};
 
 test('a failed re-score shows the error, never the old numbers', () => {
   const p = resultsPanel({summary: SUM, error: 'The Worker rejected these settings.', rescoring: false});
@@ -348,4 +349,47 @@ test('results panel states', () => {
   assert.deepEqual(resultsPanel({summary: SUM, error: '', rescoring: true}), {kind: 'metrics', summary: SUM, busy: true});
   assert.deepEqual(resultsPanel({summary: null, error: '', rescoring: true}), {kind: 'loading', summary: null, text: 'Re-scoring…'});
   assert.deepEqual(resultsPanel({summary: null, error: '', rescoring: false}), {kind: 'empty', summary: null, text: 'No result yet.'});
+});
+
+// --- re-score outcomes -------------------------------------------------------
+
+const GOOD = {n: 50, emergencies: 14, missed: 0, confusion: {}};
+
+test('a network failure (status 0) is the connection error, never a summary', () => {
+  assert.deepEqual(rescoreOutcome({ok: false, status: 0, data: null}), {
+    error: 'Couldn’t reach the Worker. Check the connection.',
+  });
+});
+
+test('an {error: 0} object is never treated as a summary', () => {
+  for (const data of [{error: 0}, {summary: {error: 0}}, {summary: null}, null, {}]) {
+    const out = rescoreOutcome({ok: true, status: 200, data});
+    assert.ok(!('summary' in out), JSON.stringify(data));
+    assert.equal(out.error, 'The Worker sent an unreadable result.');
+  }
+});
+
+test('rescoreOutcome maps each status to one plain reason', () => {
+  const err = status => rescoreOutcome({ok: false, status, data: null}).error;
+  assert.equal(err(404), 'This run is no longer stored on the Worker.');
+  assert.equal(err(409), 'This run cannot be re-scored.');
+  assert.equal(err(400), 'The Worker rejected these settings.');
+  assert.equal(err(401), 'The access token was rejected.');
+  assert.equal(err(503), 'The Worker returned an error (HTTP 503).');
+  assert.deepEqual(rescoreOutcome({ok: true, status: 200, data: {summary: GOOD}}), {summary: GOOD});
+});
+
+test('a connection error reaches the results panel as an error', () => {
+  const {error} = rescoreOutcome({ok: false, status: 0, data: null});
+  const p = resultsPanel({summary: null, error, rescoring: false});
+  assert.equal(p.kind, 'error');
+  assert.match(p.text, /Couldn’t reach the Worker/);
+});
+
+test('resultsPanel treats only a non-empty message as an error', () => {
+  assert.equal(resultsPanel({summary: GOOD, error: 0, rescoring: false}).kind, 'metrics');
+  assert.equal(resultsPanel({summary: GOOD, error: null, rescoring: false}).kind, 'metrics');
+  assert.equal(resultsPanel({summary: GOOD, error: '', rescoring: false}).kind, 'metrics');
+  // A summary that is really an error object is not shown as numbers.
+  assert.equal(resultsPanel({summary: {error: 0}, error: null, rescoring: false}).kind, 'empty');
 });
