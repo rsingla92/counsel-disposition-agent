@@ -41,7 +41,9 @@ this order.
    English, and it is a request for care.
    - If the primary's extraction fails (an error, a timeout, or output that
      fails validation), the secondary model (Gemini 3.8 Flash) tries once.
-     The case still ends at Human review (`extraction_failed`), even when the
+     The secondary is skipped when the primary's invalid output already
+     marked a red flag present, since that flag sets the floor. The case
+     still ends at Human review (`extraction_failed`), even when the
      secondary succeeds. The secondary's reading is used only to set the red-
      flag floor and send the early emergency message.
    - Red flags marked present in invalid output still count. Across both
@@ -63,12 +65,13 @@ this order.
 7. **Decide** ([`decide.ts`](../worker/src/decide.ts),
    [`router.ts`](../worker/src/router.ts)).
    - Fewer than 15 valid primary answers: Human review (`sampling_failed`).
-   - Otherwise the 20 primary answers are treated as a probability for each
+   - Otherwise the valid primary answers are treated as a probability for each
      level. The router picks the level, at or above the floor, with the lowest
      expected cost under the policy's cost weights. Ties go to the more
      acute level.
-   - The case is flagged for a physician to check if fewer than 12 of 20
-     answers agree, if the answers span more than 2 levels, if the two
+   - The case stays routed but is flagged for a physician to check if fewer
+     than 12 of the valid primary answers agree, if the answers spread more
+     than 2 levels apart, if the two
      models' most common answers fall in different tiers, if the secondary
      returned too few valid answers to cross-check, or if a quote did not
      match the message.
@@ -146,9 +149,12 @@ design is in
   widest spread (2), cost of a Human review (0.2), and the six under-triage
   weights. Moving one re-scores the selected run in the Worker from its
   stored votes, using the same `decide()` function live routing uses.
-- **Model picker.** Sonnet only, Flash only, or Sonnet + Flash.
+- **Model picker.** Policy default (Sonnet with Flash as a cross-check, as
+  deployed), Sonnet only, Flash only, or Sonnet + Flash.
 - **Live routes** sent from the demo use the chosen models and settings,
-  through `overrides` on `POST /v1/route`.
+  through `overrides` on `POST /v1/route`. The cost of a Human review is a
+  re-score setting only: the Worker never reads it when routing, so it is
+  never sent on a live route.
 
 Safety rules for live overrides:
 
@@ -166,6 +172,10 @@ per-case records: votes, floor, reason codes and reference level. They hold
 no message text. The namespace is deleted after the 2026-11-12
 presentation.
 
+**Replay mode.** The demo can also show saved runs of its synthetic
+messages ([`web/replay/`](../web/replay/)) without calling the Worker.
+Overrides are disabled in replay, since nothing is sent.
+
 ## Logging and privacy
 
 Logs are JSON lines built from an allowlist
@@ -174,7 +184,7 @@ justifications, model output or IP addresses.
 
 | Line | Fields |
 |---|---|
-| `route` | SHA-256 of the message, policy version, models, latency, status, level, floor, present flag ids, vote counts, review reasons |
+| `route` | SHA-256 of the message, policy version, models, latency, status, level, tier, floor, present red flag and modifier ids, ids with unverified quotes, vote counts, confidence, review flag and reasons, question count, photo needed, time sensitive |
 | `override` | message SHA-256, from and to levels, reason code, policy version |
 | `llm_error` | step, model, error code, HTTP status (failed extraction calls) |
 | `sample_errors` | model, valid count, total, failure counts by error |

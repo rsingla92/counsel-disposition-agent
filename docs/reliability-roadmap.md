@@ -47,18 +47,16 @@ that would make it dependable at Counsel's scale.
   `min_valid`.
 - **One extraction deadline across both models.** Today the secondary's
   attempt starts only after the primary's fails, so the early 911 or ED
-  message can arrive about 40 seconds late instead of 20. One shared
-  deadline caps it.
+  message can arrive 40 seconds or more after the message, instead of
+  within about 20. One shared deadline caps it.
 - **Alerting on account credit**, well before it runs out, since a 402
   fails every call at once.
-- **More throughput:** bring-your-own provider keys on OpenRouter or a
-  provisioned-throughput contract with Vertex, a shared retry budget per
-  case, and giving the extraction and the primary's samples priority over
-  the secondary's.
+- **More throughput:** the provider-capacity and retry-budget items in
+  [rate limits](rate-limits.md#roadmap).
 
-The rate-limit finding to design for: one model alone is not cheaper to
-run. With Sonnet only, Sonnet gets all 3 slots per case and is called about
-twice as fast, so it hit HTTP 429 on every failed sample and 96% of cases
+The rate-limit finding to design for: one model alone is cheaper (21 calls
+per case instead of 41), but it does not ease rate limits. With Sonnet
+only, Sonnet gets all 3 slots per case and is called about twice as fast, so it hit HTTP 429 on every failed sample and 96% of cases
 went to Human review. Capacity planning has to be per model, not per case.
 
 ## Phase 2: durability

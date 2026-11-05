@@ -9,7 +9,9 @@ for physician review. The Worker bundles a copy at build time
 to run if the deployed Worker reports a different version (exit code 2).
 
 To change the policy: edit the file, bump `policy_version`, run the tests,
-rerun the eval, and deploy. Nothing in the demo can change it.
+rerun the eval, and deploy. Nothing in the demo can change it. Live
+overrides from the Operations view apply to one request and never change
+the file.
 
 ## The seven levels
 

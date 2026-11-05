@@ -36,7 +36,7 @@ Calls the planner made where the PRD left a gap.
 - Three Call 911 red flags were added that the PRD's forced-911 list names
   but its table did not cover: airway or breathing compromise, altered
   consciousness, and an ongoing seizure.
-- Repeatability is measured on all 50 cases, not a subset.
+- Repeatability is measured on all 50 cases, not a subset (run pending).
 
 **Still open for the author:**
 

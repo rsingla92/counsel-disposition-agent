@@ -42,7 +42,7 @@ author ([decisions](decisions.md#v0-calls)).
 3. **Secondary outcomes:** confusion matrices (7 levels, 4 tiers, the
    brief's 3 labels); sensitivity and over-triage per level; Human review and
    Needs info rates; share of quotes verified; ROC AUC for "emergency" and
-   "needs care today", using the primary models' vote share; errors by stage;
+   "needs care today", using the primary model's vote share; errors by stage;
    latency; whether the early emergency message fired; and how the cost
    score moves when every under-triage weight is halved or doubled.
 
@@ -50,11 +50,16 @@ Headline numbers use the first run of each case.
 
 ## Results, policy 0.1.0
 
-<!-- RERUN: rows below come from the 2026-11-04 runs and the Operations
+<!-- RERUN -->
+<!-- Rows and bullets below come from the 2026-11-04 runs and the Operations
 experiment log, before the stricter extraction rule. Update from the
 50-case Sonnet + Flash rerun. -->
 
-| Condition | Missed emergencies | Human review | Cost score | Median time |
+"Sent to Human review" counts only cases the agent did not route. Routed
+cases flagged for a physician to check are counted in the cost score, and
+shown as the "Flagged for physician review" rate in the Operations view.
+
+| Condition | Missed emergencies | Sent to Human review (not routed) | Cost score | Median time |
 |---|---|---|---|---|
 | Sonnet + Flash, 3 calls in flight, extraction fallback | 0 of 14 | 12% | 0.80 | 79 s |
 | Sonnet + Flash, 6 calls in flight | 1 of 14 | 52% | 1.92 | 45 s |
@@ -62,8 +67,6 @@ experiment log, before the stricter extraction rule. Update from the
 | Rule floor only | 0 of 14 | 0% | 1.19 | 9.5 s |
 | Always escalate | 0 of 14 | 0% | 2.52 | n/a |
 | Historical | 4 of 14 | 0% | 4.12 | n/a |
-
-<!-- /RERUN -->
 
 More from the full agent's run (Sonnet + Flash, 3 in flight), quoted from
 the report:
@@ -77,6 +80,8 @@ the report:
   few days.
 - Cost score 0.52 with every under-triage weight halved, 1.36 with every one
   doubled. The full agent beats the rule floor at both.
+
+<!-- /RERUN -->
 
 ## What the conditions taught us
 
@@ -110,9 +115,9 @@ the report:
   case with no red flag or risk factor lands at Self-care, so the rule floor
   catches 0% of Routine cases. Its low cost score comes from never missing
   an emergency, not from routing the rest well.
-- **The flag rate is inside the cost score.** The report gives the Human
-  review rate, but not yet the wider share of routed cases flagged for a
-  physician to check.
+- **The flag rate is not in the report yet.** The report gives the Human
+  review rate. The wider share flagged for a physician feeds the cost score
+  and is shown in the Operations view, but the report does not print it.
 - **Pending rerun.** A 50-case Sonnet + Flash rerun under the stricter
   extraction rule (a failed primary extraction always ends at Human review)
   is running. Its numbers will replace the first row above.
@@ -124,6 +129,12 @@ cd eval
 uv sync
 COUNSEL_TOKEN=... uv run counsel-eval --url <Worker URL>
 ```
+
+`COUNSEL_TOKEN` (the Worker's access token) must be set. The credit check
+reads `OPENROUTER_API_KEY` from
+`~/.config/counsel-disposition-agent/openrouter.env` (or the file named by
+`$OPENROUTER_ENV_FILE`); without it the eval exits 3. Pass
+`--skip-credit-check` to skip it.
 
 Options: `--systems full,floor,always,historical`, `--cases all|pcp`,
 `--repeat N`, `--models sonnet|flash|sonnet+flash`, `--concurrency N`.
@@ -143,7 +154,7 @@ case is 41 calls.
 
 Raw per-case results go to `data/private/runs/` (gitignored), since they
 hold quotes from the messages. Committed reports hold aggregate numbers
-only. `python -m counsel_eval.export_experiment` strips a saved run to votes
+only. `uv run python -m counsel_eval.export_experiment` strips a saved run to votes
 and labels for the Operations view, and refuses to write inside a git
 checkout.
 
