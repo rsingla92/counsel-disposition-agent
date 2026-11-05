@@ -163,6 +163,18 @@ describe('rescore', () => {
     expect(s.human_review_rate).toBe(0);
   });
 
+  it('keeps an unverified excerpt flagged when re-routing sampling_failed', () => {
+    const unverified: ExperimentRecord = {
+      ...RECORDS[3],
+      base_reasons: ['unverified_excerpt'],
+    };
+    const exp = experiment([unverified], [SAVED[3]]);
+    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 12}));
+    expect(s.human_review_rate).toBe(0);
+    expect(s.confusion.routine.routine).toBe(1);
+    expect(s.flagged_rate).toBe(1);
+  });
+
   it('sends a routed record to Human review when min_valid rises past its votes', () => {
     const exp = experiment([RECORDS[3]], [SAVED[3]]);
     const routed = {...exp, records: [{...RECORDS[3], fixed: null}]};
