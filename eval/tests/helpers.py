@@ -6,8 +6,15 @@ from typing import Any
 import pandas as pd
 
 from counsel_eval import levels
+from counsel_eval import run
+from counsel_eval.data import load_policy
 
 SENTINEL = "SECRET MESSAGE"
+
+# The checked-in policy version, so the fakes serve what the runner expects.
+POLICY_VERSION = load_policy(run.ROOT / "policy" / "policy.yaml")[
+    "policy_version"
+]
 
 
 def make_result(
@@ -51,7 +58,7 @@ def make_result(
       "patient_message": text,
       "trace": {
           "input_sha256": "0" * 64,
-          "policy_version": "0.1.0",
+          "policy_version": POLICY_VERSION,
           "models": [{"model": "m", "provider": "p"}],
           "latency_ms": 12.0,
           "raw": {"note": text},

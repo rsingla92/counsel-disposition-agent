@@ -3,7 +3,7 @@
 # here is read by the Worker at build time (worker/scripts/build-policy.mjs).
 # Levels run from most to least acute: call_911, ed_now, in_person_today,
 # physician_contact_today, within_few_days, routine, self_care.
-policy_version: "0.1.0"
+policy_version: "0.2.0"
 
 intake:
   max_chars: 4000
@@ -183,6 +183,12 @@ red_flags:
     min_level: ed_now
     subsumes_modifiers: []
     cases: []
+  - id: heavy_bleeding_with_faintness
+    group: adult
+    description: "Heavy bleeding, not during pregnancy or after birth, together with lightheadedness, fainting, a racing heart, or pale and clammy skin"
+    min_level: ed_now
+    subsumes_modifiers: []
+    cases: []
   - id: suicidal_thoughts
     group: adult
     description: "Suicidal thoughts without a stated plan or intent"
@@ -207,6 +213,12 @@ red_flags:
     min_level: in_person_today
     subsumes_modifiers: []
     cases: [25]
+  - id: heavy_menstrual_bleeding
+    group: adult
+    description: "Heavy vaginal bleeding, not during pregnancy or after birth: soaking a pad or tampon every hour for two hours or more, or passing clots the size of a quarter or larger"
+    min_level: in_person_today
+    subsumes_modifiers: []
+    cases: []
   - id: chronic_cough_constitutional
     group: adult
     description: "Cough lasting more than three weeks along with night sweats or unexplained weight loss"
@@ -385,15 +397,15 @@ red_flags:
     cases: []
 
 modifiers:
-  - {id: age_65_plus, group: adult, description: "Age 65 or older"}
-  - {id: diabetes, group: adult, description: "Diabetes"}
-  - {id: immunosuppression, group: adult, description: "Weakened immune system (also applies to children)"}
-  - {id: anticoagulation, group: adult, description: "Taking a blood thinner"}
-  - {id: under_3_months, group: pediatric, description: "Baby younger than 3 months"}
-  - {id: born_premature, group: pediatric, description: "Born premature, within the first year of life"}
-  - {id: congenital_heart_disease, group: pediatric, description: "Heart disease present from birth"}
-  - {id: sickle_cell, group: pediatric, description: "Sickle cell disease"}
-  - {id: incomplete_vaccinations, group: pediatric, description: "Vaccinations not up to date"}
-  - {id: pregnant, group: obstetric, description: "Currently pregnant (gestational age decides which obstetric flags apply)"}
-  - {id: postpartum, group: obstetric, description: "Within 6 weeks after giving birth"}
-  - {id: high_risk_pregnancy, group: obstetric, description: "High-risk pregnancy: high blood pressure, diabetes, or twins"}
+  - {id: age_65_plus, groups: [adult], description: "Age 65 or older"}
+  - {id: diabetes, groups: [adult], description: "Diabetes"}
+  - {id: immunosuppression, groups: [adult, pediatric], description: "Weakened immune system, in an adult or a child"}
+  - {id: anticoagulation, groups: [adult], description: "Taking a blood thinner"}
+  - {id: under_3_months, groups: [pediatric], description: "Baby younger than 3 months"}
+  - {id: born_premature, groups: [pediatric], description: "Born premature, within the first year of life"}
+  - {id: congenital_heart_disease, groups: [pediatric], description: "Heart disease present from birth"}
+  - {id: sickle_cell, groups: [pediatric], description: "Sickle cell disease"}
+  - {id: incomplete_vaccinations, groups: [pediatric], description: "Vaccinations not up to date"}
+  - {id: pregnant, groups: [obstetric], description: "Currently pregnant (gestational age decides which obstetric flags apply)"}
+  - {id: postpartum, groups: [obstetric], description: "Within 6 weeks after giving birth"}
+  - {id: high_risk_pregnancy, groups: [obstetric], description: "High-risk pregnancy: high blood pressure, diabetes, or twins"}
