@@ -1,0 +1,164 @@
+{
+  "policy_loss": {
+    "human_review_cost": 0.2,
+    "boundaries": [
+      {
+        "between": [
+          "call_911",
+          "ed_now"
+        ],
+        "under": 3,
+        "over": 1
+      },
+      {
+        "between": [
+          "ed_now",
+          "in_person_today"
+        ],
+        "under": 20,
+        "over": 1
+      },
+      {
+        "between": [
+          "in_person_today",
+          "physician_contact_today"
+        ],
+        "under": 2,
+        "over": 1
+      },
+      {
+        "between": [
+          "physician_contact_today",
+          "within_few_days"
+        ],
+        "under": 5,
+        "over": 1
+      },
+      {
+        "between": [
+          "within_few_days",
+          "routine"
+        ],
+        "under": 2,
+        "over": 1
+      },
+      {
+        "between": [
+          "routine",
+          "self_care"
+        ],
+        "under": 1.5,
+        "over": 1
+      }
+    ]
+  },
+  "cases": [
+    {
+      "reference": "call_911",
+      "disposition": "call_911",
+      "status": "routed",
+      "flagged": false,
+      "id": "S01"
+    },
+    {
+      "reference": "call_911",
+      "disposition": "ed_now",
+      "status": "routed",
+      "flagged": false,
+      "id": "S02"
+    },
+    {
+      "reference": "ed_now",
+      "disposition": "in_person_today",
+      "status": "routed",
+      "flagged": true,
+      "id": "S03"
+    },
+    {
+      "reference": "ed_now",
+      "disposition": null,
+      "status": "human_review",
+      "flagged": true,
+      "id": "S04"
+    },
+    {
+      "reference": "in_person_today",
+      "disposition": "ed_now",
+      "status": "routed",
+      "flagged": false,
+      "id": "S05"
+    },
+    {
+      "reference": "physician_contact_today",
+      "disposition": "physician_contact_today",
+      "status": "routed",
+      "flagged": false,
+      "id": "S06"
+    },
+    {
+      "reference": "within_few_days",
+      "disposition": null,
+      "status": "needs_info",
+      "flagged": false,
+      "id": "S07"
+    },
+    {
+      "reference": "routine",
+      "disposition": "within_few_days",
+      "status": "routed",
+      "flagged": false,
+      "id": "S08"
+    },
+    {
+      "reference": "self_care",
+      "disposition": "routine",
+      "status": "routed",
+      "flagged": false,
+      "id": "S09"
+    },
+    {
+      "reference": "self_care",
+      "disposition": "self_care",
+      "status": "routed",
+      "flagged": false,
+      "id": "S10"
+    },
+    {
+      "reference": "routine",
+      "disposition": null,
+      "status": "human_review",
+      "flagged": true,
+      "id": "S11"
+    },
+    {
+      "reference": "in_person_today",
+      "disposition": "in_person_today",
+      "status": "needs_info",
+      "flagged": false,
+      "id": "S12"
+    },
+    {
+      "reference": "physician_contact_today",
+      "disposition": "call_911",
+      "status": "routed",
+      "flagged": true,
+      "id": "S13"
+    },
+    {
+      "reference": "within_few_days",
+      "disposition": "routine",
+      "status": "routed",
+      "flagged": false,
+      "id": "S14"
+    }
+  ],
+  "expected": {
+    "n": 14,
+    "emergencies": 4,
+    "missed": 2,
+    "human_review_rate": 0.14285714285714285,
+    "needs_info_rate": 0.14285714285714285,
+    "over_triage_rate": 0.2857142857142857,
+    "cost_score": 4.485714285714286
+  }
+}
