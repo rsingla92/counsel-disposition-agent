@@ -7,9 +7,10 @@ import {LEVELS} from './levels';
 import {openRouterClient} from './llm';
 import {overrideLine} from './log';
 import {
-  RouteOverridesSchema,
+  LiveRouteOverridesSchema,
   applyPolicyOverrides,
   checkLiveSafe,
+  majorityOk,
   selectModels,
 } from './overrides';
 import {route, type Deps, type EarlyEvent} from './pipeline';
@@ -31,7 +32,7 @@ type App = {Bindings: Env};
 const RouteBody = z.object({
   message: z.string().refine(s => s.trim() !== ''),
   mode: z.enum(['full', 'floor_only']).optional(),
-  overrides: RouteOverridesSchema.optional(),
+  overrides: LiveRouteOverridesSchema.optional(),
 });
 
 /**
@@ -127,6 +128,9 @@ export function appFor(deps: Deps): Hono<App> {
       );
     }
     const {message, mode, overrides} = parsed.data;
+    if (!majorityOk(deps.policy, overrides?.policy)) {
+      return c.json({error: 'overrides invalid'}, 400);
+    }
     const unsafe = checkLiveSafe(deps.policy, overrides?.policy);
     if (unsafe) return c.json({error: unsafe}, 400);
     let models: Pick<Deps, 'primary' | 'secondary'>;
@@ -161,6 +165,7 @@ export function appFor(deps: Deps): Hono<App> {
         mode,
         onEarly: (e: EarlyEvent) => send(e),
         overrides,
+        deployedPolicy: overrides ? deps.policy : undefined,
       });
       send({event: 'result', result});
       await pending;

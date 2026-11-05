@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {rank} from './levels';
 import type {ModelSpec} from './llm';
-import {loadPolicy, type Policy} from './policy';
+import type {Policy} from './policy';
 
 /** Floats within this of a step multiple count as on the step. */
 const STEP_TOLERANCE = 1e-9;
@@ -18,39 +18,26 @@ function stepped(min: number, max: number, step: number) {
     });
 }
 
-let loaded: Policy | null = null;
-
-/** The deployed min_valid, parsed once. */
-function loadedMinValid(): number {
-  loaded ??= loadPolicy();
-  return loaded.sampling.min_valid;
-}
-
 /**
  * Router settings a request may change, with fixed ranges (plan, "Override
- * ranges"). Out of range fails; nothing is clamped. min_top_votes must be a
- * simple majority of the effective min_valid: the override's if given, else
- * the deployed policy's.
+ * ranges"). Out of range fails; nothing is clamped. The schema stands alone,
+ * so a saved trace parses whatever policy is deployed: the rule that
+ * min_top_votes is a majority of the effective min_valid is majorityOk(),
+ * checked against a given policy.
  */
-export const PolicyOverridesSchema = z
-  .strictObject({
-    min_valid: z.number().int().min(10).max(20).optional(),
-    // 6 is a majority of the lowest min_valid; the refinement below
-    // tightens it to the effective min_valid.
-    min_top_votes: z.number().int().min(6).max(20).optional(),
-    max_span: z.number().int().min(0).max(6).optional(),
-    human_review_cost: stepped(0.05, 2, 0.05).optional(),
-    under_weights: z
-      .array(stepped(0.5, 50, 0.5))
-      .length(6)
-      .optional(),
-  })
-  .refine(
-    o =>
-      o.min_top_votes === undefined ||
-      o.min_top_votes >= Math.floor((o.min_valid ?? loadedMinValid()) / 2) + 1,
-    {path: ['min_top_votes']},
-  );
+export const PolicyOverridesSchema = z.strictObject({
+  // 20 is sampling.n; a test pins it.
+  min_valid: z.number().int().min(10).max(20).optional(),
+  // 6 is a majority of the lowest min_valid; majorityOk() tightens it.
+  min_top_votes: z.number().int().min(6).max(20).optional(),
+  max_span: z.number().int().min(0).max(6).optional(),
+  human_review_cost: stepped(0.05, 2, 0.05).optional(),
+  // One per loss boundary, in policy order; a test pins the count.
+  under_weights: z
+    .array(stepped(0.5, 50, 0.5))
+    .length(6)
+    .optional(),
+});
 
 export type PolicyOverrides = z.infer<typeof PolicyOverridesSchema>;
 
@@ -61,6 +48,29 @@ export const RouteOverridesSchema = z.strictObject({
   models: z.enum(MODEL_CHOICES).optional(),
   policy: PolicyOverridesSchema.optional(),
 });
+
+/**
+ * Overrides a live /v1/route request may send. human_review_cost is left
+ * out: the Worker never reads it, so accepting it would claim an effect
+ * that does not exist. Re-scoring uses it, through PolicyOverridesSchema.
+ */
+export const LiveRouteOverridesSchema = z.strictObject({
+  models: z.enum(MODEL_CHOICES).optional(),
+  policy: PolicyOverridesSchema.omit({human_review_cost: true}).optional(),
+});
+
+/**
+ * True when min_top_votes, if given, is a simple majority of the effective
+ * min_valid: the override's if given, else `policy`'s.
+ */
+export function majorityOk(
+  policy: Policy,
+  o: PolicyOverrides | undefined,
+): boolean {
+  if (o?.min_top_votes === undefined) return true;
+  const minValid = o.min_valid ?? policy.sampling.min_valid;
+  return o.min_top_votes >= Math.floor(minValid / 2) + 1;
+}
 
 export type RouteOverrides = z.infer<typeof RouteOverridesSchema>;
 
@@ -108,8 +118,8 @@ export function checkLiveSafe(
 
 /**
  * The models for a request. `primary` is the env PRIMARY_* spec (Sonnet)
- * and `secondary` the env SECONDARY_* spec (Flash). Throws for flash when
- * no secondary is configured.
+ * and `secondary` the env SECONDARY_* spec (Flash). Throws for flash or
+ * sonnet+flash when no secondary is configured.
  */
 export function selectModels(
   choice: ModelChoice | undefined,
@@ -122,6 +132,9 @@ export function selectModels(
     case 'flash':
       if (!secondary) throw new Error('secondary model not configured');
       return {primary: secondary, secondary: null};
+    case 'sonnet+flash':
+      if (!secondary) throw new Error('secondary model not configured');
+      return {primary, secondary};
     default:
       return {primary, secondary};
   }

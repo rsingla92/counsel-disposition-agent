@@ -253,6 +253,53 @@ describe('POST /v1/route with overrides', () => {
     expect(llm.calls).toBe(0);
   });
 
+  it('answers 503 for sonnet+flash with no secondary configured', async () => {
+    const llm = scripted({});
+    const res = await appFor(deps(llm)).request(
+      '/v1/route',
+      post({message: M, overrides: {models: 'sonnet+flash'}}),
+      ENV,
+    );
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({error: 'model not configured'});
+    expect(llm.calls).toBe(0);
+  });
+
+  it('keeps an emergency the deployed policy would choose', async () => {
+    // 3 ed_now / 17 self_care: the deployed weights choose ed_now; the
+    // overridden lower weights alone would choose self_care.
+    const res = await app({
+      sampleFor: i => ({
+        disposition: i < 3 ? 'ed_now' : 'self_care',
+        justification: 'Test justification.',
+        safety_net: 'Seek care sooner if it gets worse.',
+      }),
+    }).request(
+      '/v1/route',
+      post({
+        message: M,
+        overrides: {
+          policy: {under_weights: [3, 20, 0.5, 0.5, 0.5, 0.5], max_span: 6},
+        },
+      }),
+      ENV,
+    );
+    const result = await resultOf(res);
+    expect(result.disposition).toBe('ed_now');
+  });
+
+  it('rejects human_review_cost on a live route', async () => {
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({message: M, overrides: {policy: {human_review_cost: 0.5}}}),
+      ENV,
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({error: 'overrides invalid'});
+    expect(calls).toEqual([]);
+  });
+
   it('rejects an emergency weight below the policy without calling the LLM', async () => {
     const {app, calls} = twoModelApp();
     const res = await app.request(
@@ -274,6 +321,7 @@ describe('POST /v1/route with overrides', () => {
     for (const overrides of [
       {policy: {min_valid: 30}},
       {policy: {min_valid: 15, min_top_votes: 7}},
+      {policy: {min_top_votes: 7}},
       {policy: {under_weights: [1, 2, 3]}},
       {models: 'gpt'},
       {temperature: 0},

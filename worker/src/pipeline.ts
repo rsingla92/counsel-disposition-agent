@@ -48,6 +48,11 @@ export type RouteOptions = {
    * them by building Deps (policy and models) before calling route().
    */
   overrides?: RouteOverrides;
+  /**
+   * The deployed policy, when deps.policy carries overrides. An emergency
+   * the deployed policy would choose on the same votes is kept (zero-miss).
+   */
+  deployedPolicy?: Policy;
 };
 
 /** Patient copy for Human review when no disposition is carried. */
@@ -533,7 +538,19 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
 
   // 7. Choose and flag.
-  const disposition = chooseLevel(primary.votes, floor.floor, policy);
+  let disposition = chooseLevel(primary.votes, floor.floor, policy);
+  if (opts.deployedPolicy) {
+    // Overridden weights may not route below an emergency the deployed
+    // policy would choose (AGENTS.md rule 1).
+    const deployed = chooseLevel(
+      primary.votes,
+      floor.floor,
+      opts.deployedPolicy,
+    );
+    if (isEmergency(deployed) && rank(disposition) < rank(deployed)) {
+      disposition = deployed;
+    }
+  }
   // A configured secondary with too few valid samples cannot cross-check
   // the primary. The primary's disposition stands, but a physician looks:
   // a failed cross-check must not pass silently as an agreeing one.

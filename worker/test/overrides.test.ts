@@ -1,13 +1,17 @@
 import {describe, expect, it} from 'vitest';
 import {
+  LiveRouteOverridesSchema,
   MODEL_CHOICES,
   PolicyOverridesSchema,
   RouteOverridesSchema,
   applyPolicyOverrides,
   checkLiveSafe,
+  majorityOk,
   selectModels,
 } from '../src/overrides';
 import {loadPolicy} from '../src/policy';
+import {RouteResultSchema} from '../src/schema';
+import {validResult} from './fixtures';
 import {PRIMARY, SECONDARY} from './pipeline-fixtures';
 
 const policy = loadPolicy();
@@ -88,17 +92,9 @@ describe('PolicyOverridesSchema', () => {
     expect(ok({min_valid: 15.5})).toBe(false);
   });
 
-  it('bounds min_top_votes below by a majority of the effective min_valid', () => {
-    expect(ok({min_valid: 15, min_top_votes: 7})).toBe(false);
-    expect(ok({min_valid: 15, min_top_votes: 8})).toBe(true);
-    expect(ok({min_valid: 10, min_top_votes: 5})).toBe(false);
-    expect(ok({min_valid: 10, min_top_votes: 6})).toBe(true);
-    expect(ok({min_valid: 20, min_top_votes: 10})).toBe(false);
-    expect(ok({min_valid: 20, min_top_votes: 11})).toBe(true);
-    // Without min_valid, the loaded policy's (15) applies.
-    expect(policy.sampling.min_valid).toBe(15);
-    expect(ok({min_top_votes: 7})).toBe(false);
-    expect(ok({min_top_votes: 8})).toBe(true);
+  it('bounds min_top_votes below by 6 on its own', () => {
+    expect(ok({min_top_votes: 5})).toBe(false);
+    expect(ok({min_top_votes: 6})).toBe(true);
   });
 
   it('accepts min_top_votes up to 20', () => {
@@ -141,6 +137,74 @@ describe('PolicyOverridesSchema', () => {
     expect(ok({sampling_n: 10})).toBe(false);
     expect(ok({red_flags: []})).toBe(false);
     expect(ok({min_valid: '15'})).toBe(false);
+  });
+});
+
+describe('policy pins', () => {
+  it('has 20 samples', () => {
+    // overrides.ts caps min_valid at 20 assuming sampling.n is 20.
+    expect(policy.sampling.n).toBe(20);
+  });
+
+  it('has 6 loss boundaries', () => {
+    // overrides.ts requires exactly 6 under_weights, one per boundary.
+    expect(policy.loss.boundaries.length).toBe(6);
+  });
+});
+
+describe('majorityOk', () => {
+  it('bounds min_top_votes by a majority of the effective min_valid', () => {
+    const at = (o: object) => majorityOk(policy, o);
+    expect(at({min_valid: 15, min_top_votes: 7})).toBe(false);
+    expect(at({min_valid: 15, min_top_votes: 8})).toBe(true);
+    expect(at({min_valid: 10, min_top_votes: 5})).toBe(false);
+    expect(at({min_valid: 10, min_top_votes: 6})).toBe(true);
+    expect(at({min_valid: 20, min_top_votes: 10})).toBe(false);
+    expect(at({min_valid: 20, min_top_votes: 11})).toBe(true);
+    // Without min_valid, the given policy's (15 here) applies.
+    expect(policy.sampling.min_valid).toBe(15);
+    expect(at({min_top_votes: 7})).toBe(false);
+    expect(at({min_top_votes: 8})).toBe(true);
+    expect(at({min_valid: 10})).toBe(true);
+    expect(majorityOk(policy, undefined)).toBe(true);
+  });
+
+  it('uses the policy it is given', () => {
+    const p = structuredClone(policy);
+    p.sampling.min_valid = 10;
+    expect(majorityOk(p, {min_top_votes: 6})).toBe(true);
+    expect(majorityOk(policy, {min_top_votes: 6})).toBe(false);
+  });
+});
+
+describe('trace overrides', () => {
+  it('parse without reference to the loaded policy', () => {
+    const r = {
+      ...validResult,
+      trace: {...validResult.trace, overrides: {policy: {min_top_votes: 6}}},
+    };
+    expect(RouteResultSchema.safeParse(r).success).toBe(true);
+  });
+});
+
+describe('LiveRouteOverridesSchema', () => {
+  it('rejects human_review_cost, which live routes do not use', () => {
+    expect(
+      PolicyOverridesSchema.safeParse({human_review_cost: 0.5}).success,
+    ).toBe(true);
+    expect(
+      LiveRouteOverridesSchema.safeParse({policy: {human_review_cost: 0.5}})
+        .success,
+    ).toBe(false);
+    expect(
+      LiveRouteOverridesSchema.safeParse({
+        models: 'flash',
+        policy: {min_valid: 12, max_span: 3, under_weights: UNDER},
+      }).success,
+    ).toBe(true);
+    expect(
+      LiveRouteOverridesSchema.safeParse({policy: {bogus: 1}}).success,
+    ).toBe(false);
   });
 });
 
@@ -213,7 +277,8 @@ describe('selectModels', () => {
     });
   });
 
-  it('throws for flash with no secondary configured', () => {
+  it('throws for flash or sonnet+flash with no secondary configured', () => {
     expect(() => selectModels('flash', PRIMARY, null)).toThrow();
+    expect(() => selectModels('sonnet+flash', PRIMARY, null)).toThrow();
   });
 });

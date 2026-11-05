@@ -645,6 +645,55 @@ describe('route: overrides', () => {
     expect(r.trace.overrides).toEqual({models: 'flash'});
   });
 
+  it('keeps an emergency the deployed policy would choose', async () => {
+    // Deployed weights: ed_now costs 4.25, self_care 4.575, so ed_now.
+    // Overridden: self_care costs 3.3, so self_care without the guard.
+    const o = {under_weights: [3, 20, 0.5, 0.5, 0.5, 0.5], max_span: 6};
+    const sampleFor = (i: number): Sample => ({
+      disposition: i < 3 ? 'ed_now' : 'self_care',
+      justification: 'Test justification.',
+      safety_net: 'Seek care sooner if it gets worse.',
+    });
+    const effective = applyPolicyOverrides(policy, o);
+    const unguarded = await route(M, {
+      ...deps(scripted({sampleFor})),
+      policy: effective,
+    });
+    expect(unguarded.disposition).toBe('self_care');
+
+    const r = await route(
+      M,
+      {...deps(scripted({sampleFor})), policy: effective},
+      {overrides: {policy: o}, deployedPolicy: policy},
+    );
+    expect(r.votes.primary.ed_now).toBe(3);
+    expect(r.votes.primary.self_care).toBe(17);
+    expect(r.disposition).toBe('ed_now');
+    expect(r.patient_message).toContain(policy.levels.ed_now.patient_message);
+  });
+
+  it('lets the override choose when the deployed choice is below ed_now', async () => {
+    // 8 within_few_days / 12 routine. Deployed: within_few_days (0.6 vs
+    // 0.8). With the routine boundary's under weight at 0.5: routine (0.2).
+    const o = {under_weights: [3, 20, 2, 5, 0.5, 1.5]};
+    const sampleFor = (i: number): Sample => ({
+      disposition: i < 8 ? 'within_few_days' : 'routine',
+      justification: 'Test justification.',
+      safety_net: 'Seek care sooner if it gets worse.',
+    });
+    const base = await route(M, deps(scripted({sampleFor})));
+    expect(base.disposition).toBe('within_few_days');
+    const r = await route(
+      M,
+      {
+        ...deps(scripted({sampleFor})),
+        policy: applyPolicyOverrides(policy, o),
+      },
+      {overrides: {policy: o}, deployedPolicy: policy},
+    );
+    expect(r.disposition).toBe('routine');
+  });
+
   it('flags a 19/1 split under an overridden min_top_votes', async () => {
     const o = {min_top_votes: 20};
     const sampleFor = (i: number): Sample => ({
