@@ -182,10 +182,10 @@ Logs are JSON lines built from an allowlist
 ([`log.ts`](../worker/src/log.ts)). They never contain message text, quotes,
 justifications, model output or IP addresses.
 
-| Line | Fields |
+| Line (`kind`) | Fields (complete list, from `log.ts` and `pipeline.ts`) |
 |---|---|
-| `route` | SHA-256 of the message, policy version, models, latency, status, level, tier, floor, present red flag and modifier ids, ids with unverified quotes, vote counts, confidence, review flag and reasons, question count, photo needed, time sensitive |
-| `override` | message SHA-256, from and to levels, reason code, policy version |
+| `route` | Timestamp, SHA-256 of the message, policy version, models, latency, status, level, tier, floor, present red flag and modifier ids, ids with unverified quotes, vote counts, confidence, review flag and reasons, question count, photo needed, time sensitive |
+| `override` | Timestamp, message SHA-256, from and to levels, reason code, policy version |
 | `llm_error` | step, model, error code, HTTP status (failed extraction calls) |
 | `sample_errors` | model, valid count, total, failure counts by error |
 

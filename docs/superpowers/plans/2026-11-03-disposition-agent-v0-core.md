@@ -140,7 +140,7 @@ modifiers:
 ```
 
 Copy rules for the remaining entries:
-- Rows with a conditional minimum split into two flags, as `suicidal_thoughts` does above. Postpartum harm thoughts (case 39) becomes `postpartum_harm_thoughts` (`physician_contact_today`, `subsumes_modifiers: [postpartum]`) plus `postpartum_psychosis_signs` (confusion, hallucinations or no sleep → `ed_now`).
+- Rows with a conditional minimum split into two flags, as `suicidal_thoughts` does above. Postpartum harm thoughts becomes `postpartum_harm_thoughts` (`physician_contact_today`, `subsumes_modifiers: [postpartum]`) plus `postpartum_psychosis_signs` (confusion, hallucinations or no sleep → `ed_now`).
 - Flags that name their condition subsume that modifier: `diabetic_foot_redness` and `hyperglycemia_vomiting` subsume `diabetes`; `anticoagulated_head_injury` subsumes `anticoagulation`; `older_adult_fall_no_weight_bearing` subsumes `age_65_plus`; `infant_fever_under_3_months` subsumes `under_3_months`; pediatric `fever_sickle_or_immunosuppressed` subsumes `sickle_cell` and `immunosuppression`; every obstetric flag subsumes `pregnant` and `postpartum`.
 - Obstetric `ed_now` flags at or after 20 weeks carry `instruction: "Go to labour and delivery triage at your hospital now."`; the ingestion flag carries `instruction: "Call Poison Control at 1-800-222-1222 on the way."`
 - Add three adult flags that the forced-Call-911 list (PRD p. 15) names but no table row covers: `airway_breathing_compromise`, `altered_consciousness`, `seizure_ongoing`, each `call_911`, `cases: []`.
@@ -299,7 +299,7 @@ it('never lets a modifier pass in_person_today', () => {
   expect(ruleFloor(ex({one_sided_calf_swelling: 'present'}, ['age_65_plus']), MSG, policy).floor).toBe('in_person_today');
   expect(ruleFloor(ex({older_adult_fall_no_weight_bearing: 'present'}, ['age_65_plus']), MSG, policy).floor).toBe('ed_now');
 });
-it('does not double count a subsumed modifier (case 39)', () =>
+it('does not double count a subsumed modifier', () =>
   expect(ruleFloor(ex({postpartum_harm_thoughts: 'present'}, ['postpartum']), MSG, policy).floor).toBe('physician_contact_today'));
 it('raises physician_contact_today to in_person_today with an unsubsumed modifier', () =>
   expect(ruleFloor(ex({suicidal_thoughts: 'present'}, ['age_65_plus']), MSG, policy).floor).toBe('in_person_today'));
@@ -587,7 +587,7 @@ Spell out the four `api.test.ts` cases in full, following the comments. Expose a
     - `faithfulness(results) -> float` (share of present-flag excerpts with `excerpt_verified`)
     - `error_stage(row) -> str|None`: `'scope'` if Human review with no disposition; `'emergency_detection'` if the reference is Emergency and `received` is lower; `'emergent_vs_same_day'` if both are in Emergency/Same day with different tiers; `'missing_information'` if the reference has `info` and the result has no questions; `'explanation'` if any excerpt is unverified; else None
 
-`reference_labels.csv` is transcribed by hand from `docs/brief/Labels.txt`: `case_id` as `C01`…`C50` to match the xlsx; `level` from "Your label" (`Routine (admin)` → `routine`); `info` when the label says "+ info"; `photo` when it says "+ photo"; `time_sensitive` true only for C24. Case 16 is `in_person_today`, `info=true` (pediatrics is in scope per the PRD; this overrides the note in Labels.txt).
+`reference_labels.csv` is transcribed by hand from `docs/brief/Labels.txt`: `case_id` as `C` plus a two-digit number to match the xlsx; `level` from "Your label" (`Routine (admin)` → `routine`); `info` when the label says "+ info"; `photo` when it says "+ photo"; `time_sensitive` true only for the one case the labels mark time-sensitive. One pediatric case is `in_person_today`, `info=true` (pediatrics is in scope per the PRD; this overrides the note in Labels.txt).
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -601,10 +601,10 @@ def test_zero_count_ci_for_14_emergencies():
   assert zero_count_ci(14) == pytest.approx(0.2316, abs=1e-4)
 
 def test_gate_counts_a_miss_below_ed():
-  df = pd.DataFrame({"case_id": ["C08", "C02"],
+  df = pd.DataFrame({"case_id": ["C0X", "C0Y"],
                      "reference": ["ed_now", "call_911"],
                      "received": ["in_person_today", "ed_now"]})
-  assert gate(df)["miss_ids"] == ["C08"]
+  assert gate(df)["miss_ids"] == ["C0X"]
 
 def test_received_treats_bare_human_review_as_routine():
   assert received({"status": "human_review", "disposition": None}) == "routine"
@@ -616,8 +616,8 @@ def test_reference_label_counts():
       "call_911": 4, "ed_now": 10, "in_person_today": 8,
       "physician_contact_today": 2, "within_few_days": 7,
       "routine": 14, "self_care": 5}
-  assert set(ref[ref.info].case_id) == {"C05", "C12", "C16", "C33", "C44", "C49"}
-  assert set(ref[ref.photo].case_id) == {"C11", "C30", "C36"}
+  assert len(ref[ref.info]) == 6   # the six "+ info" cases (ids omitted)
+  assert len(ref[ref.photo]) == 3  # the three "+ photo" cases (ids omitted)
 
 @needs_private_data
 def test_reference_vs_historical_agreement():
@@ -651,8 +651,8 @@ def test_reference_vs_historical_agreement():
   - `run.py` CLI: `uv run counsel-eval --url URL --systems full,floor,always,historical [--cases all|pcp] [--repeat N]`
     - Before running, asserts `client.policy()["policy_version"]` equals the local `policy.yaml` version
     - Writes every raw result to `data/private/runs/<timestamp>/<system>.jsonl`
-    - Writes `reports/<date>-policy-<version>.md` containing, per system: the gate (misses, miss ids, CI upper bound), cost score, the three confusion matrices, per-class sensitivity and over-triage, abstention rates, faithfulness, ROC AUC (scikit-learn, one-vs-rest for Emergency and for Emergency + Same day, scored by vote share), error counts by stage, median and p95 latency, the cost score re-computed with every `under` weight halved and doubled (loss-weight sensitivity, D7; re-scored from saved runs, no new calls), and the historical mapping note. Case ids only: no message text, no excerpts.
-    - `--repeat N` runs the chosen cases N times and reports per-case agreement with the modal disposition. Repeatability runs on all 50 cases (the author's call, 2026-11-03; cost isn't a concern for V0). `--cases pcp` (C04, C08, C09, C12, C16, C17, C23, C26, C35, C39) stays available for quick checks.
+    - Writes `reports/<date>-policy-<version>.md` containing, per system: the gate (misses, CI upper bound), cost score, the three confusion matrices, per-class sensitivity and over-triage, abstention rates, faithfulness, ROC AUC (scikit-learn, one-vs-rest for Emergency and for Emergency + Same day, scored by vote share), error counts by stage, median and p95 latency, the cost score re-computed with every `under` weight halved and doubled (loss-weight sensitivity, D7; re-scored from saved runs, no new calls), and the historical mapping note. Counts and rates only: no case ids, no message text, no excerpts (changed 2026-11-05; earlier reports listed miss ids).
+    - `--repeat N` runs the chosen cases N times and reports per-case agreement with the modal disposition. Repeatability runs on all 50 cases (the author's call, 2026-11-03; cost isn't a concern for V0). `--cases pcp` (the ten PCP-study cases, `PCP_IDS` in `run.py`) stays available for quick checks.
     - Exits non-zero when the `full` system misses any emergency
 
 - [ ] **Step 1: Write the failing tests** (respx mocks the Worker)
@@ -681,7 +681,7 @@ def test_cli_exits_nonzero_on_policy_version_mismatch(...)
 def test_cli_exits_nonzero_on_missed_emergency(...)
 ```
 
-Write the last two in full: a fake client whose `.policy()` returns `0.0.0`, and a fake run where C08 is received as `routine`.
+Write the last two in full: a fake client whose `.policy()` returns `0.0.0`, and a fake run where one reference emergency is received as `routine`.
 
 - [ ] **Step 2: Verify fail.** **Step 3: Implement.** **Step 4: Verify pass.**
 - [ ] **Step 5: Commit** — `Add eval runner, core baselines and report`.
@@ -740,7 +740,7 @@ test('parseNdjson returns events in order', () => {
 - [ ] **Step 2: Deploy.** The author sets a credit cap on the OpenRouter key, then: `npx wrangler secret put OPENROUTER_API_KEY`, `npx wrangler secret put ACCESS_TOKEN`, `npx wrangler deploy`. Enable GitHub Pages from Actions. Check: `curl` the deployed `/v1/route` with an empty message → 400; with no token → 401.
 - [ ] **Step 3: Record the replays** — `uv run python -m counsel_eval.record_demo --url $URL`. Spot-check that each saved run's disposition is plausible.
 - [ ] **Step 4: Run the eval** — `uv run counsel-eval --url $URL --systems full,floor,always,historical`, then `--cases all --repeat 10`.
-  Expected: `full` has 0 missed emergencies (exit 0); `historical` shows misses on C08, C17, C23 and C35.
+  Expected: `full` has 0 missed emergencies (exit 0); `historical` shows four missed emergencies.
 - [ ] **Step 5: If the gate fails,** stop and use superpowers:systematic-debugging. Tag each miss by stage. Any policy or prompt change bumps `policy_version` and is logged in the PR description, because changes tuned on the 50 dev cases have to be disclosed in the deck.
 - [ ] **Step 6: Backup video.** The author screen-records the demo against the live Worker (both views, three messages), then repeats one message with the network off to show replay. The file stays out of git.
 - [ ] **Step 7: Commit** — `Record demo replays and first eval report` (the report and replays only).
