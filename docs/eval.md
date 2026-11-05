@@ -104,7 +104,8 @@ More from the 2026-11-05 full-agent run, quoted from the report:
   failed sample was a Sonnet HTTP 429 (79 across a 10-case check). Alone,
   Sonnet gets all 3 slots, so it is called about twice as fast. Re-scoring
   that run with "valid answers needed" at 10 drops Human review from 96% to
-  12%.
+  12%. That is a re-score only: live routes cannot lower valid answers
+  needed below the policy's 15.
 - **Flash alone sampled well but extracted slowly.** In a 10-case check,
   17 to 20 of 20 samples came back valid, but 3 of 10 extractions timed out
   at the 20-second limit.

@@ -41,11 +41,13 @@ this order.
    English, and it is a request for care.
    - If the primary's extraction fails (an error, a timeout, or output that
      fails validation), the secondary model (Gemini 3.8 Flash) tries once.
-     The secondary is skipped when the primary's invalid output already
+     When a live route runs one model only (Sonnet only or Flash only), the
+     other model is kept as an extraction-only backup and tries instead; it
+     never samples or cross-checks. The backup is skipped when the primary's invalid output already
      marked a red flag present, since that flag sets the floor. The case
      still ends at Human review (`extraction_failed`), even when the
-     secondary succeeds. The secondary's reading is used only to set the red-
-     flag floor and send the early emergency message.
+     backup succeeds. The backup's reading is used only to set the red-flag
+     floor and send the early emergency message.
    - Red flags marked present in invalid output still count. Across both
      attempts, each flag keeps its most severe answer.
 3. **Rule floor.** Each red flag marked present sets a minimum level. The
@@ -151,7 +153,8 @@ design is in
   weights. Moving one re-scores the selected run in the Worker from its
   stored votes, using the same `decide()` function live routing uses.
 - **Model picker.** Policy default (Sonnet with Flash as a cross-check, as
-  deployed), Sonnet only, Flash only, or Sonnet + Flash.
+  deployed), Sonnet only, or Flash only. With one model there is no
+  cross-check, but the other model still backs up a failed extraction.
 - **Live routes** sent from the demo use the chosen models and settings,
   through `overrides` on `POST /v1/route`. The cost of a Human review is a
   re-score setting only: the Worker never reads it when routing, so it is
@@ -163,10 +166,16 @@ Safety rules for live overrides:
   would. The two weights that guard emergencies can only go up. When
   overrides are sent, the Worker also picks a level with the deployed policy
   and never goes below it when that level is ED now or Call 911.
+- Valid answers needed (`min_valid`) can only go up on a live route. Below
+  the deployed value the Worker answers 400 `min_valid_below_policy`; the
+  demo raises it to the policy value before sending.
+- Sonnet only and Flash only keep the other model as an extraction-only
+  backup, so a failed extraction still sets red-flag floors and sends the
+  early emergency message. The case still ends at Human review.
 - Red-flag floors, the early emergency event and the sample count cannot be
   changed from the view.
-- Re-scoring can lower the emergency weights, to show what would happen.
-  Any resulting misses are marked "What-if only".
+- Re-scoring can lower the emergency weights and valid answers needed, to
+  show what would happen. The view marks these settings "What-if only".
 
 Saved runs live in a Workers KV namespace (`EXPERIMENTS`) as stripped
 per-case records: votes, floor, reason codes and reference level. They hold

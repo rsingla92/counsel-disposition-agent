@@ -93,8 +93,7 @@ section in the reliability roadmap doc.
 - Repo is public. Never commit `docs/brief/`, `data/private/`, Counsel's
   messages, labels, or any excerpt from them.
 - Logs never contain message text or IP addresses.
-- Every `/v1/*` call except `/v1/schema` and `/v1/policy` needs the
-  `ACCESS_TOKEN` bearer token, as today.
+- Every `/v1/*` call except `/v1/schema` needs the `ACCESS_TOKEN` bearer token; `/v1/policy` needs it too (corrected 2026-11-05).
 - Every failure path still ends at Human review or higher (AGENTS.md rule 2).
 - Tests are hermetic, with the LLM mocked.
 - OpenRouter: provider pinned to `google-vertex`, no fallbacks, at most 3
