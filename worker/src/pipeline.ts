@@ -397,6 +397,20 @@ function extractionErrorLine(spec: ModelSpec, e: unknown): string {
   });
 }
 
+/**
+ * A log line for a model's failed sample calls: counts by error key only,
+ * never message or sample text.
+ */
+function sampleErrorsLine(spec: ModelSpec, set: VoteSet, n: number): string {
+  return JSON.stringify({
+    kind: 'sample_errors',
+    model: spec.model,
+    valid: set.valid,
+    n,
+    failures: set.failures,
+  });
+}
+
 /** Salvaged flags from two attempts: each flag keeps its most severe state. */
 function mergeFlags(
   a: Extraction['red_flags'] | null,
@@ -440,7 +454,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
 
   // 2. Extraction (an LlmError is the only failure extract() reports). When
-  // the primary marks no flag present, the secondary tries once.
+  // the primary's extraction fails, the secondary tries once, but only to
+  // carry red-flag floors: a failed primary extraction always ends at Human
+  // review, even if the secondary succeeds.
   let ex: Extraction | null = null;
   let salvaged: Extraction['red_flags'] | null = null;
   for (const spec of [deps.primary, deps.secondary]) {
@@ -448,9 +464,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     addSpec(run, spec);
     try {
       const got = await extract(message, spec, deps.llm, policy);
-      ex = got.extraction;
       run.raw.extraction = got.raw;
       run.extractionModel = spec;
+      ex = got.extraction;
       break;
     } catch (e) {
       try {
@@ -473,6 +489,17 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
       run.extraction = salvagedExtraction(salvaged, policy);
       setFloor(run, opts);
     }
+    return humanReview(run, 'extraction_failed');
+  }
+  if (run.extractionModel !== deps.primary) {
+    // The primary failed, so the case ends at Human review whatever the
+    // secondary read. Its flags, merged with any salvaged from the primary's
+    // output, still set the floor.
+    run.extraction = {
+      ...ex,
+      red_flags: mergeFlags(salvaged, ex.red_flags),
+    };
+    setFloor(run, opts);
     return humanReview(run, 'extraction_failed');
   }
   run.extraction = ex;
@@ -516,6 +543,14 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     deps.secondary ? draw(deps.secondary) : Promise.resolve(null),
   ]);
   if (deps.secondary) addSpec(run, deps.secondary);
+  for (const set of [primary, secondary]) {
+    if (!set || Object.keys(set.failures).length === 0) continue;
+    try {
+      deps.log(sampleErrorsLine(set.spec, set, policy.sampling.n));
+    } catch {
+      // Logging must not change the patient's outcome.
+    }
+  }
   run.raw.primary = primary.raw;
   run.raw.secondary = secondary?.raw ?? null;
   const votes = {primary: primary.votes, secondary: secondary?.votes ?? null};

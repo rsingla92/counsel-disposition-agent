@@ -52,10 +52,11 @@ only the Human review message ("if this is an emergency, call 911").
 - At most 3 calls in flight per case, down from 6.
 - Extraction gets the same rate-limit retries as sampling: 4, with backoff
   from 1 s. It used to get 1.
-- When the primary model's extraction marks no red flag present (an error, or
-  output that failed validation), the secondary model extracts instead. Red
-  flags read from invalid output still set the floor; across both attempts
-  each flag keeps its most severe state.
+- When the primary model's extraction fails (an error, or output that failed
+  validation), the secondary model extracts, but the case always ends at
+  Human review. The secondary's extraction only carries red-flag floors; red
+  flags read from invalid output still set the floor, and across both
+  attempts each flag keeps its most severe state.
 - Each failed extraction call logs the model, error code and HTTP status, so
   the next run shows whether failures are 429s or timeouts. Logs carry no
   message text.
