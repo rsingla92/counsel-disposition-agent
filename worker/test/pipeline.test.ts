@@ -7,6 +7,7 @@ import {
   traceLine,
   type EarlyEvent,
 } from '../src/pipeline';
+import {applyPolicyOverrides, selectModels} from '../src/overrides';
 import {loadPolicy} from '../src/policy';
 import {RouteResultSchema, type Sample} from '../src/schema';
 import {
@@ -622,6 +623,53 @@ describe('route: secondary model', () => {
       expect.objectContaining({routine: 0, ed_now: 0}),
     );
     expect((r.trace.raw as {secondary: string[]}).secondary).toEqual([]);
+  });
+});
+
+describe('route: overrides', () => {
+  it('gives Human review when the only model fails to extract', async () => {
+    // models "flash": Flash runs alone, so there is no fallback extraction.
+    const llm = scripted({extractError: 'provider_error'});
+    const models = selectModels('flash', PRIMARY, SECONDARY);
+    const r = await route(
+      REFILL_WITH_CHEST,
+      {...deps(llm), ...models},
+      {overrides: {models: 'flash'}},
+    );
+    expect(models.secondary).toBeNull();
+    expect(r.status).toBe('human_review');
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.disposition).toBeNull();
+    expect(llm.calls).toBe(1);
+    expect(r.trace.models).toEqual([SECONDARY]);
+    expect(r.trace.overrides).toEqual({models: 'flash'});
+  });
+
+  it('flags a 19/1 split under an overridden min_top_votes', async () => {
+    const o = {min_top_votes: 20};
+    const sampleFor = (i: number): Sample => ({
+      disposition: i === 0 ? 'within_few_days' : 'routine',
+      justification: 'Test justification.',
+      safety_net: 'Seek care sooner if it gets worse.',
+    });
+    const base = await route(M, deps(scripted({sampleFor})));
+    expect(base.human_review.reasons).not.toContain('split_vote');
+    expect(base.trace.overrides).toBeNull();
+
+    const r = await route(
+      M,
+      {
+        ...deps(scripted({sampleFor})),
+        policy: applyPolicyOverrides(policy, o),
+      },
+      {overrides: {policy: o}},
+    );
+    expect(r.votes.primary.routine).toBe(19);
+    expect(r.human_review.reasons).toContain('split_vote');
+    expect(r.human_review.flagged).toBe(true);
+    expect(r.disposition).toBe(base.disposition);
+    expect(r.trace.overrides).toEqual({policy: o});
+    expect(r.trace.policy_version).toBe(policy.policy_version);
   });
 });
 

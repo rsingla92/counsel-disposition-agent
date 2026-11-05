@@ -2,10 +2,14 @@ import {describe, expect, it} from 'vitest';
 import schemaJson from '../../schema/route-result.schema.json';
 import worker, {appFor, workerFor, type Env} from '../src/index';
 import {loadPolicy} from '../src/policy';
-import {OverrideReasonCodeSchema} from '../src/schema';
+import type {LlmClient, LlmRequest} from '../src/llm';
+import {route} from '../src/pipeline';
+import {OverrideReasonCodeSchema, type RouteResult} from '../src/schema';
 import {
   M,
+  PRIMARY,
   REFILL_WITH_CHEST,
+  SECONDARY,
   deferred,
   deps,
   scripted,
@@ -158,6 +162,174 @@ describe('POST /v1/route', () => {
     );
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({error: 'model not configured'});
+  });
+});
+
+/** Wraps an LlmClient to record each call's step and model. */
+function recording(llm: LlmClient) {
+  const calls: {step: string; model: string}[] = [];
+  const client: LlmClient = {
+    complete(req: LlmRequest) {
+      calls.push({step: req.schemaName, model: req.spec.model});
+      return llm.complete(req);
+    },
+  };
+  return {client, calls};
+}
+
+/** The result line of a /v1/route response. */
+async function resultOf(res: Response): Promise<RouteResult> {
+  const events = lines(await res.text());
+  return events[events.length - 1].result as RouteResult;
+}
+
+describe('POST /v1/route with overrides', () => {
+  const UNDER = loadPolicy().loss.boundaries.map(b => b.under);
+
+  function twoModelApp(opts: ScriptOpts = {}) {
+    const {client, calls} = recording(scripted(opts));
+    const app = appFor({...deps(client), secondary: SECONDARY});
+    return {app, calls};
+  }
+
+  it('runs Sonnet only for models sonnet', async () => {
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({message: M, overrides: {models: 'sonnet'}}),
+      ENV,
+    );
+    expect(res.status).toBe(200);
+    const result = await resultOf(res);
+    expect(calls.length).toBeGreaterThan(0);
+    expect(calls.filter(c => c.model === SECONDARY.model)).toEqual([]);
+    expect(result.trace.overrides).toEqual({models: 'sonnet'});
+    expect(result.trace.models).toEqual([PRIMARY]);
+    expect(result.votes.secondary).toBeNull();
+  });
+
+  it('sends extraction and samples to Flash only for models flash', async () => {
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({message: M, overrides: {models: 'flash'}}),
+      ENV,
+    );
+    expect(res.status).toBe(200);
+    const result = await resultOf(res);
+    expect(calls.filter(c => c.model === PRIMARY.model)).toEqual([]);
+    expect(calls.filter(c => c.step === 'extraction')).toEqual([
+      {step: 'extraction', model: SECONDARY.model},
+    ]);
+    expect(calls.filter(c => c.step !== 'extraction').length).toBe(
+      loadPolicy().sampling.n,
+    );
+    expect(result.trace.models).toEqual([SECONDARY]);
+    expect(result.trace.extraction_model).toEqual(SECONDARY);
+    expect(result.votes.secondary).toBeNull();
+  });
+
+  it('runs both families for models sonnet+flash', async () => {
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({message: M, overrides: {models: 'sonnet+flash'}}),
+      ENV,
+    );
+    const result = await resultOf(res);
+    expect(calls.some(c => c.model === SECONDARY.model)).toBe(true);
+    expect(result.trace.models).toEqual([PRIMARY, SECONDARY]);
+  });
+
+  it('answers 503 for flash with no secondary configured', async () => {
+    const llm = scripted({});
+    const res = await appFor(deps(llm)).request(
+      '/v1/route',
+      post({message: M, overrides: {models: 'flash'}}),
+      ENV,
+    );
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({error: 'model not configured'});
+    expect(llm.calls).toBe(0);
+  });
+
+  it('rejects an emergency weight below the policy without calling the LLM', async () => {
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({
+        message: M,
+        overrides: {
+          policy: {under_weights: UNDER.map((u, i) => (i === 1 ? 1 : u))},
+        },
+      }),
+      ENV,
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({error: 'emergency_weight_below_policy'});
+    expect(calls).toEqual([]);
+  });
+
+  it('rejects out-of-range and unknown overrides without calling the LLM', async () => {
+    for (const overrides of [
+      {policy: {min_valid: 30}},
+      {policy: {min_valid: 15, min_top_votes: 7}},
+      {policy: {under_weights: [1, 2, 3]}},
+      {models: 'gpt'},
+      {temperature: 0},
+      'sonnet',
+      null,
+    ]) {
+      const {app, calls} = twoModelApp();
+      const res = await app.request(
+        '/v1/route',
+        post({message: M, overrides}),
+        ENV,
+      );
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({error: 'overrides invalid'});
+      expect(calls).toEqual([]);
+    }
+  });
+
+  it('applies policy overrides to the route', async () => {
+    const res = await app({
+      sampleFor: i => ({
+        disposition: i === 0 ? 'within_few_days' : 'routine',
+        justification: 'Test justification.',
+        safety_net: 'Seek care sooner if it gets worse.',
+      }),
+    }).request(
+      '/v1/route',
+      post({message: M, overrides: {policy: {min_top_votes: 20}}}),
+      ENV,
+    );
+    const result = await resultOf(res);
+    expect(result.human_review.reasons).toContain('split_vote');
+    expect(result.trace.overrides).toEqual({policy: {min_top_votes: 20}});
+    expect(result.trace.policy_version).toBe(loadPolicy().policy_version);
+  });
+
+  it("keeps today's result with no overrides", async () => {
+    const opts: ScriptOpts = {flags: {cardiac_chest_pain: 'present'}};
+    const res = await app(opts).request(
+      '/v1/route',
+      post({message: REFILL_WITH_CHEST}),
+      ENV,
+    );
+    const result = await resultOf(res);
+    const direct = await route(REFILL_WITH_CHEST, deps(scripted(opts)));
+    expect(result.trace.overrides).toBeNull();
+    expect({
+      ...result,
+      trace: {...result.trace, latency_ms: 0},
+    }).toEqual({...direct, trace: {...direct.trace, latency_ms: 0}});
+  });
+
+  it('keeps serving the loaded policy', async () => {
+    const res = await app().request('/v1/policy', {headers: AUTH}, ENV);
+    const body = (await res.json()) as {policy_version: string};
+    expect(body.policy_version).toBe(loadPolicy().policy_version);
   });
 });
 

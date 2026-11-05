@@ -11,6 +11,7 @@ import {
 } from './levels';
 import {LlmError, type LlmClient, type ModelSpec} from './llm';
 import {traceLine} from './log';
+import type {RouteOverrides} from './overrides';
 import type {Policy} from './policy';
 import {chooseLevel, emptyVotes, reviewReasons, type Votes} from './router';
 import {drawSamples, type VoteSet} from './sample';
@@ -42,6 +43,11 @@ export type EarlyEvent = {
 export type RouteOptions = {
   mode?: 'full' | 'floor_only';
   onEarly?: (e: EarlyEvent) => void;
+  /**
+   * The request's overrides, recorded in the trace only. The caller applies
+   * them by building Deps (policy and models) before calling route().
+   */
+  overrides?: RouteOverrides;
 };
 
 /** Patient copy for Human review when no disposition is carried. */
@@ -95,6 +101,7 @@ type Run = {
   hash: Promise<string>;
   models: ModelSpec[];
   extractionModel: ModelSpec | null;
+  overrides: RouteOverrides | null;
   raw: {
     extraction: string | null;
     primary: string[];
@@ -225,6 +232,7 @@ async function assemble(run: Run, o: Outcome): Promise<RouteResult> {
       policy_version: run.deps.policy.policy_version,
       models: run.models,
       extraction_model: run.extractionModel,
+      overrides: run.overrides,
       latency_ms: Date.now() - run.start,
       raw: run.raw,
     },
@@ -587,6 +595,7 @@ export async function route(
     hash: sha256Hex(message).catch(() => ''),
     models: [],
     extractionModel: null,
+    overrides: opts.overrides ?? null,
     raw: {extraction: null, primary: [], secondary: null},
     extraction: null,
     floor: null,
@@ -644,6 +653,7 @@ function lastResort(run: Run): RouteResult {
       policy_version: run.deps.policy?.policy_version ?? '',
       models: run.models,
       extraction_model: run.extractionModel,
+      overrides: run.overrides,
       latency_ms: Date.now() - run.start,
       raw: null,
     },

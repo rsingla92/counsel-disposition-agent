@@ -385,6 +385,63 @@
             }
           ]
         },
+        "overrides": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "models": {
+                  "type": "string",
+                  "enum": [
+                    "sonnet",
+                    "flash",
+                    "sonnet+flash"
+                  ]
+                },
+                "policy": {
+                  "type": "object",
+                  "properties": {
+                    "min_valid": {
+                      "type": "integer",
+                      "minimum": 10,
+                      "maximum": 20
+                    },
+                    "min_top_votes": {
+                      "type": "integer",
+                      "minimum": 6,
+                      "maximum": 20
+                    },
+                    "max_span": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 6
+                    },
+                    "human_review_cost": {
+                      "type": "number",
+                      "minimum": 0.05,
+                      "maximum": 2
+                    },
+                    "under_weights": {
+                      "minItems": 6,
+                      "maxItems": 6,
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0.5,
+                        "maximum": 50
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "latency_ms": {
           "type": "number",
           "minimum": 0

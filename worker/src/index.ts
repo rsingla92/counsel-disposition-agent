@@ -6,6 +6,12 @@ import routeResultSchema from '../../schema/route-result.schema.json';
 import {LEVELS} from './levels';
 import {openRouterClient} from './llm';
 import {overrideLine} from './log';
+import {
+  RouteOverridesSchema,
+  applyPolicyOverrides,
+  checkLiveSafe,
+  selectModels,
+} from './overrides';
 import {route, type Deps, type EarlyEvent} from './pipeline';
 import {loadPolicy} from './policy';
 import {OverrideReasonCodeSchema} from './schema';
@@ -25,6 +31,7 @@ type App = {Bindings: Env};
 const RouteBody = z.object({
   message: z.string().refine(s => s.trim() !== ''),
   mode: z.enum(['full', 'floor_only']).optional(),
+  overrides: RouteOverridesSchema.optional(),
 });
 
 /**
@@ -112,15 +119,33 @@ export function appFor(deps: Deps): Hono<App> {
           error:
             field === 'mode'
               ? 'mode must be full or floor_only'
-              : 'message must be non-empty text',
+              : field === 'overrides'
+                ? 'overrides invalid'
+                : 'message must be non-empty text',
         },
         400,
       );
     }
-    if (!deps.primary.model || !deps.primary.provider) {
+    const {message, mode, overrides} = parsed.data;
+    const unsafe = checkLiveSafe(deps.policy, overrides?.policy);
+    if (unsafe) return c.json({error: unsafe}, 400);
+    let models: Pick<Deps, 'primary' | 'secondary'>;
+    try {
+      models = selectModels(overrides?.models, deps.primary, deps.secondary);
+    } catch {
       return c.json({error: 'model not configured'}, 503);
     }
-    const {message, mode} = parsed.data;
+    if (!models.primary.model || !models.primary.provider) {
+      return c.json({error: 'model not configured'}, 503);
+    }
+    // Without overrides the loaded Deps are used as they are.
+    const routeDeps: Deps = overrides
+      ? {
+          ...deps,
+          ...models,
+          policy: applyPolicyOverrides(deps.policy, overrides.policy),
+        }
+      : deps;
     c.header('Content-Type', 'application/x-ndjson');
     c.header('Cache-Control', 'no-store');
     return stream(c, async s => {
@@ -132,9 +157,10 @@ export function appFor(deps: Deps): Hono<App> {
           .then(() => s.write(`${JSON.stringify(event)}\n`))
           .catch(() => {});
       };
-      const result = await route(message, deps, {
+      const result = await route(message, routeDeps, {
         mode,
         onEarly: (e: EarlyEvent) => send(e),
+        overrides,
       });
       send({event: 'result', result});
       await pending;
