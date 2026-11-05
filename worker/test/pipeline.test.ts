@@ -723,7 +723,7 @@ describe('route: overrides', () => {
 });
 
 describe('route: extraction fallback', () => {
-  it('extracts with the secondary when the primary fails', async () => {
+  it('ends at Human review but carries the secondary floor when the primary fails', async () => {
     const onEarly = vi.fn();
     const llm = scripted({
       extractError: 'provider_error',
@@ -736,7 +736,9 @@ describe('route: extraction fallback', () => {
       {...deps(llm), secondary: SECONDARY},
       {onEarly},
     );
-    expect(r.human_review.reasons).not.toContain('extraction_failed');
+    expect(r.status).toBe('human_review');
+    expect(r.human_review.flagged).toBe(true);
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.floor).toBe('call_911');
     expect(r.disposition).toBe('call_911');
     expect(onEarly).toHaveBeenCalledWith(
@@ -744,6 +746,24 @@ describe('route: extraction fallback', () => {
     );
     expect(r.trace.models).toEqual([PRIMARY, SECONDARY]);
     expect(r.trace.extraction_model).toEqual(SECONDARY);
+    // Two extraction calls, no sampling.
+    expect(llm.calls).toBe(2);
+  });
+
+  it('ends at Human review when the primary times out and the secondary finds no flag', async () => {
+    // Codex's scenario: sampling would vote self_care for every sample.
+    const llm = scripted({
+      extractError: 'timeout',
+      extractErrorOn: 'primary',
+      samples: 'self_care',
+    });
+    const r = await route(M, {...deps(llm), secondary: SECONDARY});
+    expect(r.status).toBe('human_review');
+    expect(r.human_review.flagged).toBe(true);
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
+    expect(r.disposition).toBeNull();
+    expect(r.trace.extraction_model).toEqual(SECONDARY);
+    expect(llm.calls).toBe(2);
   });
 
   it('records the primary as the extraction model when it succeeds', async () => {
@@ -814,8 +834,10 @@ describe('route: extraction fallback', () => {
       ...deps(llm),
       secondary: SECONDARY,
     });
-    expect(r.human_review.reasons).not.toContain('extraction_failed');
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.floor).toBe('call_911');
+    expect(r.trace.extraction_model).toEqual(SECONDARY);
+    expect(llm.calls).toBe(2);
   });
 
   it('asks the secondary when the primary output has no flag list', async () => {
@@ -828,8 +850,10 @@ describe('route: extraction fallback', () => {
       ...deps(llm),
       secondary: SECONDARY,
     });
-    expect(r.human_review.reasons).not.toContain('extraction_failed');
+    expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.floor).toBe('call_911');
+    expect(r.trace.extraction_model).toEqual(SECONDARY);
+    expect(llm.calls).toBe(2);
   });
 
   it('floors salvaged flags from the secondary after a primary error', async () => {
