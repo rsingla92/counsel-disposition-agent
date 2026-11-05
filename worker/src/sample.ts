@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {neutralise, wrapPatientMessage} from './extract';
 import {maxLevel, type Level} from './levels';
-import type {LlmClient, ModelSpec} from './llm';
+import {LlmError, type LlmClient, type ModelSpec} from './llm';
 import type {Policy} from './policy';
 import {emptyVotes, type Votes} from './router';
 import {SampleSchema, type Extraction, type Sample} from './schema';
@@ -12,6 +12,8 @@ export type VoteSet = {
   valid: number;
   samples: Sample[];
   raw: string[];
+  /** Failed sample calls by key: '<code>:<status>', '<code>', 'unknown' or 'schema_invalid'. */
+  failures: Record<string, number>;
 };
 
 /** System prompt for one disposition sample. */
@@ -41,7 +43,7 @@ Answer only with JSON matching the supplied schema.`;
 /**
  * Draws policy.sampling.n samples from one model in parallel. Each sample's
  * disposition is clamped up to `floor`. Failed calls and schema-invalid
- * responses are dropped. Never throws.
+ * responses are dropped and counted in `failures`. Never throws.
  */
 export async function drawSamples(
   message: string,
@@ -94,14 +96,31 @@ Floor: ${floor}`;
   const votes = emptyVotes();
   const samples: Sample[] = [];
   const raw: string[] = [];
+  const failures: Record<string, number> = {};
+  const fail = (key: string) => {
+    failures[key] = (failures[key] ?? 0) + 1;
+  };
   for (const r of results) {
-    if (r.status !== 'fulfilled') continue;
+    if (r.status !== 'fulfilled') {
+      const e: unknown = r.reason;
+      fail(
+        e instanceof LlmError
+          ? e.status === undefined
+            ? e.code
+            : `${e.code}:${e.status}`
+          : 'unknown',
+      );
+      continue;
+    }
     raw.push(r.value.raw);
     const parsed = SampleSchema.safeParse(r.value.json);
-    if (!parsed.success) continue;
+    if (!parsed.success) {
+      fail('schema_invalid');
+      continue;
+    }
     const disposition = maxLevel(parsed.data.disposition, floor);
     samples.push({...parsed.data, disposition});
     votes[disposition]++;
   }
-  return {spec, votes, valid: samples.length, samples, raw};
+  return {spec, votes, valid: samples.length, samples, raw, failures};
 }
