@@ -118,7 +118,13 @@ the case is flagged `unverified_excerpt` for a physician to check.
 - Primary: `anthropic/claude-sonnet-5.5`. Secondary:
   `google/gemini-3.8-flash`.
 - Each message makes 41 model calls: 1 extraction and 20 samples from each
-  model. At most 3 are in flight at once per case.
+  model. Each model has its own queue, because Vertex rate-limits each
+  model separately: at most 2 Sonnet calls and 4 Flash calls in flight per
+  case, and never more than 6 connections in all (the Worker limit).
+- Flash is called with reasoning effort `low`. It reasons by default, which
+  roughly tripled its call time and timed out some extractions.
+- Each sample is asked to keep its justification to at most 40 words,
+  since output length sets a sample's latency. Nothing enforces the cap.
 - Only HTTP 429 (rate limited) is retried: up to 4 times, with backoff
   doubling from 1 second.
 - Time limits: 20 seconds for extraction, 15 seconds per sample.

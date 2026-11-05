@@ -4,7 +4,7 @@ import {stream} from 'hono/streaming';
 import {z} from 'zod';
 import routeResultSchema from '../../schema/route-result.schema.json';
 import {LEVELS} from './levels';
-import {openRouterClient} from './llm';
+import {openRouterClient, tuningFromEnv, type ModelTuning} from './llm';
 import {overrideLine} from './log';
 import {
   LiveRouteOverridesSchema,
@@ -34,6 +34,11 @@ export type Env = {
   PRIMARY_PROVIDER: string;
   SECONDARY_MODEL: string;
   SECONDARY_PROVIDER: string;
+  /** Per-model queue sizes (1-6) and reasoning efforts; unset is the default. */
+  PRIMARY_MAX_IN_FLIGHT?: string;
+  PRIMARY_REASONING_EFFORT?: string;
+  SECONDARY_MAX_IN_FLIGHT?: string;
+  SECONDARY_REASONING_EFFORT?: string;
   ALLOWED_ORIGIN: string;
   /** Saved eval runs for the Operations view; absent reads as empty. */
   EXPERIMENTS?: ExperimentStore;
@@ -287,6 +292,26 @@ export function appFor(deps: Deps): Hono<App> {
   return app;
 }
 
+/**
+ * Per-model client tuning from the env, keyed by model id. A model follows
+ * its tuning into any role, so Flash keeps its settings in Flash-only mode.
+ */
+export function clientTuning(env: Env): Record<string, ModelTuning> {
+  const tuning: Record<string, ModelTuning> = {};
+  const add = (model: string | undefined, t: ModelTuning) => {
+    if (model && Object.keys(t).length > 0) tuning[model] = t;
+  };
+  add(
+    env.PRIMARY_MODEL,
+    tuningFromEnv(env.PRIMARY_MAX_IN_FLIGHT, env.PRIMARY_REASONING_EFFORT),
+  );
+  add(
+    env.SECONDARY_MODEL,
+    tuningFromEnv(env.SECONDARY_MAX_IN_FLIGHT, env.SECONDARY_REASONING_EFFORT),
+  );
+  return tuning;
+}
+
 /** Builds Deps from the Worker environment, once per request. */
 export function depsFromEnv(env: Env): Deps {
   const secondary =
@@ -294,7 +319,13 @@ export function depsFromEnv(env: Env): Deps {
       ? {model: env.SECONDARY_MODEL, provider: env.SECONDARY_PROVIDER}
       : null;
   return {
-    llm: openRouterClient(env.OPENROUTER_API_KEY),
+    llm: openRouterClient(
+      env.OPENROUTER_API_KEY,
+      undefined,
+      undefined,
+      undefined,
+      clientTuning(env),
+    ),
     policy: loadPolicy(),
     primary: {
       model: env.PRIMARY_MODEL ?? '',
