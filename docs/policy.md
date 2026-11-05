@@ -64,9 +64,9 @@ flags.
 ## Risk factors (modifiers)
 
 12 risk factors, such as age 65 or older, diabetes, a blood thinner, a weak
-immune system (adults and children), a baby under 3 months, and pregnancy. If any is present, the
-floor rises by one level in total, not one per factor, and never above In
-person today. A flag that already names the risk factor (for example a head
+immune system (adults and children), a baby under 3 months, and pregnancy.
+If any is present, the floor rises by one level in total, not one per
+factor, and never above In person today. A flag that already names the risk factor (for example a head
 injury on a blood thinner) does not get an extra level for that factor.
 
 ## Cost weights

@@ -399,7 +399,7 @@ red_flags:
 modifiers:
   - {id: age_65_plus, groups: [adult], description: "Age 65 or older"}
   - {id: diabetes, groups: [adult], description: "Diabetes"}
-  - {id: immunosuppression, groups: [adult, pediatric], description: "Weakened immune system"}
+  - {id: immunosuppression, groups: [adult, pediatric], description: "Weakened immune system, in an adult or a child"}
   - {id: anticoagulation, groups: [adult], description: "Taking a blood thinner"}
   - {id: under_3_months, groups: [pediatric], description: "Baby younger than 3 months"}
   - {id: born_premature, groups: [pediatric], description: "Born premature, within the first year of life"}
