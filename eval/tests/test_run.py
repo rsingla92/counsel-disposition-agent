@@ -21,6 +21,7 @@ ROOT = pathlib.Path(__file__).parents[2]
 POLICY_PATH = ROOT / "policy" / "policy.yaml"
 POLICY = load_policy(POLICY_PATH)
 KEY_URL = "https://openrouter.ai/api/v1/key"
+CREDITS_URL = "https://openrouter.ai/api/v1/credits"
 
 
 def _report(runs, tmp_path, **kwargs):
@@ -143,14 +144,25 @@ def test_estimate_live_calls():
   assert est == pytest.approx((41 + 1) * 10 * 2 * 0.01)
 
 
+def _balances(respx_mock, limit, total=10_000.0, usage=0.0):
+  """Mocks the key's spend limit and the account's credit balance."""
+  key = respx_mock.get(KEY_URL).respond(
+      200, json={"data": {"limit_remaining": limit}}
+  )
+  credits = respx_mock.get(CREDITS_URL).respond(
+      200, json={"data": {"total_credits": total, "total_usage": usage}}
+  )
+  return key, credits
+
+
 def test_credit_check_passes(respx_mock, tmp_path):
-  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": 100}})
+  _balances(respx_mock, 100)
   ok, message = run.credit_check(1.0, _env_file(tmp_path))
   assert ok, message
 
 
 def test_credit_check_refuses_and_names_both_numbers(respx_mock, tmp_path):
-  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": 1.0}})
+  _balances(respx_mock, 1.0)
   ok, message = run.credit_check(1.0, _env_file(tmp_path))
   assert not ok
   assert "1.00" in message and "1.20" in message
@@ -158,17 +170,63 @@ def test_credit_check_refuses_and_names_both_numbers(respx_mock, tmp_path):
 
 
 def test_credit_check_null_limit_passes(respx_mock, tmp_path):
-  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": None}})
+  _balances(respx_mock, None)
   ok, _ = run.credit_check(1000.0, _env_file(tmp_path))
   assert ok
 
 
+def test_credit_check_refuses_on_empty_account_with_no_key_limit(
+    respx_mock, tmp_path
+):
+  # The 2026-11-04 run: the key had no limit but the account was spent, so
+  # every call returned 402.
+  _balances(respx_mock, None, total=50.0, usage=49.5)
+  ok, message = run.credit_check(1.0, _env_file(tmp_path))
+  assert not ok
+  assert "0.50" in message and "1.20" in message
+
+
+def test_credit_check_uses_the_smaller_of_key_and_account(
+    respx_mock, tmp_path
+):
+  _balances(respx_mock, 100.0, total=50.0, usage=45.0)
+  ok, message = run.credit_check(10.0, _env_file(tmp_path))
+  assert not ok
+  assert "5.00" in message
+
+
+def test_credit_check_refuses_when_account_unreadable(respx_mock, tmp_path):
+  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": None}})
+  respx_mock.get(CREDITS_URL).respond(500)
+  ok, message = run.credit_check(1.0, _env_file(tmp_path))
+  assert not ok
+  assert "could not read" in message
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"data": {"total_credits": "50", "total_usage": 1.0}},
+        {"data": {"total_credits": 50.0}},
+        {"data": {"total_credits": 50.0, "total_usage": True}},
+        {"data": None},
+    ],
+)
+def test_credit_check_fails_closed_on_malformed_account(
+    respx_mock, tmp_path, body
+):
+  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": None}})
+  respx_mock.get(CREDITS_URL).respond(200, json=body)
+  ok, message = run.credit_check(1.0, _env_file(tmp_path))
+  assert not ok
+  assert "could not read credit balance" in message
+
+
 def test_credit_check_sends_bearer(respx_mock, tmp_path):
-  route = respx_mock.get(KEY_URL).respond(
-      200, json={"data": {"limit_remaining": None}}
-  )
+  key, credits = _balances(respx_mock, None)
   run.credit_check(1.0, _env_file(tmp_path, "sk-abc"))
-  assert route.calls.last.request.headers["authorization"] == "Bearer sk-abc"
+  assert key.calls.last.request.headers["authorization"] == "Bearer sk-abc"
+  assert credits.calls.last.request.headers["authorization"] == "Bearer sk-abc"
 
 
 # --- CLI --------------------------------------------------------------------
@@ -313,7 +371,7 @@ def test_cli_repeat_runs_each_case_n_times(tmp_path):
 
 
 def test_cli_refuses_on_insufficient_credit(respx_mock, tmp_path):
-  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": 1.0}})
+  _balances(respx_mock, 1.0)
   env_file = _env_file(tmp_path)
   client = FakeClient()
   code = run.main(
@@ -326,7 +384,7 @@ def test_cli_refuses_on_insufficient_credit(respx_mock, tmp_path):
 
 
 def test_cli_credit_ok_proceeds(respx_mock, tmp_path):
-  respx_mock.get(KEY_URL).respond(200, json={"data": {"limit_remaining": 500}})
+  _balances(respx_mock, 500)
   env_file = _env_file(tmp_path)
   client = FakeClient()
   code = run.main(

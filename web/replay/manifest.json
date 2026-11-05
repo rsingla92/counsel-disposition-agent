@@ -1,7 +1,42 @@
 [
   {
+    "id": "chest-pressure",
+    "label": "Chest pressure spreading to the jaw",
+    "file": "chest-pressure.json"
+  },
+  {
+    "id": "walt-warfarin-head",
+    "label": "Walt, 70, on warfarin, hit his head",
+    "file": "walt-warfarin-head.json"
+  },
+  {
+    "id": "priya-infant-fever",
+    "label": "Priya's 6-month-old with fever",
+    "file": "priya-infant-fever.json"
+  },
+  {
+    "id": "uti-symptoms",
+    "label": "Burning when passing urine",
+    "file": "uti-symptoms.json"
+  },
+  {
     "id": "refill-buried-flag",
     "label": "Metformin refill with a buried red flag",
     "file": "refill-buried-flag.json"
+  },
+  {
+    "id": "annual-checkup",
+    "label": "Booking a routine check-up",
+    "file": "annual-checkup.json"
+  },
+  {
+    "id": "common-cold",
+    "label": "Mild cold for two days",
+    "file": "common-cold.json"
+  },
+  {
+    "id": "spanish-sore-throat",
+    "label": "Sore throat, written in Spanish",
+    "file": "spanish-sore-throat.json"
   }
 ]

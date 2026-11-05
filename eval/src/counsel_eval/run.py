@@ -52,6 +52,7 @@ exit codes:
 """
 
 _OPENROUTER_KEY_URL = "https://openrouter.ai/api/v1/key"
+_OPENROUTER_CREDITS_URL = "https://openrouter.ai/api/v1/credits"
 _DEFAULT_ENV_FILE = "~/.config/counsel-disposition-agent/openrouter.env"
 _CREDIT_MARGIN = 1.2
 _STAGES = (
@@ -115,40 +116,50 @@ def estimate_usd(
   return calls * n_cases * repeats * per_call_usd
 
 
+def _is_number(x: object) -> bool:
+  return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+
 def credit_check(
     estimate: float, env_file: str | os.PathLike[str]
 ) -> tuple[bool, str]:
-  """Checks the OpenRouter key has at least 1.2 x the estimate left.
+  """Checks OpenRouter has at least 1.2 x the estimate left to spend.
 
-  The key is read from `env_file` and never printed or returned.
+  What is left is the smaller of the key's spend limit and the account's
+  credit balance: a key with no limit still fails with 402 once the account
+  is spent. The key is read from `env_file` and never printed or returned.
 
   Args:
     estimate: Estimated spend in USD.
     env_file: KEY=VALUE file holding OPENROUTER_API_KEY.
 
   Returns:
-    (ok, message). A null limit means no limit and passes.
+    (ok, message). A null key limit means the account balance alone counts.
   """
   try:
     key = read_env_file(env_file)["OPENROUTER_API_KEY"]
   except (OSError, KeyError):
     return False, "OPENROUTER_API_KEY not found in the env file"
+  headers = {"Authorization": f"Bearer {key}"}
   try:
+    response = httpx.get(_OPENROUTER_KEY_URL, headers=headers, timeout=15.0)
+    response.raise_for_status()
+    limit = response.json()["data"]["limit_remaining"]
+    if limit is not None and not _is_number(limit):
+      return False, "could not read credit balance (non-numeric limit)"
     response = httpx.get(
-        _OPENROUTER_KEY_URL,
-        headers={"Authorization": f"Bearer {key}"},
-        timeout=15.0,
+        _OPENROUTER_CREDITS_URL, headers=headers, timeout=15.0
     )
     response.raise_for_status()
-    remaining = response.json()["data"]["limit_remaining"]
+    credits = response.json()["data"]
+    total, usage = credits["total_credits"], credits["total_usage"]
   except (httpx.HTTPError, KeyError, TypeError, ValueError) as e:
     return False, f"could not read credit balance ({type(e).__name__})"
-  if remaining is not None and (
-      isinstance(remaining, bool) or not isinstance(remaining, (int, float))
-  ):
-    return False, "could not read credit balance (non-numeric limit)"
-  if remaining is None:
-    return True, "OpenRouter key has no spend limit"
+  if not (_is_number(total) and _is_number(usage)):
+    return False, "could not read credit balance (non-numeric balance)"
+  remaining = total - usage
+  if limit is not None:
+    remaining = min(remaining, limit)
   required = _CREDIT_MARGIN * estimate
   if remaining < required:
     return False, (

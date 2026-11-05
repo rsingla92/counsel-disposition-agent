@@ -225,6 +225,12 @@ export const RouteResultSchema = z
       models: z.array(
         z.strictObject({model: z.string(), provider: z.string()}),
       ),
+      // The model whose output is in raw.extraction; null when none came
+      // back. Optional so results saved before it existed still parse.
+      extraction_model: z
+        .strictObject({model: z.string(), provider: z.string()})
+        .nullable()
+        .optional(),
       latency_ms: z.number().nonnegative(),
       raw: z.unknown(),
     }),

@@ -106,9 +106,6 @@ export async function extract(
     jsonSchema: extractionJsonSchema(policy),
     temperature: 0,
     timeoutMs: policy.extraction.timeout_ms,
-    // Extraction gates the early emergency event, so it waits out one rate
-    // limit at most.
-    maxRetries: 1,
   });
   const parsed = schema.safeParse(res.json);
   if (!parsed.success) {

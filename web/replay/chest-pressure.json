@@ -1,0 +1,422 @@
+{
+  "id": "chest-pressure",
+  "label": "Chest pressure spreading to the jaw",
+  "message": "Hi, I'm 58. For the last 30 minutes I've had a heavy pressure in the middle of my chest that's spreading into my jaw and left arm. I'm sweating a lot and feel a bit sick. I took an antacid and it hasn't helped. Should I just wait for my appointment on Friday?",
+  "recorded_at": "2026-11-04T15:46:23+00:00",
+  "early": {
+    "event": "early",
+    "floor": "call_911",
+    "patient_message": "Call 911 now. Do not drive yourself. A Counsel physician has been notified."
+  },
+  "result": {
+    "status": "routed",
+    "disposition": "call_911",
+    "tier": "emergency",
+    "brief_label": "URGENT_ESCALATION",
+    "floor": "call_911",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "present",
+        "excerpt": "heavy pressure in the middle of my chest that's spreading into my jaw and left arm. I'm sweating a lot",
+        "excerpt_verified": true
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [],
+    "votes": {
+      "primary": {
+        "call_911": 20,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      },
+      "secondary": {
+        "call_911": 20,
+        "ed_now": 0,
+        "in_person_today": 0,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      }
+    },
+    "confidence": 1,
+    "human_review": {
+      "flagged": false,
+      "reasons": []
+    },
+    "info_requests": {
+      "questions": [],
+      "photo": false
+    },
+    "time_sensitive": true,
+    "justification": "Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now) because driving or being driven risks delay and deterioration, such as cardiac arrest, and EMS can start treatment and monitoring immediately. There is no higher level to choose. Waiting for the Friday appointment is not safe.",
+    "safety_net": "Call 911 now. Do not drive yourself and do not wait for Friday. Stop all activity and sit or lie down in a comfortable position. Unlock the door and keep your phone with you. If you are not allergic to aspirin and have no bleeding problems, and the 911 dispatcher agrees, chew one regular 325 mg aspirin (or four 81 mg low-dose tablets). If you faint, become short of breath, or the pain gets worse, tell the dispatcher right away. If someone is with you and you become unresponsive and stop breathing normally, they should start CPR and use an AED if one is available.",
+    "patient_message": "Call 911 now. Do not drive yourself. A Counsel physician has been notified. Call 911 now. Do not drive yourself and do not wait for Friday. Stop all activity and sit or lie down in a comfortable position. Unlock the door and keep your phone with you. If you are not allergic to aspirin and have no bleeding problems, and the 911 dispatcher agrees, chew one regular 325 mg aspirin (or four 81 mg low-dose tablets). If you faint, become short of breath, or the pain gets worse, tell the dispatcher right away. If someone is with you and you become unresponsive and stop breathing normally, they should start CPR and use an AED if one is available.",
+    "trace": {
+      "input_sha256": "c0da31aca38454f6ab47326436a4a1df13815e49365cf18228434228b7ad2ed9",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        },
+        {
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 64012,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"present\",\"excerpt\":\"heavy pressure in the middle of my chest that's spreading into my jaw and left arm. I'm sweating a lot\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[],\"photo_needed\":false,\"time_sensitive\":true}",
+        "primary": [
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now) because driving or being driven risks delay and deterioration, such as cardiac arrest, and EMS can start treatment and monitoring immediately. There is no higher level to choose. Waiting for the Friday appointment is not safe.\",\"safety_net\":\"Call 911 now. Do not drive yourself and do not wait for Friday. Stop all activity and sit or lie down in a comfortable position. Unlock the door and keep your phone with you. If you are not allergic to aspirin and have no bleeding problems, and the 911 dispatcher agrees, chew one regular 325 mg aspirin (or four 81 mg low-dose tablets). If you faint, become short of breath, or the pain gets worse, tell the dispatcher right away. If someone is with you and you become unresponsive and stop breathing normally, they should start CPR and use an AED if one is available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now), because driving to the ED risks collapse or arrhythmia without EMS care, and ambulance crews can start treatment and ECG immediately. There is no higher level available. Waiting until Friday is not safe.\",\"safety_net\":\"Call 911 now. Do not wait for Friday's appointment and do not drive yourself. Unlock the front door and sit or lie down while you wait. If you have no aspirin allergy and no medical reason to avoid it, and the 911 dispatcher agrees, chew one adult 325 mg aspirin. If you lose consciousness, stop breathing normally, or the pain worsens, tell the dispatcher right away; if someone is with you and you are unresponsive, they should start CPR and use an AED if available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, no relief from antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/MI. The floor is call_911. Not lower (ED by self-transport, in-person today, or waiting until Friday) because he risks sudden cardiac arrest and needs EMS monitoring, defibrillation capability and early treatment. It cannot go higher because call_911 is the highest level.\",\"safety_net\":\"Do not wait for Friday and do not drive yourself. Call 911 now. Unlock the door and sit or rest while waiting for the ambulance. If you have no aspirin allergy and no been told to avoid it, the dispatcher may advise chewing one regular 325 mg aspirin. If you become faint, short of breath, collapse, or lose consciousness, tell the 911 dispatcher immediately; someone nearby should start CPR if you stop breathing or have no pulse.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, no relief from antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/MI. The floor is call_911. Not one level lower (ed_now) because a possible heart attack can cause cardiac arrest, and the patient should not drive; EMS can start treatment and defibrillate if needed. No higher level exists. Waiting until Friday is unsafe.\",\"safety_net\":\"Call 911 now; do not drive yourself and do not wait for Friday's appointment. Unlock the door and sit or rest while waiting for the ambulance. If you are not allergic to aspirin and have no instructions against it, and the 911 dispatcher advises it, chew one regular 325 mg aspirin. If you become faint, short of breath, or collapse, or the pain worsens, tell the dispatcher immediately and have someone nearby ready to start CPR.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm, with profuse sweating and nausea, unrelieved by antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/possible MI. The floor is call_911. Not lower: waiting until Friday or driving self to the ED risks delay and arrest without monitoring or defibrillation. Not higher: call_911 is the highest level.\",\"safety_net\":\"Do not wait for your Friday appointment and do not drive yourself. Call 911 now. Unlock your door and stay seated or resting while you wait. If you are not allergic to aspirin and have no bleeding problems, the dispatcher may advise you to chew one regular 325 mg aspirin. If you faint, become very short of breath, or the pain worsens, tell the dispatcher right away. If you collapse and are unresponsive, someone nearby should start CPR and use an AED if available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with profuse sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic acute coronary syndrome presentation, and the floor is call_911. Not one level lower (ed_now) because the patient should not delay or drive themselves, since cardiac arrest can occur at any time and EMS can start treatment and defibrillate. There is no higher level available. Waiting for the Friday appointment is not appropriate.\",\"safety_net\":\"Call 911 now. Do not drive yourself. Unlock the door and sit or lie down in a comfortable position. If you are not allergic to aspirin and have no bleeding problem, and the dispatcher agrees, chew one regular 325 mg aspirin (or four 81 mg low-dose tablets). If you become unresponsive, stop breathing normally, or the pain worsens, tell the dispatcher immediately so they can guide CPR and get a defibrillator.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, not relieved by antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now) because the patient should not travel on their own, since arrest can happen at any time and EMS can begin treatment and monitoring immediately. There is no higher level. Waiting until Friday is not safe.\",\"safety_net\":\"Call 911 now, do not wait for Friday's appointment and do not drive yourself. Unlock the door and sit or rest while you wait for the ambulance. If you are not allergic to aspirin and have no bleeding problems, and the 911 dispatcher agrees, chew one regular 325 mg aspirin. If you lose consciousness, stop breathing normally, or the pain worsens, tell the dispatcher right away. If someone is with you and you collapse, they should start CPR and use an AED if available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with profuse sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome and the floor is call_911. Not one level lower (ed_now) because driving or being driven risks delay in treatment and cardiac arrest without paramedic care and defibrillator access. Nothing higher exists. Waiting for the Friday appointment is unsafe.\",\"safety_net\":\"Call 911 now. Do not wait for Friday and do not drive yourself. Unlock the door and sit or rest while you wait for the ambulance. If you are not allergic to aspirin and have no bleeding problem, the dispatcher may advise chewing one regular 325 mg aspirin. If you lose consciousness, become very short of breath, or the pain worsens, tell the dispatcher immediately.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with profuse sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/possible heart attack. The floor is call_911. Not one level lower (ed_now) because the patient should not drive or travel on their own with ongoing symptoms that could lead to cardiac arrest, and EMS can start treatment and monitoring immediately. There is no higher level available. Waiting for the Friday appointment is not safe.\",\"safety_net\":\"Call 911 now and do not wait for Friday's appointment. Do not drive yourself. Unlock the front door and sit or rest while you wait for the ambulance. If you are not allergic to aspirin and have no instruction against it, the 911 dispatcher may advise you to chew one adult aspirin (325 mg). If you lose consciousness or stop breathing, someone nearby should start CPR and use an AED if one is available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm with heavy sweating and nausea, unrelieved by antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/MI. The floor is call_911. Not one level lower (ed_now) because the patient should not drive and needs EMS for immediate monitoring, aspirin guidance and defibrillation capability in case of cardiac arrest. There is no higher level available. Waiting for the Friday appointment is unsafe.\",\"safety_net\":\"Call 911 right now; do not wait for Friday and do not drive yourself. Unlock your front door and sit or rest while waiting for the ambulance. If you are not allergic to aspirin and have no bleeding problems, the 911 dispatcher may advise you to chew one regular 325 mg aspirin. If you faint, have trouble breathing, or the pain worsens, tell the dispatcher immediately. Someone should stay with you until help arrives.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now), because the patient should not travel on their own: cardiac arrest can happen suddenly, and EMS can begin monitoring, give aspirin if appropriate, and defibrillate if needed. Nothing higher exists. Waiting for the Friday appointment is unsafe.\",\"safety_net\":\"Call 911 now. Do not drive yourself. Stop all activity and sit or rest while waiting for the ambulance. Unlock the door and keep your phone nearby. If you are not allergic to aspirin and have no bleeding problems, emergency dispatch may advise chewing one regular 325 mg aspirin, so follow their instructions. If you become faint, short of breath, or lose consciousness, tell the dispatcher immediately, and have someone nearby start CPR if you stop breathing or have no pulse.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm with heavy sweating and nausea, unrelieved by antacid, in a 58-year-old, is a classic presentation of acute coronary syndrome/possible heart attack. The floor is call_911. Not one level lower (ed_now) because driving oneself risks collapse or arrhythmia while en route, and EMS can begin ECG, aspirin and defibrillation if needed. There is no higher level available. Waiting until Friday is not safe.\",\"safety_net\":\"Call 911 now. Do not drive yourself and do not wait for your appointment. Stop all activity and sit or lie down. Unlock your front door and keep your phone nearby. If emergency dispatch advises it and you have no aspirin allergy or bleeding problem, chew one regular 325 mg aspirin. If you pass out, have trouble breathing, or the pain worsens, tell the dispatcher immediately. If someone is with you and you collapse and are unresponsive and not breathing normally, they should start CPR and use an AED if available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm with heavy sweating and nausea, unrelieved by antacid, in a 58-year-old, is a classic presentation of acute coronary syndrome/MI. The floor is call_911. Not one level lower (ed_now) because self-transport risks delay in treatment and sudden cardiac arrest en route, and EMS can begin ECG and treatment immediately. There is no higher level available. Waiting until Friday is unsafe.\",\"safety_net\":\"Call 911 now. Do not drive yourself and do not wait for your Friday appointment. Unlock the door and sit or lie down while you wait. If you are not allergic to aspirin and have no bleeding problem, the dispatcher may advise chewing one regular 325 mg aspirin. If you lose consciousness, stop breathing, or the pain worsens, tell the dispatcher immediately so they can guide CPR and send help.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm with diaphoresis and nausea in a 58-year-old, unrelieved by antacid, is a classic presentation of acute coronary syndrome/MI. The floor is call_911. Not lower (ED by self-transport, in-person or waiting until Friday) because he could arrest en route and EMS can start monitoring, aspirin and defibrillation if needed. Not higher because call_911 is the highest level.\",\"safety_net\":\"Call 911 now; do not wait for Friday's appointment and do not drive yourself. Unlock the door and sit or rest while waiting for the ambulance. If you are not allergic to aspirin and have no bleeding problems, the dispatcher may advise chewing one regular 325 mg aspirin. If you lose consciousness or become very short of breath, have someone start CPR and use an AED if one is available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm with heavy sweating and nausea, unrelieved by antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911, so nothing lower is allowed. Not one level lower (ed_now) because driving oneself risks collapse or arrest en route and EMS can start treatment and defibrillate. There is no higher level. Waiting for the Friday appointment is not safe.\",\"safety_net\":\"Call 911 now. Do not drive yourself and do not wait for Friday. Unlock your front door and sit or lie down while waiting for the ambulance. If you are not allergic to aspirin and have no bleeding problem, the dispatcher may advise chewing one regular 325 mg aspirin. If you lose consciousness, have trouble breathing, or the pain worsens, tell the dispatcher right away. Someone nearby should start CPR if you collapse and stop breathing normally.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to jaw and left arm with heavy sweating and nausea, unrelieved by antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911 and this is the highest level, so there is no higher option. Not lower because the patient should not drive or wait for Friday; this needs an ambulance with EMS monitoring and defibrillation capability now.\",\"safety_net\":\"Call 911 now and do not wait for Friday's appointment. Do not drive yourself. Unlock the door and sit or rest while waiting for the ambulance. If you are not allergic to aspirin and have no bleeding problems, the dispatcher may advise chewing one regular 325 mg aspirin. If you collapse, become unresponsive, or have trouble breathing, tell the dispatcher immediately so they can guide you through emergency steps.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with profuse sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now) because driving or being driven risks delay in treatment and deterioration, such as cardiac arrest, without EMS monitoring and defibrillation. There is no higher level available. Waiting for the Friday appointment is not safe.\",\"safety_net\":\"Call 911 now. Do not drive yourself. Stop all activity and sit or rest while waiting. If you are not allergic to aspirin and have no bleeding problem, and the dispatcher advises it, chew one regular 325 mg aspirin. Unlock your door and have someone stay with you if possible. If you lose consciousness or stop breathing, someone should start CPR and use an AED if one is available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not one level lower (ed_now) because the patient should not drive or wait, as arrhythmia or cardiac arrest can occur and EMS can start treatment and monitoring immediately. There is no higher level available. Waiting until Friday is not appropriate.\",\"safety_net\":\"Call 911 now. Do not drive yourself and do not wait for your Friday appointment. Unlock the door and sit or rest while waiting for the ambulance. If you have been told to take aspirin and are not allergic, the 911 dispatcher can advise on chewing one. If you pass out, stop responding, or stop breathing normally, someone nearby should start CPR and use an AED if available.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with profuse sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/MI. The floor is call_911. Not one level lower (ed_now), because the patient should not travel on their own, as they risk arrest en route and EMS can start treatment and defibrillate immediately. Nothing higher exists. Waiting until Friday is not safe.\",\"safety_net\":\"Call 911 now. Do not drive yourself. Unlock the door and sit or rest while you wait for the ambulance. If you are not allergic to aspirin and have no bleeding problem, and the 911 dispatcher agrees, chew one adult 325 mg aspirin. If you lose consciousness, become short of breath, or the pain worsens, tell the dispatcher right away. Someone nearby should be ready to start CPR if you collapse.\"}",
+          "{\"disposition\":\"call_911\",\"justification\":\"Flag cardiac_chest_pain: 30 minutes of heavy central chest pressure radiating to the jaw and left arm, with heavy sweating and nausea, and no relief from an antacid, in a 58-year-old. This is a classic presentation of acute coronary syndrome/heart attack. The floor is call_911. Not lower (ED by self-transport, same-day visit, or waiting until Friday) because the patient could collapse or go into cardiac arrest on the way, and EMS can start treatment and monitoring immediately. Not higher because call_911 is the highest level.\",\"safety_net\":\"Do not wait for Friday and do not drive yourself. Call 911 now. Unlock the door and sit or lie down while you wait for the ambulance. Unless you are allergic or have been told not to take aspirin, the dispatcher may advise chewing one regular 325 mg aspirin. If you pass out, stop breathing normally, or the pain gets worse, tell the 911 dispatcher right away; anyone with you should start CPR if you are unresponsive.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Identified cardiac_chest_pain presenting with classic acute coronary syndrome symptoms (radiating heavy chest pressure, diaphoresis, nausea). This is the highest disposition level, and it cannot be lowered below call_911 due to imminent risk of life-threatening myocardial infarction.\",\n  \"safety_net\": \"Call 911 immediately. Do not drive yourself to the hospital. Rest while waiting for the ambulance, unlock your front door, and chew an adult aspirin (325 mg) if readily available and you have no allergy or contraindications.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports acute chest pressure radiating to the jaw and arm with associated diaphoresis, fulfilling cardiac_chest_pain indicative of potential acute coronary syndrome. call_911 is the highest emergency level; a lower level is unsafe and prohibited by the floor due to the immediate risk of life-threatening cardiac compromise.\",\n  \"safety_net\": \"Call 911 immediately for emergency medical evaluation and do not attempt to drive yourself to the hospital. If available and not contraindicated, follow emergency dispatcher instructions regarding taking aspirin while waiting for paramedics.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports classic symptoms of an acute coronary syndrome, meeting the cardiac_chest_pain red flag. call_911 is the highest possible disposition. A lower disposition such as ed_now is unsafe because emergency medical services are needed immediately for monitoring, stabilization, and rapid transport.\",\n  \"safety_net\": \"Call 911 immediately. Do not drive yourself to the hospital. While waiting for emergency personnel, sit or lie down, unlock the front door, and if you are not allergic to aspirin and have no contraindications, chew an adult aspirin (325 mg) or four baby aspirins (81 mg each).\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Relying on cardiac_chest_pain; the patient presents with classic symptoms of an acute myocardial infarction (substernal pressure radiating to the jaw and left arm, accompanied by diaphoresis and nausea). This is the highest disposition level available. It cannot be lowered to ed_now because ongoing acute ischemic chest pain requires immediate paramedic dispatch for continuous monitoring, pre-hospital stabilization, and safe transport.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself to the hospital. While waiting for emergency personnel, sit or lie down, unlock your front door if possible, and chew an adult aspirin (325 mg) if you are not allergic and have no history of severe bleeding. If your symptoms worsen, become unresponsive, or you have severe difficulty breathing, have someone notify the 911 operator right away.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Based on cardiac_chest_pain with radiation to the jaw and arm accompanied by diaphoresis and nausea, this presentation is concerning for acute coronary syndrome. Cannot be higher as call_911 is the maximum disposition level. Cannot be lower (ed_now) because active unstable ischemic symptoms carry high risk of sudden decompensation or arrest, requiring immediate paramedic evaluation and transport rather than private transport.\",\n  \"safety_net\": \"Call 911 immediately. If accessible and you have no allergies or contraindications, chew an adult aspirin (325 mg) or four low-dose aspirins (81 mg each) while waiting for the ambulance. Sit or lie down and do not attempt to drive yourself.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports acute, classic signs of myocardial infarction/acute coronary syndrome (cardiac_chest_pain: heavy substernal chest pressure radiating to the jaw and left arm, accompanied by diaphoresis and nausea). Call 911 is the highest possible disposition level. A lower level such as ed_now is unsafe because emergency medical services are needed for immediate stabilization, monitoring, and rapid transit.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself. Unlock your door, sit or lie down comfortably, and if you are not allergic and have no contraindications, chew an adult aspirin (325 mg) or 4 baby aspirins while waiting for emergency personnel.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Based on the red flag cardiac_chest_pain (acute onset heavy chest pressure radiating to the jaw and arm accompanied by diaphoresis and nausea), these symptoms strongly suggest acute coronary syndrome. Cannot go higher as call_911 is the highest triage level. Cannot go lower to ed_now because emergency medical transport is essential for immediate monitoring, treatment, and rapid transfer without the risk of unmonitored transit.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself to the hospital. If you have someone with you, inform them immediately. If not contraindicated or allergic, ask the 911 dispatcher if you should chew an adult aspirin while waiting for EMS.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Patient reports classic symptoms of acute coronary syndrome including substernal chest pressure radiating to the left arm and jaw, accompanied by diaphoresis and nausea (cardiac_chest_pain). This is the highest level of triage. A lower disposition like ed_now is unsafe because emergency medical services are required immediately for pre-hospital monitoring, treatment, and rapid transport.\",\n  \"safety_net\": \"Call 911 immediately. Do not attempt to drive yourself to the hospital. Sit down, try to stay calm, and if you are not allergic and have it available, chew an adult aspirin (325 mg) or two low-dose aspirins while waiting for the ambulance.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient is reporting classic symptoms of acute coronary syndrome (cardiac_chest_pain) including retrosternal heavy chest pressure radiating to the jaw and left arm, accompanied by diaphoresis and nausea. This is the highest disposition level available. A lower disposition like ED now is unsafe because active myocardial ischemia requires immediate emergency medical services (EMS) for stabilization, monitoring, and prompt transport.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself to the hospital. Rest while waiting for the ambulance. If you have aspirin and no allergies or contraindications, chew one adult dose (325 mg) or 2-4 low-dose tablets as directed by emergency dispatchers. If you feel faint or lose consciousness, someone nearby should call 911 and begin CPR if needed.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Patient presents with acute, classic symptoms of myocardial infarction/acute coronary syndrome (chest pressure radiating to jaw and left arm, diaphoresis, nausea), triggering the cardiac_chest_pain flag. Call_911 is the highest triage level available. A lower disposition like ed_now is unsafe because emergency medical services are required immediately for cardiac monitoring and potential intervention; the patient should not drive or be driven privately.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself to the hospital. While waiting for paramedics, sit or lie down, unlock your front door if you can do so safely, and notify someone nearby if possible. If you have aspirin and no allergies or contraindications, chew one adult aspirin (325 mg) or 2-4 low-dose aspirins.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports acute, substernal heavy chest pressure radiating to the jaw and left arm with diaphoresis and nausea, consistent with acute coronary syndrome (cardiac_chest_pain). Call_911 is the highest disposition available. A lower disposition such as ED now is inappropriate because emergency medical services are urgently needed for prehospital evaluation, monitoring, and treatment given the high risk of life-threatening arrhythmias or decompensation.\",\n  \"safety_net\": \"Call 911 immediately. Do not drive yourself to the hospital. If an AED is available nearby, ensure someone knows where it is, and unlock your front door so emergency responders can access you quickly.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Patient reports classic symptoms of acute coronary syndrome (heavy central chest pressure radiating to jaw and left arm with diaphoresis and nausea), fulfilling cardiac_chest_pain. Call_911 is the highest emergency level and matches the floor. Ed_now is insufficient because acute ischemic chest pain carries an immediate risk of life-threatening arrhythmia requiring EMS monitoring and treatment en route rather than private transport.\",\n  \"safety_net\": \"Call 911 immediately. Do not drive yourself to the hospital. While waiting for emergency services, sit or lie down, unlock your front door, and chew an adult aspirin (325 mg) if you are not allergic and have no history of severe bleeding.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Relying on the red flag cardiac_chest_pain, the patient reports classic signs of acute coronary syndrome (substernal pressure radiating to jaw and left arm, accompanied by diaphoresis and nausea). Why not higher: call_911 is the highest level of urgency. Why not lower (ed_now): Active, high-risk acute ischemic symptoms require immediate emergency medical service evaluation and transport rather than private transport due to risk of sudden decompensation or arrest.\",\n  \"safety_net\": \"Call 911 immediately. Do not attempt to drive yourself to the hospital. While waiting for emergency services, sit or lie down, unlock the front door, and chew an adult aspirin (325 mg) if readily available and you have no allergy or medical reason to avoid it.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports classic symptoms of an acute myocardial infarction/coronary syndrome (flag: cardiac_chest_pain) with substernal heavy pressure radiating to the jaw and left arm, accompanied by diaphoresis and nausea. This is the highest disposition level (call_911). A lower level such as ed_now is unsafe because transport via emergency medical services is necessary to allow immediate monitoring, intervention, and rapid transport without driving oneself.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself to the hospital. While waiting for emergency services, unlock your front door and rest. If you have non-coated aspirin available and have no allergies or bleeding contraindications, chew 325 mg (or four 81 mg chewable baby aspirins).\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports acute chest pressure radiating to the jaw and left arm associated with diaphoresis and nausea (cardiac_chest_pain), consistent with acute coronary syndrome. call_911 is the highest triage level available. Lowering to ed_now is unsafe because emergency medical services are vital for immediate continuous monitoring, stabilization, and rapid transport given the risk of sudden cardiac arrest.\",\n  \"safety_net\": \"Call 911 immediately. Do not attempt to drive yourself to the hospital. Unlock the front door, sit down, and notify someone nearby if possible while awaiting emergency responders.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Flagged cardiac_chest_pain. The patient presents with acute, classic symptoms of myocardial infarction (heavy central chest pressure radiating to jaw and left arm, diaphoresis, nausea). This is the highest disposition level available. A lower disposition like ED now is unsafe because immediate prehospital monitoring, stabilization, and rapid transport via EMS are required.\",\n  \"safety_net\": \"Call 911 immediately. Do not attempt to drive yourself. Sit or lie down comfortably while waiting for emergency personnel. If you have non-enteric coated aspirin and no allergies or bleeding risks, chew one regular strength or baby aspirin while awaiting EMS.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports acute substernal chest pressure radiating to the jaw and left arm associated with diaphoresis and nausea, classic symptoms of acute coronary syndrome (cardiac_chest_pain). Call_911 is the highest level of emergency escalation. It cannot be lower (e.g., ed_now) because acute myocardial infarction requires immediate dispatch of emergency medical services for rapid intervention, pre-hospital monitoring, and transport safely to an emergency department rather than private transit.\",\n  \"safety_net\": \"Call 911 immediately. Do not attempt to drive yourself to the hospital. Unlock your front door, sit down, rest, and chew one regular adult-dose aspirin (325 mg) or 2 to 4 low-dose chewable aspirins while waiting for emergency personnel, provided you do not have an aspirin allergy or active bleeding.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"Based on flag cardiac_chest_pain, the patient presents with classic symptoms of acute coronary syndrome (substernal pressure radiating to jaw and left arm with diaphoresis and nausea). There is no higher disposition level. Lower dispositions like ed_now are unsafe as the patient requires emergency medical services for immediate stabilization, telemetry, and rapid transport rather than self-transport.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself. Rest quietly while waiting for emergency personnel. If you have non-enteric coated aspirin and no allergies or bleeding risks, chew 325 mg (or 4 baby aspirins) while awaiting EMS.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports classic acute coronary syndrome symptoms, identified by cardiac_chest_pain with radiation to the jaw/arm and diaphoresis. Call_911 is the highest triage level. A lower disposition such as ED now is unsafe because driving oneself poses severe risks of cardiac arrest or hemodynamic instability en route without paramedic support.\",\n  \"safety_net\": \"Call 911 immediately and do not drive yourself to the hospital. Unlock your door and chew an adult non-enteric coated aspirin (325 mg) if readily available and not contraindicated, while awaiting emergency medical personnel.\"\n}",
+          "{\n  \"disposition\": \"call_911\",\n  \"justification\": \"The patient reports classic symptoms of acute coronary syndrome with substernal chest pressure radiating to the left arm and jaw associated with diaphoresis and nausea (cardiac_chest_pain). Call 911 is the highest emergency level. A lower level such as ed_now is unsafe because emergent paramedic evaluation, pre-hospital monitoring, and rapid transport are vital for suspected myocardial infarction.\",\n  \"safety_net\": \"Call 911 immediately. Do not drive yourself to the hospital. While waiting for emergency services, sit down, rest, and unlock your front door.\"\n}"
+        ]
+      }
+    }
+  }
+}

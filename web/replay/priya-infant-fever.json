@@ -1,0 +1,424 @@
+{
+  "id": "priya-infant-fever",
+  "label": "Priya's 6-month-old with fever",
+  "message": "Hello, this is Priya. My daughter is 6 months old and has had a fever since last night, 38.9 C this morning. She's still feeding a little but she's had far fewer wet diapers than usual, only two since yesterday evening. She's fussy but she does wake up and look at me. What should I do?",
+  "recorded_at": "2026-11-04T15:48:44+00:00",
+  "early": null,
+  "result": {
+    "status": "needs_info",
+    "disposition": "in_person_today",
+    "tier": "same_day",
+    "brief_label": "URGENT_ESCALATION",
+    "floor": "in_person_today",
+    "red_flags": [
+      {
+        "id": "cardiac_chest_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anaphylaxis",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "cauda_equina_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "sudden_vision_loss",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_now",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "airway_breathing_compromise",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "altered_consciousness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "seizure_ongoing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_plan_or_intent",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "stroke_signs_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "thunderclap_headache",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "anticoagulated_head_injury",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_neck_stiffness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "gi_bleeding_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "acute_testicular_pain",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperglycemia_vomiting",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bowel_obstruction_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "older_adult_fall_no_weight_bearing",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "major_trauma",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "suicidal_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "orthopnea_or_leg_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_lung_disease_worsening",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "one_sided_calf_swelling",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "chronic_cough_constitutional",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "diabetic_foot_redness",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_respiratory_distress",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_prolonged_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_nonblanching_rash_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_fever_under_3_months",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_lethargy_or_floppy",
+        "state": "absent",
+        "excerpt": "she does wake up and look at me",
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_first_seizure_resolved",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "infant_green_vomit_or_bulging_fontanelle",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_possible_ingestion",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_head_injury_red_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "fever_sickle_or_immunosuppressed",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_dehydration",
+        "state": "present",
+        "excerpt": "far fewer wet diapers than usual",
+        "excerpt_verified": true
+      },
+      {
+        "id": "peds_prolonged_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "peds_limp_with_fever",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_heavy_bleeding",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_seizure",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "obstetric_chest_pain_or_dyspnea",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_ectopic_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "bleeding_from_20_weeks",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preterm_labour_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "reduced_fetal_movement",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "preeclampsia_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "early_pregnancy_bleeding_cramping",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "hyperemesis_no_fluids",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_fever_or_discharge",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_harm_thoughts",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      },
+      {
+        "id": "postpartum_psychosis_signs",
+        "state": "unknown",
+        "excerpt": null,
+        "excerpt_verified": false
+      }
+    ],
+    "modifiers": [],
+    "votes": {
+      "primary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 20,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      },
+      "secondary": {
+        "call_911": 0,
+        "ed_now": 0,
+        "in_person_today": 20,
+        "physician_contact_today": 0,
+        "within_few_days": 0,
+        "routine": 0,
+        "self_care": 0
+      }
+    },
+    "confidence": 1,
+    "human_review": {
+      "flagged": false,
+      "reasons": [
+        "missing_info"
+      ]
+    },
+    "info_requests": {
+      "questions": [
+        "Is she breathing comfortably, or are her ribs pulling in or her breathing very fast?",
+        "Does she have any rash that stays visible when you press on it?",
+        "Does she have sickle cell disease or a weakened immune system?"
+      ],
+      "photo": false
+    },
+    "time_sensitive": true,
+    "justification": "Flag peds_dehydration: a 6-month-old with fever of 38.9 C for about a day, reduced feeding, and only 2 wet diapers in roughly 12+ hours, which suggests early dehydration and needs hands-on assessment (hydration status, source of fever, possible UTI or other infection). The floor is in_person_today. Not one level higher (ed_now or call_911): she is waking, making eye contact and still taking some feeds, with no reported lethargy, breathing difficulty, rash, or inability to drink, so there is no clear sign of shock or severe illness. Not lower: a phone or virtual visit cannot assess hydration, and reduced urine output with fever in an infant should not wait.",
+    "safety_net": "Go to the ED now or call 911 if she becomes hard to wake, limp or unusually drowsy, is inconsolable, refuses all feeds, has no wet diaper for 6-8 hours, has a dry mouth, no tears or a sunken soft spot, has fast or labored breathing, blue or pale or mottled skin, repeated vomiting, a seizure, a non-blanching rash, a stiff neck, or a fever of 40 C or higher. Keep offering breast milk or formula in small frequent amounts while arranging the visit today.",
+    "patient_message": "You need to be seen in person today, within about 6 hours. A Counsel physician will review your message within 1 hour. Go to the ED now or call 911 if she becomes hard to wake, limp or unusually drowsy, is inconsolable, refuses all feeds, has no wet diaper for 6-8 hours, has a dry mouth, no tears or a sunken soft spot, has fast or labored breathing, blue or pale or mottled skin, repeated vomiting, a seizure, a non-blanching rash, a stiff neck, or a fever of 40 C or higher. Keep offering breast milk or formula in small frequent amounts while arranging the visit today.",
+    "trace": {
+      "input_sha256": "9e645e1b3f6b74b185f76b8ccdb8056a0cd2f71cd98055d4fd6cee30a218d7b6",
+      "policy_version": "0.1.0",
+      "models": [
+        {
+          "model": "anthropic/claude-sonnet-5.5",
+          "provider": "google-vertex"
+        },
+        {
+          "model": "google/gemini-3.8-flash",
+          "provider": "google-vertex"
+        }
+      ],
+      "latency_ms": 82746,
+      "raw": {
+        "extraction": "{\"language\":\"en\",\"is_care_request\":true,\"red_flags\":[{\"id\":\"cardiac_chest_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anaphylaxis\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"cauda_equina_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"sudden_vision_loss\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_now\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"airway_breathing_compromise\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"altered_consciousness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"seizure_ongoing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_plan_or_intent\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"stroke_signs_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"thunderclap_headache\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"anticoagulated_head_injury\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_neck_stiffness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"gi_bleeding_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"acute_testicular_pain\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperglycemia_vomiting\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bowel_obstruction_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"older_adult_fall_no_weight_bearing\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"major_trauma\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"suicidal_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"orthopnea_or_leg_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_lung_disease_worsening\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"one_sided_calf_swelling\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"chronic_cough_constitutional\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"diabetic_foot_redness\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_respiratory_distress\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_prolonged_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_nonblanching_rash_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_fever_under_3_months\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_lethargy_or_floppy\",\"state\":\"absent\",\"excerpt\":\"she does wake up and look at me\"},{\"id\":\"peds_first_seizure_resolved\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"infant_green_vomit_or_bulging_fontanelle\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_possible_ingestion\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_head_injury_red_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"fever_sickle_or_immunosuppressed\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_dehydration\",\"state\":\"present\",\"excerpt\":\"far fewer wet diapers than usual\"},{\"id\":\"peds_prolonged_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"peds_limp_with_fever\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_heavy_bleeding\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_seizure\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"obstetric_chest_pain_or_dyspnea\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_ectopic_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"bleeding_from_20_weeks\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preterm_labour_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"reduced_fetal_movement\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"preeclampsia_signs\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"early_pregnancy_bleeding_cramping\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"hyperemesis_no_fluids\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_fever_or_discharge\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_harm_thoughts\",\"state\":\"unknown\",\"excerpt\":\"\"},{\"id\":\"postpartum_psychosis_signs\",\"state\":\"unknown\",\"excerpt\":\"\"}],\"modifiers\":{\"age_65_plus\":{\"present\":false,\"excerpt\":\"\"},\"diabetes\":{\"present\":false,\"excerpt\":\"\"},\"immunosuppression\":{\"present\":false,\"excerpt\":\"\"},\"anticoagulation\":{\"present\":false,\"excerpt\":\"\"},\"under_3_months\":{\"present\":false,\"excerpt\":\"\"},\"born_premature\":{\"present\":false,\"excerpt\":\"\"},\"congenital_heart_disease\":{\"present\":false,\"excerpt\":\"\"},\"sickle_cell\":{\"present\":false,\"excerpt\":\"\"},\"incomplete_vaccinations\":{\"present\":false,\"excerpt\":\"\"},\"pregnant\":{\"present\":false,\"excerpt\":\"\"},\"postpartum\":{\"present\":false,\"excerpt\":\"\"},\"high_risk_pregnancy\":{\"present\":false,\"excerpt\":\"\"}},\"questions\":[\"Is she breathing comfortably, or are her ribs pulling in or her breathing very fast?\",\"Does she have any rash that stays visible when you press on it?\",\"Does she have sickle cell disease or a weakened immune system?\"],\"photo_needed\":false,\"time_sensitive\":true}",
+        "primary": [
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag peds_dehydration: a 6-month-old with fever of 38.9 C for about a day, reduced feeding, and only 2 wet diapers in roughly 12+ hours, which suggests early dehydration and needs hands-on assessment (hydration status, source of fever, possible UTI or other infection). The floor is in_person_today. Not one level higher (ed_now or call_911): she is waking, making eye contact and still taking some feeds, with no reported lethargy, breathing difficulty, rash, or inability to drink, so there is no clear sign of shock or severe illness. Not lower: a phone or virtual visit cannot assess hydration, and reduced urine output with fever in an infant should not wait.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp or unusually drowsy, is inconsolable, refuses all feeds, has no wet diaper for 6-8 hours, has a dry mouth, no tears or a sunken soft spot, has fast or labored breathing, blue or pale or mottled skin, repeated vomiting, a seizure, a non-blanching rash, a stiff neck, or a fever of 40 C or higher. Keep offering breast milk or formula in small frequent amounts while arranging the visit today.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Relied on flag peds_dehydration (far fewer wet diapers, only two since last evening) together with a fever of 38.9 C in a 6-month-old, which sets the floor at in_person_today. Not one level higher (ed_now): the infant wakes, makes eye contact, and is still feeding a little, so there are no signs of lethargy, unresponsiveness, breathing difficulty or severe dehydration, though the ED is reasonable if no same-day in-person slot is available. Not one level lower (physician_contact_today): reduced urine output with fever needs a hands-on exam for hydration status and for the source of the fever, and cannot be safely managed by a virtual conversation alone.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp, or unusually drowsy, has trouble breathing or fast breathing, has a bluish or pale/mottled color, a bulging soft spot, a stiff neck, a rash that does not fade when pressed, repeated vomiting or refusal to feed, no wet diaper for 6-8 hours, no tears when crying, a dry mouth, sunken eyes or soft spot, a seizure, or inconsolable crying. Keep offering breast milk or formula in small frequent amounts while arranging to be seen today.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today and I agree. A 6-month-old with fever of 38.9 C for about a day and reduced urine output (peds_dehydration: only two wet diapers since yesterday evening, feeding less) needs hands-on assessment of hydration status and a fever source (e.g., UTI, otitis, other infection), which cannot be done remotely. Why not one level lower: a virtual conversation cannot assess hydration, perfusion or exam, and signs of dehydration in an infant with fever should not wait days. Why not ED now/911: she is still waking, making eye contact, interactive and taking some feeds, with no reported lethargy, breathing difficulty, persistent vomiting, or unresponsiveness, so a same-day clinic or urgent care evaluation is reasonable, with escalation if she worsens.\",\"safety_net\":\"Go to the emergency department or call 911 right away if she becomes hard to wake, limp, very drowsy or inconsolable, has trouble breathing or fast labored breathing, has a blue or gray color, a seizure, a stiff neck, a bulging soft spot, a non-blanching rash, repeated vomiting, no wet diaper for 6-8 hours, no tears when crying, a dry mouth, sunken soft spot or eyes, cold or mottled hands and feet, or refuses to feed. If you cannot be seen in person today, go to the ED. Keep offering breast milk or formula in small frequent amounts, and ask the clinician about fever medicine dosing appropriate for her weight and age.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag peds_dehydration: a 6-month-old with fever of 38.9 C since last night, reduced feeding, and only two wet diapers in about 12+ hours has possible early dehydration and needs an in-person exam, with hydration assessment and a fever source evaluation, today (floor: in_person_today). Not one level higher (ed_now): she wakes, makes eye contact, and still feeds a little, so there are no signs of lethargy, unresponsiveness, or severe dehydration reported. Not lower: a virtual-only or delayed visit cannot assess hydration status or exclude a serious source of infection such as a UTI, otitis media, or pneumonia.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp, or unresponsive, has trouble breathing, has a bluish or gray color, refuses all feeds, or has no wet diaper for 6-8 hours. Also seek ED care for repeated vomiting, a sunken soft spot, no tears when crying, a dry mouth, cold hands and feet, a seizure, a stiff neck, a new rash that does not fade when pressed, or inconsolable crying. In the meantime, offer frequent small feeds of breast milk or formula, and do not give water or home remedies.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today. A 6-month-old with fever of 38.9 C for about a day and reduced urine output (peds_dehydration: only two wet diapers since yesterday evening) with decreased feeding needs hands-on assessment today for hydration status and a source of fever such as UTI, otitis, or other infection. Not one level higher (ed_now or call_911): she wakes, makes eye contact, and is still taking some feeds, with no reported lethargy, breathing difficulty, rash, or inconsolability, so emergency transport is not clearly required, though the ED is appropriate if no same-day clinic visit is available. Not one level lower (physician_contact_today): a virtual conversation cannot assess hydration or examine her, and the floor forbids going below in_person_today.\",\"safety_net\":\"Call 911 or go to the ED immediately if she becomes hard to wake, limp, or unresponsive, has trouble breathing, a seizure, a bluish or gray color, a non-blanching rash, a bulging soft spot, or inconsolable crying. Go to the ED now if she has no wet diaper for 6-8 hours, refuses all feeds, vomits repeatedly, has a dry mouth, no tears, or a sunken soft spot, or if the fever rises to 40 C or higher. If you cannot get a same-day in-person appointment, go to urgent care or the ED.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag peds_dehydration: a 6-month-old with fever of 38.9 C since last night, reduced feeding, and only two wet diapers in about 12+ hours has possible early dehydration with an unidentified fever source, so she needs hands-on assessment (hydration status, exam, possible urine testing) today. This meets the floor of in_person_today. Not ed_now/call_911: she is arousable, makes eye contact, and still takes some feeds, with no reported breathing difficulty, lethargy, or inconsolability, so there is no sign of shock or severe illness at this time. Not lower: a virtual visit or waiting cannot assess hydration, and infants with fever and reduced urine output can worsen quickly.\",\"safety_net\":\"Go to the emergency department right away or call 911 if she becomes hard to wake, limp, or unusually drowsy, has trouble breathing or fast labored breathing, has a bluish or gray color, has a rash that does not fade when pressed, has repeated vomiting or refuses all feeds, has no wet diaper for 6-8 hours, has a sunken soft spot, no tears when crying, a dry mouth, cold hands and feet, a seizure, or a persistent high-pitched or inconsolable cry. Until she is seen, keep offering breast milk or formula in small frequent amounts, and follow your clinician's advice on fever medicine and dosing for her weight.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today. A 6-month-old with fever of 38.9 C since last night and reduced urine output (flag peds_dehydration: only two wet diapers in about 12+ hours) and reduced feeding needs hands-on assessment today for hydration status and a fever source (e.g., UTI, otitis, viral illness). Not one level higher (ed_now): she is waking, making eye contact, and still taking some feeds, with no reported lethargy, breathing difficulty, rash, or inconsolability, so emergency transport is not clearly needed if she can be seen today. Not lower (physician_contact_today): a virtual conversation cannot assess dehydration or examine her, and the floor requires in-person evaluation.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp or floppy, unresponsive, or inconsolable; has trouble breathing, grunting, or fast breathing; develops a rash that does not fade when pressed, blue or gray color, or a seizure; refuses all feeds or keeps vomiting; has no wet diaper for 6-8 hours, a sunken soft spot, dry mouth, or no tears; or if the fever rises above 40 C. If you cannot be seen in person today, go to urgent care or the ED. Keep offering breast milk or formula in small frequent amounts.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today (flag peds_dehydration). A 6-month-old with fever of 38.9 C since last night, reduced feeding and only two wet diapers in about 12+ hours has possible early dehydration and an undifferentiated fever source (e.g., UTI, otitis, viral illness) that needs a hands-on exam, hydration assessment and possibly urine testing. Not ed_now/call_911: she is arousable, makes eye contact, still taking some feeds, with no reported breathing difficulty, lethargy, limpness, seizure, non-blanching rash or inconsolable crying, so she is not currently showing signs of shock or serious toxicity. Not lower (physician_contact_today or within_few_days): reduced urine output with fever in an infant cannot be safely assessed remotely and can progress quickly.\",\"safety_net\":\"Go to the emergency department or call 911 right away if she becomes hard to wake, limp, or unusually drowsy; has trouble breathing or fast labored breathing; has a seizure; develops a rash that does not fade when pressed; has a bulging soft spot; vomits repeatedly or has green vomit; cries inconsolably; has no wet diaper for 6-8 hours, a dry mouth, no tears or a sunken soft spot; looks pale, mottled or blue; or the fever rises to 40 C or higher. Keep offering breast milk or formula in small frequent amounts while arranging to be seen today. Do not give ibuprofen at under 6 months of age without medical advice; at 6 months, follow the correct weight-based dose on the label or as advised by the clinician.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"6-month-old with fever 38.9 C since last night plus markedly reduced urine output (only 2 wet diapers in ~12+ hours) and reduced feeding, flag peds_dehydration, meets the in_person_today floor. Not lower: fever with signs of dehydration in an infant needs hands-on exam (hydration status, source such as UTI, otitis, or other infection) and possibly urine testing and fluids; this can't be safely handled by message. Not ed_now/call_911: she is waking, alert, making eye contact, still taking some feeds, with no reported lethargy, breathing difficulty, rash, seizure, or inconsolability, so she appears stable for same-day clinic or urgent care evaluation. If a same-day clinic slot is not available, go to the ED.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp or very drowsy, is inconsolable, has trouble breathing or fast labored breathing, has a seizure, develops a purple or non-blanching rash, has a bulging soft spot, repeated or green vomiting, cold or mottled hands and feet, a dry mouth with no tears, a sunken soft spot, or no wet diaper for 6-8 hours, or refuses all feeds. Offer small frequent feeds (breast milk or formula) while arranging care, and do not give ibuprofen under 6 months or any medication without confirming the dose with a clinician; if she is 6 months or older, weight-based acetaminophen is acceptable only per clinician guidance.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today (flag peds_dehydration). A 6-month-old with fever of 38.9 C for about a day, reduced feeding and only two wet diapers since yesterday evening has possible dehydration and an undiagnosed source of fever, so she needs a hands-on exam today (hydration status, ears, throat, chest, urine). Not one level higher (ed_now): she is awake, makes eye contact, is still taking some feeds, and no signs of lethargy, breathing difficulty, or severe dehydration are described; however, if same-day in-person care is not available promptly, the ED is the right place. Not lower (physician_contact_today or below): decreased urine output in an infant with fever cannot be safely assessed by message or phone alone.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp, or unusually drowsy; has trouble breathing, fast or grunting breathing; has a seizure; has a rash of purple or dark spots that does not fade when pressed; has a bulging soft spot on her head; has repeated vomiting or green vomit; refuses all feeds; has no wet diaper for 6-8 hours; has a dry mouth, no tears when crying, or sunken eyes or soft spot; has cold or mottled hands and feet; or has a fever of 40 C or higher. Meanwhile, keep offering frequent small feeds of breast milk or formula, and ask the clinic or pharmacist about an appropriate acetaminophen dose for her weight.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag peds_dehydration: a 6-month-old with fever of 38.9 C since last night, reduced feeding and only 2 wet diapers in about 12+ hours suggests early dehydration, and the fever source is unknown. This needs an in-person exam today for hydration assessment and a fever workup, which matches the floor of in_person_today. Not one level higher (ed_now): she wakes, makes eye contact, is still feeding a little and is fussy but interactive, with no stated lethargy, breathing difficulty, rash or inability to drink. Not lower: a virtual visit cannot assess hydration, and decreased urine output with fever in an infant should not wait.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp or unusually drowsy, stops feeding or refuses all fluids, has no wet diaper for 6-8 hours, has a dry mouth, no tears or a sunken soft spot, has fast or labored breathing, a blotchy, pale or blue color, a non-blanching rash, repeated vomiting, a seizure, or a fever of 40 C or higher. Keep offering breast milk or formula in small frequent amounts while arranging to be seen today.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today (flag peds_dehydration). A 6-month-old with fever of 38.9 C since last night, reduced feeding and only 2 wet diapers in about 12+ hours suggests early-to-moderate dehydration and needs hands-on exam (hydration status, source of fever, possible urine testing). Not one level higher (ed_now/call_911): she wakes, makes eye contact and is still feeding some, so there are no signs of lethargy, unresponsiveness, breathing difficulty or shock in the message. Not lower: a virtual-only conversation or waiting days cannot assess dehydration, and decreased urine output with fever in an infant is a risk that needs same-day evaluation.\",\"safety_net\":\"Go to the emergency department or call 911 right away if she becomes hard to wake, limp, unusually drowsy or inconsolable, has trouble breathing or fast breathing, a bluish or very pale/mottled color, a stiff neck or bulging soft spot on the head, repeated vomiting or refusal to feed, no wet diaper for 6-8 hours, no tears when crying, a very dry mouth, sunken soft spot or eyes, cold hands and feet, a seizure, a new rash that does not fade when pressed, or fever of 40 C or higher. Keep offering breast milk or formula in small frequent amounts while arranging the visit, and if you cannot be seen in person today, go to the emergency department.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag peds_dehydration: a 6-month-old with fever of 38.9 C since last night, reduced feeding, and only 2 wet diapers in about 12+ hours, which suggests early dehydration and an undiagnosed source of fever. This meets the in_person_today floor. Not one level higher (ed_now/call_911): she wakes, makes eye contact, and is still taking some feeds, with no reported lethargy, breathing difficulty, unresponsiveness, or inability to drink, so she does not appear to be in extremis. Not lower: a virtual-only conversation cannot assess hydration status, perfusion, or the fever source (e.g., UTI, otitis, pneumonia), and an infant with decreased urine output needs a hands-on exam today.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp, or unusually drowsy, is inconsolable, has trouble breathing or fast labored breathing, has a bluish or very pale/mottled color, refuses all feeds, vomits repeatedly or has green vomit, has no wet diaper for 6-8 hours, has a sunken soft spot, no tears, or a dry mouth, develops a rash that doesn't fade when pressed, has a seizure, or her fever rises above 40 C. If you cannot get an in-person appointment today, go to urgent care or the ED. Keep offering breast milk or formula in small, frequent amounts, and use infant-appropriate fever medicine only as directed by a clinician for her weight.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Flag peds_dehydration: a 6-month-old with fever of 38.9 C since last night, reduced feeding, and only two wet diapers in about 12+ hours, which suggests early dehydration, along with an undiagnosed source of fever. The floor is in_person_today and I agree. Why not lower: a virtual visit cannot assess hydration status, perfusion, or the source of the fever, so an infant with decreased urine output needs a hands-on exam, and possibly urine testing or oral rehydration support. Why not ed_now or call_911: she is still waking, making eye contact, and feeding a little, with no reported lethargy, breathing difficulty, rash, or inability to drink, so she does not appear to be in shock or critically ill. If same-day clinic access is not available, she should go to urgent care or the ED today.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp, or unresponsive, has difficulty or fast breathing, has a seizure, develops a purple or non-blanching rash, has a bulging soft spot, cries inconsolably, has a stiff neck, refuses all feeds, has no wet diaper for 6-8 hours, has a dry mouth, no tears, sunken soft spot or eyes, has cold or mottled hands and feet, or vomits repeatedly or has green vomit. Keep offering breast milk, formula, or oral rehydration solution in small frequent amounts while arranging to be seen today.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today. Flag peds_dehydration: a 6-month-old with fever of 38.9 C since last night, reduced feeding and only 2 wet diapers in about 12+ hours suggests early dehydration and needs a hands-on exam (hydration status, source of fever, possible urine testing). Not one level higher (ed_now): she is waking, making eye contact, and still taking some feeds, with no reported lethargy, breathing difficulty, or other signs of severe illness, so same-day in-person assessment (urgent care or same-day clinic) is reasonable, though ED is appropriate if none is available promptly. Not lower (physician_contact_today or below): a virtual conversation cannot assess hydration, and the floor forbids it.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp, or unusually drowsy, has trouble breathing or fast labored breathing, has a bluish or very pale color, a bulging soft spot, repeated vomiting or green vomit, a seizure, a rash that doesn't fade when pressed, inconsolable crying, no wet diaper for 6-8 hours, a dry mouth, no tears, sunken eyes, or refuses to feed. Offer small frequent feeds (breast milk or formula) while arranging care. Ask the clinician before giving fever medicine and dose by weight.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today. A 6-month-old with fever of 38.9 C since last night and signs of early dehydration (peds_dehydration: only two wet diapers in about 12+ hours, reduced feeding) needs hands-on assessment of hydration status, a source of fever, and possible urine testing today. Why not one level higher: she is waking, making eye contact, and still taking some feeds, with no reported lethargy, breathing difficulty, rash, or inability to drink, so there is no stated indication for 911 or an emergency-department-level response, though the ED is appropriate if a same-day clinic visit is not available. Why not one level lower: a phone or virtual conversation cannot assess hydration, and decreased urine output with fever in an infant should not wait days.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp, or unusually drowsy; has trouble breathing or fast breathing; refuses all feeds; has no wet diaper for 6-8 hours; has a sunken soft spot, dry mouth, or no tears when crying; develops a rash that does not fade when pressed, repeated vomiting, a seizure, or blue or gray skin; or the fever rises above 40 C. Keep offering breast milk or formula in small, frequent amounts while arranging to be seen today.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today (flag peds_dehydration). A 6-month-old with fever of 38.9 C since last night, reduced feeding, and only two wet diapers in about 12+ hours has possible early dehydration and needs an in-person exam, hydration assessment and a search for the fever source (e.g., UTI, otitis, other infection). Not one level higher (ed_now/call_911): she is waking, making eye contact and still taking some feeds, with no reported lethargy, breathing difficulty, rash or inconsolability, so there is no sign of shock or severe illness; if the clinic cannot see her today, the ED is the alternative. Not one level lower: a virtual-only conversation cannot assess hydration status, and decreased urine output with fever in an infant is not safe for home care or a delayed visit.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp or very drowsy, is inconsolable, has trouble breathing or fast breathing, has a bluish or gray color, a bulging soft spot, a sunken soft spot, no tears when crying, a dry mouth, cold hands and feet, a rash that does not fade when pressed, repeated vomiting, a seizure, refuses all feeds, or has no wet diaper for 6-8 hours. Keep offering breast milk or formula in small, frequent amounts while arranging to be seen today.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today (flag peds_dehydration). A 6-month-old with fever of 38.9 C since last night, reduced feeding and only two wet diapers in about 12+ hours has possible early dehydration and needs an in-person exam today for hydration status and a fever source (e.g., UTI, ear or throat infection). Not one level higher (ed_now): she wakes, makes eye contact, is still feeding a little and is fussy but consolable, with no stated lethargy, breathing difficulty, rash or inability to drink, so a same-day clinic or urgent care visit is reasonable if it is available promptly. Not lower (physician_contact_today): a virtual conversation cannot assess dehydration and fever source in an infant with decreased urine output.\",\"safety_net\":\"Go to the ED or call 911 right away if she becomes hard to wake, limp, or inconsolable, has trouble breathing or fast breathing, refuses all feeds, has no wet diaper for 6-8 hours, has a sunken soft spot, dry mouth or no tears when crying, cold or mottled hands and feet, a rash that does not fade when pressed, repeated vomiting, a seizure, or a fever of 40 C or higher. If you cannot be seen in person today, go to the ED. Keep offering breast milk or formula in small frequent amounts while arranging care.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today. A 6-month-old with fever of 38.9 C since last night and reduced urine output (peds_dehydration: only two wet diapers since yesterday evening) needs a hands-on exam today to assess hydration, look for a fever source (ear, urine, chest), and decide on testing or oral rehydration versus IV fluids. Not one level lower (physician_contact_today): a virtual visit cannot assess hydration status, perfusion or the source of fever, and the floor forbids going lower. Not one level higher (ed_now or call_911): she is still feeding a little, wakes up, makes eye contact, and has no reported lethargy, breathing difficulty, blue color, seizure, rash or inconsolability. Same-day in-person care at an urgent care, pediatric clinic or ED is appropriate. If no same-day clinic slot is available, go to the ED.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp, or unresponsive, is not making eye contact, has trouble breathing, grunting, or fast breathing, has blue or gray lips or skin, has a seizure, has a new rash that does not fade when pressed, has a bulging soft spot, cries inconsolably, refuses all feeds, vomits repeatedly or has green vomit, has no wet diaper for 6-8 hours, has a dry mouth, no tears or a sunken soft spot, or has cold or mottled hands and feet. Keep offering frequent small feeds (breast milk or formula) on the way and until she is seen. Do not give ibuprofen if she is dehydrated or under 6 months without clinician advice. Acetaminophen at the weight-based dose may be used for comfort.\"}",
+          "{\"disposition\":\"in_person_today\",\"justification\":\"Floor is in_person_today. A 6-month-old with fever of 38.9 C since last night and reduced urine output (only 2 wet diapers in about 12+ hours, flag peds_dehydration) needs a hands-on exam to assess hydration and find the fever source (e.g., UTI, otitis, other infection). Not one level lower (physician_contact_today or below) because dehydration cannot be assessed or treated remotely and the floor requires in-person evaluation. Not one level higher (ed_now/call_911) because she is still feeding a little, wakes and makes eye contact, and has no reported lethargy, breathing difficulty, persistent vomiting, rash, or unresponsiveness; same-day urgent care or pediatric office assessment is reasonable if available promptly, otherwise ED.\",\"safety_net\":\"Go to the ED now or call 911 if she becomes hard to wake, limp, or unresponsive, has trouble breathing, a bluish or very pale color, a seizure, a bulging soft spot, a stiff neck, a rash that does not fade when pressed, repeated vomiting or green vomit, refuses all feeds, has no wet diaper for 6-8 hours, has a dry mouth, no tears when crying, or sunken eyes, or if fever rises or she seems worse. If you cannot be seen in person today, go to the ED. Keep offering small, frequent feeds (breast milk or formula) and do not give ibuprofen if dehydrated or under 6 months without clinician advice; acetaminophen at a weight-based dose is acceptable if instructed.\"}"
+        ],
+        "secondary": [
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The patient is a 6-month-old with high fever and signs of dehydration (peds_dehydration: only two wet diapers since yesterday). An in-person evaluation today is necessary to evaluate hydration status and identify the source of the fever. ED now is not required immediately as she remains alert, makes eye contact, and is still feeding, but virtual care (one level lower) is insufficient because a hands-on physical exam is needed.\",\n  \"safety_net\": \"Seek emergency care immediately if she becomes difficult to wake or unusually lethargic, develops rapid or labored breathing, stops drinking fluids entirely, has no wet diapers over the next several hours, develops a dark purple or red rash, or if her hands and feet become cold and pale.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on the flag peds_dehydration ('far fewer wet diapers than usual') alongside a significant fever in a 6-month-old, an in-person physical assessment is required today to check hydration status and identify an infection source. ED now is not required immediately as the infant remains interactive and alert rather than lethargic or in respiratory distress. Physician contact today is insufficient because physical examination is necessary.\",\n  \"safety_net\": \"Please seek emergency care immediately if your daughter becomes difficult to wake or unusually sleepy, stops drinking fluids entirely, has no wet diapers for more than 6-8 hours, develops fast or labored breathing, or develops a new rash.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on peds_dehydration, the infant needs an in-person physical exam today to evaluate hydration status and identify the source of the fever. ED now is not required at this moment because she remains interactive, wakes up, looks at her mother, and is still taking some fluids without signs of severe dehydration or lethargy. A lower disposition is unsafe given the floor of in_person_today and the risk of rapid dehydration in a 6-month-old with high fever and decreased urine output.\",\n  \"safety_net\": \"Seek immediate emergency care (ED or call 911) if she becomes very difficult to wake up, unusually limp or lethargic, develops rapid or labored breathing, stops producing wet diapers entirely, cannot keep any liquids down, or if her hands or feet become cold, pale, or mottled.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on peds_dehydration, a 6-month-old with high fever and decreased wet diapers requires physical evaluation today to assess hydration and identify the infection source. ED now is not required immediately because the infant is still responsive, waking up, and taking some fluids without lethargy or respiratory distress. Physician contact today is insufficient because physical exam is necessary.\",\n  \"safety_net\": \"Seek emergency medical care immediately (call 911 or go to the nearest emergency department) if your baby becomes difficult to awaken, unusually lethargic or unresponsive, develops trouble breathing, has no wet diapers, has sunken eyes or a sunken soft spot on her head, or cannot keep any fluids down.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"A 6-month-old infant with high fever and signs of reduced fluid intake/output (peds_dehydration) requires a physical exam to assess hydration status and identify the source of infection. ED now is not required because she remains alert, wakes, makes eye contact, and has no reported lethargy or respiratory distress. Physician contact today is insufficient because physical examination (vitals, fontanelle, perfusion) cannot be performed virtually, and in_person_today is the safety floor.\",\n  \"safety_net\": \"Seek emergency care immediately (call 911 or go to the nearest emergency room) if your daughter becomes difficult to wake or unusually lethargic, has trouble breathing, stops producing wet diapers entirely, develops a stiff neck or rash, or is unable to keep any fluids down.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Evaluated with flag peds_dehydration due to significantly decreased urine output in a 6-month-old infant with fever. in_person_today is appropriate to physically assess hydration and check for a source of infection. ed_now is not currently required because the infant remains alert, responsive, and able to take some fluids without signs of severe lethargy or respiratory compromise. A lower disposition like physician_contact_today is unsafe given the risk of rapid clinical dehydration in an infant.\",\n  \"safety_net\": \"Have your baby seen by a healthcare provider today. Go to the nearest Emergency Department immediately if she becomes difficult to wake up, excessively lethargic or unresponsive, develops trouble breathing, refuses all fluids, has no wet diapers, or has sunken eyes or a sunken soft spot on her head.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The infant exhibits signs of dehydration with reduced wet diapers and fever (peds_dehydration), meeting criteria for same-day evaluation. ED now is not required as she remains responsive, interacts, and lacks signs of lethargy, respiratory compromise, or shock. Care cannot be deferred to a lower level due to the age of the infant, degree of fever, and dehydration risk establishing the floor at in_person_today.\",\n  \"safety_net\": \"Seek emergency care immediately if your daughter becomes difficult to wake or unusually lethargic, develops rapid or labored breathing, stops drinking entirely, has no wet diapers over several hours, or develops blue lips or a new rash.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on peds_dehydration, the infant requires a same-day physical evaluation to assess hydration status and source of fever. ED is not immediately required as she remains interactive, wakes up, and is taking some fluids without lethargy or respiratory compromise. A lower disposition is unsafe given her age (6 months) and significantly decreased wet diapers.\",\n  \"safety_net\": \"Seek emergency medical care immediately (call 911 or go to the nearest ED) if she becomes abnormally sleepy or difficult to wake up, develops difficulty breathing, has no wet diapers for over 8 hours, has dry lips/mouth with crying without tears, or develops a new rash.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on peds_dehydration ('far fewer wet diapers than usual', only two since last evening) in a 6-month-old with high fever, an in-person physical assessment is required today. ED now is not immediately required because the infant is still alert, responsive, and taking some feeds without signs of lethargy or respiratory distress. Lower dispositions are not appropriate as the floor is in_person_today to evaluate hydration and the fever source.\",\n  \"safety_net\": \"Please seek emergency care immediately if she becomes difficult to wake or unusually lethargic, has trouble breathing, stops drinking fluids entirely, develops a sunken soft spot or dry mouth without tears, or develops persistent vomiting.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on peds_dehydration, the infant requires an in-person physical assessment today to evaluate hydration status and identify the source of the fever. ED now is not required at this moment because she remains responsive, interacts, and is still taking some fluids without reported lethargy or respiratory distress. Physician contact today is insufficient as an in-person exam is necessary and it is below the established floor.\",\n  \"safety_net\": \"Please seek emergency care immediately (call 911 or go to the nearest emergency room) if she becomes unusually sleepy, difficult to awaken, develops fast or difficult breathing, stops producing wet diapers completely, cannot keep fluids down, or appears limp.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on peds_dehydration in a 6-month-old infant with high fever, an in-person physical examination today is necessary to evaluate hydration status, vital signs, and source of infection. ED now is not required at this moment because the infant is still alert, interactive, and drinking some fluids without lethargy or severe distress. A lower disposition like physician_contact_today is unsafe because physical assessment is warranted and the floor is in_person_today.\",\n  \"safety_net\": \"Seek emergency medical care immediately (call 911 or go to the nearest emergency room) if your daughter becomes extremely lethargic, difficult to wake, develops rapid or labored breathing, has no wet diapers, refuses all fluids, or shows pale, mottled, or blue skin.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on the peds_dehydration flag, a 6-month-old infant with fever and decreased wet diapers requires same-day evaluation. 'in_person_today' is chosen because physical examination of hydration, vitals, and fever source is necessary (preventing 'physician_contact_today', which is also below the floor). 'ed_now' is not required immediately as she is still interactive, waking up to look at her mother, and taking some feeds, without reported lethargy or respiratory distress.\",\n  \"safety_net\": \"Please bring your daughter for an in-person evaluation today. Seek immediate emergency care (ED or 911) if she becomes unusually difficult to wake, extremely lethargic or limp, develops trouble breathing, refuses all fluids, or has sunken eyes or a sunken soft spot on her head.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The infant has fever and signs of early dehydration with significantly decreased wet diapers (peds_dehydration), meeting the floor of in_person_today for physical assessment and hydration check. ED now is not required as she remains interactive, wakes up, and continues to feed without signs of severe lethargy or respiratory distress. Lower than in_person_today is unsafe due to the age of the infant and risk of rapid dehydration.\",\n  \"safety_net\": \"Please bring your daughter to be seen by a doctor today. If she becomes difficult to wake, completely refuses fluids, has no wet diapers for over 8 hours, has sunken eyes or a sunken soft spot on her head, or develops difficulty breathing, proceed directly to the nearest emergency department.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on peds_dehydration, a 6-month-old infant with a high fever and reduced wet diapers requires an in-person physical examination today to evaluate hydration and identify the source of infection. ED now is not immediately required as the child is still waking up, interacting, and taking some fluids without reported respiratory distress or lethargy. Physician contact today or lower is inappropriate because physical assessment and vital signs are needed, and it falls below the safety floor.\",\n  \"safety_net\": \"Seek emergency care immediately if your daughter becomes very difficult to wake or unusually lethargic, develops rapid or labored breathing, completely stops producing wet diapers, cannot keep any fluids down, or develops pale, mottled, or blue-tinged skin.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Relying on red flag peds_dehydration in a 6-month-old infant with high fever (38.9 C) and decreased wet diapers. In_person_today is required as the infant needs same-day clinical assessment for dehydration and underlying infection, and the floor is in_person_today. Not ed_now because she is still waking, interactive, and taking some fluids without reported lethargy or respiratory distress; not physician_contact_today as it falls below the safety floor and requires physical examination.\",\n  \"safety_net\": \"Please have your daughter seen by a doctor today. Seek emergency care immediately if she becomes difficult to wake, lethargic, refuses all fluids, develops fast or labored breathing, produces no wet diapers, or has a fever that does not come down.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The infant exhibits signs of potential dehydration (peds_dehydration) alongside a significant fever, meeting the floor of in_person_today for a direct physical examination and hydration assessment. ED now is not required at this moment as she remains responsive, interacts, and is taking some fluids without respiratory distress or lethargy. Lower levels such as physician_contact_today are unsafe given her age and the need for hands-on clinical evaluation.\",\n  \"safety_net\": \"Seek immediate emergency care (ED or 911) if your baby becomes very difficult to wake, refuses all fluids, develops sunken eyes or a sunken soft spot on her head, has no wet diapers for 8 hours, has trouble breathing, or becomes unusually pale or blue.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on peds_dehydration, a 6-month-old infant with a high fever and significantly decreased wet diapers requires an in-person assessment today to evaluate hydration status and source of fever. ED now is not required at this moment because she remains responsive, interacts, and is still taking some fluids. A lower level of care is contraindicated by the floor and the risk of rapid clinical decline from dehydration in an infant.\",\n  \"safety_net\": \"Please seek emergency care immediately (go to the nearest ED or call 911) if she becomes lethargic or difficult to wake, develops rapid or labored breathing, has completely dry mouth or cries without tears, a sunken soft spot on her head, starts vomiting everything, or shows extreme weakness.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Flag peds_dehydration is present given only two wet diapers since yesterday alongside fever in a 6-month-old infant. In-person today is required because physical evaluation of hydration, vital signs, and fever source is necessary, ruling out physician_contact_today (and lower dispositions). ED now is not required at this moment as the infant remains interactive, wakes up, and is still feeding somewhat without signs of lethargy, cyanosis, or respiratory distress.\",\n  \"safety_net\": \"Please have your daughter seen by a doctor today. Seek emergency care immediately if she becomes difficult to wake up, unusually floppy or limp, refuses all fluids, develops fast or labored breathing, has no wet diapers for over 8 hours, has crying without tears, or has a sunken soft spot on her head.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"Based on flag peds_dehydration, a 6-month-old with high fever and significantly reduced urine output requires physical examination today to evaluate hydration and identify the infection source. ED now is not required because the child remains interactive, wakes up, makes eye contact, and has no acute respiratory distress or lethargy. Physician contact today is insufficient as an in-person physical assessment is clinically necessary and below the floor.\",\n  \"safety_net\": \"Seek emergency medical care immediately (call 911 or go to the nearest emergency room) if your daughter becomes abnormally sleepy or difficult to awaken, has difficulty breathing, develops cool or mottled hands/feet, has sunken eyes or a sunken soft spot on her head, stops producing wet diapers entirely, or refuses all fluids.\"\n}",
+          "{\n  \"disposition\": \"in_person_today\",\n  \"justification\": \"The infant presents with fever and signs of dehydration (peds_dehydration: only two wet diapers since yesterday evening), which requires an in-person physical assessment today to evaluate hydration status. ED now is not required at this time because she is alert, looking at her parent, and still taking some feeds. A lower level of care is unsafe due to the risk of rapid clinical worsening with dehydration in a young infant and is precluded by the safety floor.\",\n  \"safety_net\": \"Please bring her in for evaluation today. Seek emergency care immediately if she becomes lethargic or difficult to wake up, develops labored or unusually fast breathing, refuses all liquids, has no wet diapers for 8 hours, has crying without tears, or develops cool/mottled extremities.\"\n}"
+        ]
+      }
+    }
+  }
+}

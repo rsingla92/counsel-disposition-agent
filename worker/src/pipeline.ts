@@ -9,7 +9,7 @@ import {
   tierOf,
   type Level,
 } from './levels';
-import type {LlmClient, ModelSpec} from './llm';
+import {LlmError, type LlmClient, type ModelSpec} from './llm';
 import {traceLine} from './log';
 import type {Policy} from './policy';
 import {chooseLevel, emptyVotes, reviewReasons, type Votes} from './router';
@@ -94,6 +94,7 @@ type Run = {
   start: number;
   hash: Promise<string>;
   models: ModelSpec[];
+  extractionModel: ModelSpec | null;
   raw: {
     extraction: string | null;
     primary: string[];
@@ -223,6 +224,7 @@ async function assemble(run: Run, o: Outcome): Promise<RouteResult> {
       input_sha256: await run.hash,
       policy_version: run.deps.policy.policy_version,
       models: run.models,
+      extraction_model: run.extractionModel,
       latency_ms: Date.now() - run.start,
       raw: run.raw,
     },
@@ -382,6 +384,35 @@ function setFloor(run: Run, opts: RouteOptions): FloorResult {
   return floor;
 }
 
+/**
+ * A log line for a failed extraction call: the model, error code and HTTP
+ * status only.
+ */
+function extractionErrorLine(spec: ModelSpec, e: unknown): string {
+  return JSON.stringify({
+    kind: 'llm_error',
+    step: 'extraction',
+    model: spec.model,
+    code: e instanceof LlmError ? e.code : 'unknown',
+    status: e instanceof LlmError ? e.status : undefined,
+  });
+}
+
+/** Salvaged flags from two attempts: each flag keeps its most severe state. */
+function mergeFlags(
+  a: Extraction['red_flags'] | null,
+  b: Extraction['red_flags'],
+): Extraction['red_flags'] {
+  if (!a) return b;
+  const severity = {unknown: 0, absent: 1, present: 2};
+  return Object.fromEntries(
+    Object.entries(b).map(([id, f]) => [
+      id,
+      severity[a[id].state] >= severity[f.state] ? a[id] : f,
+    ]),
+  );
+}
+
 /** An extraction holding only salvaged red flags: no modifiers or questions. */
 function salvagedExtraction(
   flags: Extraction['red_flags'],
@@ -409,19 +440,38 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     return humanReview(run, 'too_long');
   }
 
-  // 2. Extraction (an LlmError is the only failure extract() reports).
-  addSpec(run, deps.primary);
-  let ex: Extraction;
-  try {
-    const got = await extract(message, deps.primary, deps.llm, policy);
-    ex = got.extraction;
-    run.raw.extraction = got.raw;
-  } catch (e) {
+  // 2. Extraction (an LlmError is the only failure extract() reports). When
+  // the primary marks no flag present, the secondary tries once.
+  let ex: Extraction | null = null;
+  let salvaged: Extraction['red_flags'] | null = null;
+  for (const spec of [deps.primary, deps.secondary]) {
+    if (!spec) continue;
+    addSpec(run, spec);
+    try {
+      const got = await extract(message, spec, deps.llm, policy);
+      ex = got.extraction;
+      run.raw.extraction = got.raw;
+      run.extractionModel = spec;
+      break;
+    } catch (e) {
+      try {
+        deps.log(extractionErrorLine(spec, e));
+      } catch {
+        // Logging must not change the patient's outcome.
+      }
+      if (e instanceof ExtractionInvalidError && e.flags) {
+        run.raw.extraction = e.raw;
+        run.extractionModel = spec;
+        salvaged = mergeFlags(salvaged, e.flags);
+        if (Object.values(salvaged).some(f => f.state === 'present')) break;
+      }
+    }
+  }
+  if (!ex) {
     // Output that missed or repeated a flag still floors the flags it did
     // mark present; the case goes to a physician either way.
-    if (e instanceof ExtractionInvalidError && e.flags) {
-      run.raw.extraction = e.raw;
-      run.extraction = salvagedExtraction(e.flags, policy);
+    if (salvaged) {
+      run.extraction = salvagedExtraction(salvaged, policy);
       setFloor(run, opts);
     }
     return humanReview(run, 'extraction_failed');
@@ -536,6 +586,7 @@ export async function route(
     // never delays the early event.
     hash: sha256Hex(message).catch(() => ''),
     models: [],
+    extractionModel: null,
     raw: {extraction: null, primary: [], secondary: null},
     extraction: null,
     floor: null,
@@ -592,6 +643,7 @@ function lastResort(run: Run): RouteResult {
       input_sha256: '',
       policy_version: run.deps.policy?.policy_version ?? '',
       models: run.models,
+      extraction_model: run.extractionModel,
       latency_ms: Date.now() - run.start,
       raw: null,
     },
