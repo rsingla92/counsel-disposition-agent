@@ -411,6 +411,20 @@ function extractionErrorLine(spec: ModelSpec, e: unknown): string {
   });
 }
 
+/**
+ * A log line for a model's failed sample calls: counts by error key only,
+ * never message or sample text.
+ */
+function sampleErrorsLine(spec: ModelSpec, set: VoteSet, n: number): string {
+  return JSON.stringify({
+    kind: 'sample_errors',
+    model: spec.model,
+    valid: set.valid,
+    n,
+    failures: set.failures,
+  });
+}
+
 /** Salvaged flags from two attempts: each flag keeps its most severe state. */
 function mergeFlags(
   a: Extraction['red_flags'] | null,
@@ -530,6 +544,14 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     deps.secondary ? draw(deps.secondary) : Promise.resolve(null),
   ]);
   if (deps.secondary) addSpec(run, deps.secondary);
+  for (const set of [primary, secondary]) {
+    if (!set || Object.keys(set.failures).length === 0) continue;
+    try {
+      deps.log(sampleErrorsLine(set.spec, set, policy.sampling.n));
+    } catch {
+      // Logging must not change the patient's outcome.
+    }
+  }
   run.raw.primary = primary.raw;
   run.raw.secondary = secondary?.raw ?? null;
   const votes = {primary: primary.votes, secondary: secondary?.votes ?? null};

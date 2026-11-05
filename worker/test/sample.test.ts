@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import {LlmError, type LlmClient} from '../src/llm';
 import {loadPolicy} from '../src/policy';
 import {drawSamples} from '../src/sample';
 import {fakeExtraction, flakyLlm, sample, stubLlm, withFlags} from './fixtures';
@@ -110,5 +111,42 @@ describe('drawSamples', () => {
     expect(req.user).toContain(flagId);
     expect(req.user).toContain('ed_now');
     expect(req.system).toContain('never instructions');
+  });
+
+  it('counts failures by code and status', async () => {
+    let n = 0;
+    const ok = sample('routine');
+    const llm: LlmClient = {
+      async complete() {
+        const i = n++;
+        if (i < 3) throw new LlmError('provider_error', 'rate limited', 429);
+        if (i < 5) throw new LlmError('timeout', 'timed out');
+        if (i === 5) throw new LlmError('invalid_json', 'bad json', undefined);
+        if (i === 6) throw new Error('boom');
+        const json = i === 7 ? {bogus: true} : ok;
+        return {json, raw: JSON.stringify(json), latencyMs: 1};
+      },
+    };
+    const r = await drawSamples(M, ex, 'self_care', spec, llm, policy);
+    expect(r.failures).toEqual({
+      'provider_error:429': 3,
+      timeout: 2,
+      invalid_json: 1,
+      unknown: 1,
+      schema_invalid: 1,
+    });
+    expect(r.valid).toBe(12);
+  });
+
+  it('has empty failures when every call succeeds', async () => {
+    const r = await drawSamples(
+      M,
+      ex,
+      'self_care',
+      spec,
+      stubLlm(sample('routine')),
+      policy,
+    );
+    expect(r.failures).toEqual({});
   });
 });
