@@ -12,3 +12,11 @@ PRIMARY_PROVIDER = "google-vertex"
 SECONDARY_MODEL = "google/gemini-3.8-flash"
 SECONDARY_PROVIDER = "google-vertex"
 ALLOWED_ORIGIN = "https://counsel-disposition-web.counsel-demo.workers.dev"
+
+# Saved eval runs for the Operations view (export_experiment.py output), read
+# by GET /v1/experiments and POST /v1/experiments/:id/rescore.
+# Placeholder id: replace it with the id from
+# `wrangler kv namespace create EXPERIMENTS` before deploying.
+[[kv_namespaces]]
+binding = "EXPERIMENTS"
+id = "REPLACE_WITH_EXPERIMENTS_NAMESPACE_ID"

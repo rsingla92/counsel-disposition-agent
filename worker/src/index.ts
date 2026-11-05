@@ -8,6 +8,7 @@ import {openRouterClient} from './llm';
 import {overrideLine} from './log';
 import {
   LiveRouteOverridesSchema,
+  PolicyOverridesSchema,
   applyPolicyOverrides,
   checkLiveSafe,
   majorityOk,
@@ -15,7 +16,11 @@ import {
 } from './overrides';
 import {route, type Deps, type EarlyEvent} from './pipeline';
 import {loadPolicy} from './policy';
+import {rescore, type Experiment} from './rescore';
 import {OverrideReasonCodeSchema} from './schema';
+
+/** The read side of a Workers KV namespace, all the Worker uses. */
+export type ExperimentStore = {get(key: string): Promise<string | null>};
 
 export type Env = {
   OPENROUTER_API_KEY: string;
@@ -25,6 +30,8 @@ export type Env = {
   SECONDARY_MODEL: string;
   SECONDARY_PROVIDER: string;
   ALLOWED_ORIGIN: string;
+  /** Saved eval runs for the Operations view; absent reads as empty. */
+  EXPERIMENTS?: ExperimentStore;
 };
 
 type App = {Bindings: Env};
@@ -34,6 +41,31 @@ const RouteBody = z.object({
   mode: z.enum(['full', 'floor_only']).optional(),
   overrides: LiveRouteOverridesSchema.optional(),
 });
+
+/** A re-score of a saved run: the full override range, no live check. */
+const RescoreBody = z.strictObject({
+  policy: PolicyOverridesSchema.optional(),
+});
+
+/** Experiment ids as export_experiment.py writes them. */
+const EXPERIMENT_ID = /^[A-Za-z0-9._-]{1,64}$/;
+
+/** Reads a JSON value from KV; null when the store or key is absent. */
+async function readKv(
+  store: ExperimentStore | undefined,
+  key: string,
+): Promise<unknown> {
+  const text = store ? await store.get(key) : null;
+  return text === null ? null : JSON.parse(text);
+}
+
+async function readExperiment(
+  store: ExperimentStore | undefined,
+  id: string,
+): Promise<Experiment | null> {
+  if (!EXPERIMENT_ID.test(id)) return null;
+  return (await readKv(store, `experiment:${id}`)) as Experiment | null;
+}
 
 /**
  * A physician override. `from` is null when the case had no disposition
@@ -179,6 +211,45 @@ export function appFor(deps: Deps): Hono<App> {
     }
     deps.log(overrideLine(parsed.data, deps.policy.policy_version));
     return c.body(null, 204);
+  });
+
+  app.get('/v1/experiments', async c => {
+    const store = c.env?.EXPERIMENTS;
+    const index = await readKv(store, 'experiments:index');
+    const ids = Array.isArray(index)
+      ? index.filter((id): id is string => typeof id === 'string')
+      : [];
+    const experiments = [];
+    for (const id of ids) {
+      const e = await readExperiment(store, id);
+      if (!e) continue;
+      experiments.push({
+        id: e.id,
+        label: e.label,
+        models: e.models,
+        rescorable: e.rescorable,
+        summary: e.summary,
+        median_latency_ms: e.median_latency_ms,
+      });
+    }
+    return c.json({experiments});
+  });
+
+  app.post('/v1/experiments/:id/rescore', async c => {
+    const parsed = RescoreBody.safeParse(await body(c.req.raw));
+    if (!parsed.success || !majorityOk(deps.policy, parsed.data.policy)) {
+      return c.json({error: 'overrides invalid'}, 400);
+    }
+    const exp = await readExperiment(c.env?.EXPERIMENTS, c.req.param('id'));
+    if (!exp) return c.json({error: 'experiment not found'}, 404);
+    if (!exp.rescorable) {
+      return c.json({error: 'experiment cannot be re-scored'}, 409);
+    }
+    const applied = parsed.data.policy ?? {};
+    return c.json({
+      summary: rescore(exp, applyPolicyOverrides(deps.policy, applied)),
+      policy_applied: applied,
+    });
   });
 
   app.notFound(c => c.json({error: 'not found'}, 404));
