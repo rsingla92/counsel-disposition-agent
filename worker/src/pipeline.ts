@@ -440,7 +440,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
 
   // 2. Extraction (an LlmError is the only failure extract() reports). When
-  // the primary marks no flag present, the secondary tries once.
+  // the primary's extraction fails, the secondary tries once, but only to
+  // carry red-flag floors: a failed primary extraction always ends at Human
+  // review, even if the secondary succeeds.
   let ex: Extraction | null = null;
   let salvaged: Extraction['red_flags'] | null = null;
   for (const spec of [deps.primary, deps.secondary]) {
@@ -448,9 +450,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     addSpec(run, spec);
     try {
       const got = await extract(message, spec, deps.llm, policy);
-      ex = got.extraction;
       run.raw.extraction = got.raw;
       run.extractionModel = spec;
+      ex = got.extraction;
       break;
     } catch (e) {
       try {
@@ -473,6 +475,17 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
       run.extraction = salvagedExtraction(salvaged, policy);
       setFloor(run, opts);
     }
+    return humanReview(run, 'extraction_failed');
+  }
+  if (run.extractionModel !== deps.primary) {
+    // The primary failed, so the case ends at Human review whatever the
+    // secondary read. Its flags, merged with any salvaged from the primary's
+    // output, still set the floor.
+    run.extraction = {
+      ...ex,
+      red_flags: mergeFlags(salvaged, ex.red_flags),
+    };
+    setFloor(run, opts);
     return humanReview(run, 'extraction_failed');
   }
   run.extraction = ex;
