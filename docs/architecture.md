@@ -144,7 +144,8 @@ design is in
 [the Operations view spec](superpowers/specs/2026-11-04-operations-view-design.md).
 
 - **Experiment log.** Saved eval runs, one row each: condition, missed
-  emergencies, Human review rate, cost score and median time.
+  emergencies, Human review rate, cost score and median time. It has five
+  rows, with "Sonnet + Flash, as deployed (stricter extraction)" first.
 - **Sliders.** Agreement needed (12 of 20), valid answers needed (15),
   widest spread (2), cost of a Human review (0.2), and the six under-triage
   weights. Moving one re-scores the selected run in the Worker from its

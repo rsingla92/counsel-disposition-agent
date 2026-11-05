@@ -5,7 +5,9 @@
 The eval ([`eval/`](../eval/), Python) sends each reviewed case to the
 deployed Worker, scores the results and writes an aggregate report to
 [`reports/`](../reports/). The latest is
-[policy 0.1.0](../reports/2026-11-04-policy-0.1.0.md).
+[policy 0.1.0, 2026-11-05](../reports/2026-11-05-policy-0.1.0.md). The
+[2026-11-04 report](../reports/2026-11-04-policy-0.1.0.md) is kept as
+history.
 
 ## The cases
 
@@ -50,10 +52,11 @@ Headline numbers use the first run of each case.
 
 ## Results, policy 0.1.0
 
-<!-- RERUN -->
-<!-- Rows and bullets below come from the 2026-11-04 runs and the Operations
-experiment log, before the stricter extraction rule. Update from the
-50-case Sonnet + Flash rerun. -->
+The full agent's numbers come from the 2026-11-05 run, Sonnet + Flash as
+deployed, with the stricter extraction rule. The baselines come from the
+2026-11-04 runs. The other rows are earlier conditions from the Operations
+view's experiment log, which now has five rows, with "Sonnet + Flash, as
+deployed (stricter extraction)" first.
 
 "Sent to Human review" counts only cases the agent did not route. Routed
 cases flagged for a physician to check are counted in the cost score, and
@@ -61,27 +64,34 @@ shown as the "Flagged for physician review" rate in the Operations view.
 
 | Condition | Missed emergencies | Sent to Human review (not routed) | Cost score | Median time |
 |---|---|---|---|---|
-| Sonnet + Flash, 3 calls in flight, extraction fallback | 0 of 14 | 12% | 0.80 | 79 s |
+| **Sonnet + Flash, as deployed (stricter extraction), 2026-11-05** | **0 of 14** | **0%** | **0.808** | **83 s** |
+| Sonnet + Flash, 3 calls in flight, before the stricter extraction rule (2026-11-04) | 0 of 14 | 12% | 0.80 | 79 s |
 | Sonnet + Flash, 6 calls in flight | 1 of 14 | 52% | 1.92 | 45 s |
 | Sonnet only, 3 calls in flight | 0 of 14 | 96% | 2.29 | 38 s |
-| Rule floor only | 0 of 14 | 0% | 1.19 | 9.5 s |
-| Always escalate | 0 of 14 | 0% | 2.52 | n/a |
-| Historical | 4 of 14 | 0% | 4.12 | n/a |
+| Rule floor only | 0 of 14 | 0% | 1.190 | 9.5 s |
+| Always escalate | 0 of 14 | 0% | 2.520 | n/a |
+| Historical | 4 of 14 | 0% | 4.120 | n/a |
 
-More from the full agent's run (Sonnet + Flash, 3 in flight), quoted from
-the report:
+Human review fell from 12% to 0% between the two Sonnet + Flash runs
+because no extraction failed this time, not because of the stricter rule.
+The rule can only send more cases to Human review, never fewer: it turns
+a failed primary extraction into Human review even when the backup model's
+extraction works.
 
-- ROC AUC 0.972 for emergency, 0.939 for emergency or same day.
+More from the 2026-11-05 full-agent run, quoted from the report:
+
+- ROC AUC 0.972 for emergency, 0.920 for emergency or same day.
 - Every quote for a present red flag was verified (100%).
 - The early emergency message fired on every emergency case (100%).
-- Needs info on 64% of cases. Median latency 78.6 s, p95 93.9 s.
+- Needs info on 74% of cases. Median latency 83.2 s, p95 99.1 s.
 - Sensitivity was 100% for Call 911, ED now, Physician contact today and
   Self-care; 92.9% for Routine; 75% for In person today; 71.4% for Within a
   few days.
-- Cost score 0.52 with every under-triage weight halved, 1.36 with every one
-  doubled. The full agent beats the rule floor at both.
-
-<!-- /RERUN -->
+- Cost score 0.548 with every under-triage weight halved, 1.328 with every
+  one doubled. The full agent beats the rule floor (0.595 and 2.380) at
+  both.
+- From the experiment log (the same run, re-scored in the Worker): 14% of
+  cases flagged for physician review, and 18% over-triage.
 
 ## What the conditions taught us
 
@@ -116,11 +126,9 @@ the report:
   catches 0% of Routine cases. Its low cost score comes from never missing
   an emergency, not from routing the rest well.
 - **The flag rate is not in the report yet.** The report gives the Human
-  review rate. The wider share flagged for a physician feeds the cost score
-  and is shown in the Operations view, but the report does not print it.
-- **Pending rerun.** A 50-case Sonnet + Flash rerun under the stricter
-  extraction rule (a failed primary extraction always ends at Human review)
-  is running. Its numbers will replace the first row above.
+  review rate. The wider share flagged for a physician (14% in the
+  2026-11-05 run) feeds the cost score and is shown in the Operations view,
+  but the report does not print it.
 
 ## Running it
 

@@ -47,25 +47,21 @@ message ([reliability roadmap](docs/reliability-roadmap.md)).
 
 ## Results
 
-From [the policy 0.1.0 report](reports/2026-11-04-policy-0.1.0.md): 50
+From [the policy 0.1.0 report](reports/2026-11-05-policy-0.1.0.md): 50
 cases reviewed blind by a physician, 14 of them emergencies (Call 911 or
 ED now). Aggregate numbers only.
 
-<!-- RERUN -->
-<!-- The full-agent row comes from run 2 (2026-11-04 15:55 UTC), before the
-stricter extraction rule. Update it from the 50-case rerun. -->
-
 | System | Missed emergencies | Sent to Human review (not routed) | Cost score (lower is better) |
 |---|---|---|---|
-| **Full agent** (Sonnet + Flash) | **0 of 14** | **12%** | **0.80** |
-| Rule floor only | 0 of 14 | 0% | 1.19 |
-| Always escalate to ED | 0 of 14 | 0% | 2.52 |
-| Historical dispositions | 4 of 14 | 0% | 4.12 |
+| **Full agent** (Sonnet + Flash) | **0 of 14** | **0%** | **0.808** |
+| Rule floor only | 0 of 14 | 0% | 1.190 |
+| Always escalate to ED | 0 of 14 | 0% | 2.520 |
+| Historical dispositions | 4 of 14 | 0% | 4.120 |
 
-From the 2026-11-04 run, before the stricter extraction rule; a rerun is in
-progress.
-
-<!-- /RERUN -->
+Full agent: 2026-11-05 run, Sonnet + Flash as deployed, with the stricter
+extraction rule. 14% of its cases were routed but flagged for a physician
+to check, and 74% asked for more information (Needs info). Baselines: the
+2026-11-04 runs.
 
 The cost score is the average cost per case of routing mistakes, weighted
 so under-triage costs more than over-triage, plus 0.2 for every case flagged

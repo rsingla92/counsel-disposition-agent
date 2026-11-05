@@ -29,10 +29,11 @@ is the zero-data-retention route.
   calls began returning HTTP 402, so that run's rule-floor numbers were
   rerun after a top-up.
 
-<!-- RERUN -->
-- **Sonnet + Flash under the stricter extraction rule (rerun in progress on
-  2026-11-05):** results to follow.
-<!-- /RERUN -->
+- **Sonnet + Flash under the stricter extraction rule, 3 calls in flight.**
+  On 2026-11-05 the full agent missed 0 of 14 emergencies, with 0% Human
+  review, Needs info on 74% of cases, a cost score of 0.808 and a median
+  latency of 83 s. No extraction failed in this run. The full results are
+  in the [2026-11-05 report](../reports/2026-11-05-policy-0.1.0.md).
 
 On the cases that got enough samples, the router behaved as designed. The
 failures come from throughput, not from model judgement.
