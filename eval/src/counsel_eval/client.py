@@ -63,17 +63,24 @@ class RouteClient:
     """
     return getattr(self._local, "early", None)
 
-  def route(self, message: str, mode: str = "full") -> dict[str, Any]:
+  def route(
+      self, message: str, mode: str = "full", models: str | None = None
+  ) -> dict[str, Any]:
     """Routes one message and returns the result object.
 
     Args:
       message: The patient message.
       mode: "full" or "floor_only".
+      models: Optional override of which models run: "sonnet", "flash" or
+        "sonnet+flash". None sends no overrides (the Worker default).
 
     Raises:
       SchemaMismatch: If the stream has no result or it fails the schema.
       httpx.HTTPError: On transport failure or a non-2xx status.
     """
+    body: dict[str, Any] = {"message": message, "mode": mode}
+    if models is not None:
+      body["overrides"] = {"models": models}
     started = time.perf_counter()
     early = False
     early_event = None
@@ -82,7 +89,7 @@ class RouteClient:
     with self._http.stream(
         "POST",
         f"{self._base_url}/v1/route",
-        json={"message": message, "mode": mode},
+        json=body,
     ) as response:
       response.raise_for_status()
       for line in response.iter_lines():

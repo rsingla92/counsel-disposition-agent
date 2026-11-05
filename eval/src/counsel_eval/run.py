@@ -51,6 +51,8 @@ exit codes:
   5  internal error
 """
 
+MODELS_CHOICES = ("sonnet", "flash", "sonnet+flash")
+_SINGLE_MODELS = ("sonnet", "flash")
 _OPENROUTER_KEY_URL = "https://openrouter.ai/api/v1/key"
 _OPENROUTER_CREDITS_URL = "https://openrouter.ai/api/v1/credits"
 _DEFAULT_ENV_FILE = "~/.config/counsel-disposition-agent/openrouter.env"
@@ -102,6 +104,18 @@ def read_env_file(path: str | os.PathLike[str]) -> dict[str, str]:
 def live_calls_per_case(system: str, calls_per_case: int) -> int:
   """Returns the OpenRouter calls one case costs on a system."""
   return {"full": calls_per_case, "floor": 1}.get(system, 0)
+
+
+def effective_calls_per_case(models: str | None, explicit: int | None) -> int:
+  """Returns the OpenRouter calls one full case costs.
+
+  Args:
+    models: The --models flag, or None.
+    explicit: The --calls-per-case flag, or None. It wins when given.
+  """
+  if explicit is not None:
+    return explicit
+  return 21 if models in _SINGLE_MODELS else 41
 
 
 def estimate_usd(
@@ -171,19 +185,25 @@ def credit_check(
 
 
 def _call_full(
-    client: Any, tasks: Sequence[tuple[str, str, int]], concurrency: int
+    client: Any,
+    tasks: Sequence[tuple[str, str, int]],
+    concurrency: int,
+    models: str | None = None,
 ) -> list[dict[str, Any]]:
   def one(task: tuple[str, str, int]) -> dict[str, Any]:
     case_id, message, repeat = task
     try:
-      result = client.route(message)
+      if models is None:
+        result = client.route(message)
+      else:
+        result = client.route(message, models=models)
     except Exception as e:  # pylint: disable=broad-exception-caught
       return {"case_id": case_id, "repeat": repeat, "error": type(e).__name__}
     return {
         "case_id": case_id,
         "repeat": repeat,
         "result": result,
-        "meta": dict(client.last_meta),
+        "meta": {**client.last_meta, "models": models or "default"},
     }
 
   with ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool:
@@ -208,15 +228,25 @@ def run_system(
     *,
     repeat: int,
     concurrency: int,
+    models: str | None = None,
 ) -> list[dict[str, Any]]:
-  """Runs one system and returns its saved-run entries."""
+  """Runs one system and returns its saved-run entries.
+
+  Args:
+    system: One of SYSTEMS.
+    cases: Frame with case_id and message.
+    client: The route client.
+    repeat: Repeats per case.
+    concurrency: Worker threads.
+    models: Model override for the full system only; other systems ignore it.
+  """
   if system == "full":
     tasks = [
         (c, m, r)
         for r in range(repeat)
         for c, m in zip(cases["case_id"], cases["message"])
     ]
-    return _call_full(client, tasks, concurrency)
+    return _call_full(client, tasks, concurrency, models)
   if system == "floor":
     out = []
     for r in range(repeat):
@@ -612,7 +642,19 @@ def build_parser() -> argparse.ArgumentParser:
   p.add_argument("--concurrency", type=int, default=4)
   p.add_argument("--skip-credit-check", action="store_true")
   p.add_argument("--per-call-usd", type=float, default=0.0075)
-  p.add_argument("--calls-per-case", type=int, default=41)
+  p.add_argument(
+      "--calls-per-case",
+      type=int,
+      default=None,
+      help="credit-estimate calls per full case (default 41, or 21 when "
+      "--models is sonnet or flash)",
+  )
+  p.add_argument(
+      "--models",
+      choices=MODELS_CHOICES,
+      default=None,
+      help="run the full system with one model or both (default: Worker's)",
+  )
   p.add_argument("--data-dir", default=str(ROOT / "data" / "private"))
   p.add_argument("--runs-dir", default=None)
   p.add_argument("--reports-dir", default=str(ROOT / "reports"))
@@ -684,7 +726,11 @@ def _main(
     return EXIT_POLICY_MISMATCH
 
   estimate = estimate_usd(
-      systems, len(cases), args.repeat, args.per_call_usd, args.calls_per_case
+      systems,
+      len(cases),
+      args.repeat,
+      args.per_call_usd,
+      effective_calls_per_case(args.models, args.calls_per_case),
   )
   if not args.skip_credit_check and estimate > 0:
     env_file = env.get("OPENROUTER_ENV_FILE", _DEFAULT_ENV_FILE)
@@ -706,6 +752,7 @@ def _main(
         client,
         repeat=args.repeat,
         concurrency=args.concurrency,
+        models=args.models,
     )
     runs[system] = entries
     with open(runs_dir / f"{system}.jsonl", "w", encoding="utf-8") as f:

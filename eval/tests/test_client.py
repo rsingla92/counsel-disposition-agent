@@ -1,5 +1,7 @@
 """Tests for counsel_eval.client."""
 
+import json
+
 import httpx
 import pytest
 
@@ -43,6 +45,21 @@ def test_client_sends_bearer_and_mode(respx_mock):
   request = route.calls.last.request
   assert request.headers["authorization"] == "Bearer tok"
   assert b"floor_only" in request.content
+
+
+def test_client_sends_models_override_only_when_given(respx_mock):
+  route = respx_mock.post(f"{URL}/v1/route").respond(
+      200, text=ndjson({"event": "result", "result": VALID_RESULT})
+  )
+  client = RouteClient(URL, "tok")
+  client.route("m", models="sonnet")
+  assert json.loads(route.calls.last.request.content) == {
+      "message": "m",
+      "mode": "full",
+      "overrides": {"models": "sonnet"},
+  }
+  client.route("m")
+  assert "overrides" not in json.loads(route.calls.last.request.content)
 
 
 def test_client_rejects_schema_mismatch(respx_mock):
