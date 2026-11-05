@@ -1,9 +1,10 @@
+import {z} from 'zod';
 import {decide} from './decide';
 import {LEVELS, type Level} from './levels';
 import {summarize, type ScoredCase, type Summary} from './metrics';
 import type {Policy} from './policy';
 import type {Votes} from './router';
-import type {ReasonCode} from './schema';
+import {ReasonCodeSchema, type ReasonCode} from './schema';
 
 /**
  * One saved case, as export_experiment.py writes it: the votes and the
@@ -36,6 +37,71 @@ export type Experiment = {
   summary: Summary;
   median_latency_ms: number;
 };
+
+const LevelSchema = z.enum(LEVELS);
+const VotesSchema = z.strictObject(
+  Object.fromEntries(LEVELS.map(l => [l, z.number().int().min(0)])) as Record<
+    Level,
+    z.ZodNumber
+  >,
+);
+const COLUMNS = [...LEVELS, 'human_review'] as const;
+const ConfusionRowSchema = z.strictObject(
+  Object.fromEntries(COLUMNS.map(c => [c, z.number().int().min(0)])) as Record<
+    (typeof COLUMNS)[number],
+    z.ZodNumber
+  >,
+);
+
+const SummarySchema = z.strictObject({
+  n: z.number().int().min(0),
+  emergencies: z.number().int().min(0),
+  missed: z.number().int().min(0),
+  human_review_rate: z.number(),
+  needs_info_rate: z.number(),
+  over_triage_rate: z.number(),
+  flagged_rate: z.number(),
+  cost_score: z.number(),
+  confusion: z.strictObject(
+    Object.fromEntries(LEVELS.map(l => [l, ConfusionRowSchema])) as Record<
+      Level,
+      typeof ConfusionRowSchema
+    >,
+  ),
+});
+
+const RecordSchema = z.strictObject({
+  case_id: z.string(),
+  reference: LevelSchema,
+  fixed: z
+    .strictObject({
+      status: z.literal('human_review'),
+      disposition: LevelSchema.nullable(),
+      reasons: z.array(ReasonCodeSchema),
+    })
+    .nullable(),
+  floor: LevelSchema,
+  primary: VotesSchema,
+  secondary: VotesSchema.nullable(),
+  questions: z.number().int().min(0),
+  photo: z.boolean(),
+  base_reasons: z.array(ReasonCodeSchema),
+  latency_ms: z.number(),
+});
+
+/** An Experiment as read from KV; anything else is treated as missing. */
+export const ExperimentSchema: z.ZodType<Experiment> = z.strictObject({
+  id: z.string(),
+  label: z.string(),
+  models: z.string(),
+  rescorable: z.boolean(),
+  records: z.array(RecordSchema),
+  summary: SummarySchema,
+  median_latency_ms: z.number(),
+});
+
+/** The KV `experiments:index` value: experiment ids in display order. */
+export const ExperimentIndexSchema = z.array(z.string());
 
 function total(votes: Votes): number {
   return LEVELS.reduce((sum, l) => sum + votes[l], 0);

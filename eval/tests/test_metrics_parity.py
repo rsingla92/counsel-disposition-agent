@@ -55,6 +55,9 @@ def test_python_metrics_match_parity_fixture():
       expected["needs_info_rate"], abs=1e-9
   )
   assert over == pytest.approx(expected["over_triage_rate"], abs=1e-9)
+  assert float(df["flagged"].astype(bool).mean()) == pytest.approx(
+      expected["flagged_rate"], abs=1e-9
+  )
   assert cost_score(df, policy) == pytest.approx(
       expected["cost_score"], abs=1e-9
   )

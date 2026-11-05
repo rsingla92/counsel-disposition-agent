@@ -42,6 +42,7 @@ SUMMARY_KEYS = {
     "human_review_rate",
     "needs_info_rate",
     "over_triage_rate",
+    "flagged_rate",
     "cost_score",
     "confusion",
 }
@@ -250,6 +251,8 @@ def test_summary_uses_the_eval_scoring(data_dir, tmp_path):
   assert s["missed"] == 0
   assert s["human_review_rate"] == pytest.approx(3 / 7)
   assert s["needs_info_rate"] == pytest.approx(2 / 7)
+  # C02, C03, C04 (split vote) and C05 (failed call) are flagged.
+  assert s["flagged_rate"] == pytest.approx(4 / 7)
   # C03 and C05 score as routine, below their references: under, not over.
   assert s["over_triage_rate"] == pytest.approx(0.0)
   assert s["confusion"]["ed_now"]["human_review"] == 1
@@ -291,3 +294,53 @@ def test_reports_a_missing_run(data_dir, tmp_path):
   (data_dir / "runs" / STAMP / "full.jsonl").unlink()
   assert _export(data_dir, out) != 0
   assert not out.exists()
+
+
+def _git_tree(root, git_file=False):
+  """Makes a directory that looks like a checkout (or a worktree)."""
+  root.mkdir(parents=True)
+  if git_file:
+    (root / ".git").write_text("gitdir: /elsewhere/.git/worktrees/x\n")
+  else:
+    (root / ".git").mkdir()
+  return root
+
+
+def test_refuses_an_out_inside_a_git_checkout(data_dir, tmp_path):
+  out = _git_tree(tmp_path / "checkout") / "exp.json"
+  assert _export(data_dir, out) == 2
+  assert not out.exists()
+
+
+def test_refuses_an_out_below_a_worktree_git_file(data_dir, tmp_path):
+  tree = _git_tree(tmp_path / "worktree", git_file=True)
+  out = tree / "nested" / "deeper" / "exp.json"
+  assert _export(data_dir, out) == 2
+  assert not out.exists()
+
+
+def test_refuses_a_relative_out_into_a_checkout(
+    data_dir, tmp_path, monkeypatch
+):
+  checkout = _git_tree(tmp_path / "checkout")
+  inner = checkout / "a" / "b"
+  inner.mkdir(parents=True)
+  monkeypatch.chdir(inner)
+  assert _export(data_dir, "../../exp.json") == 2
+  assert not (checkout / "exp.json").exists()
+
+
+def test_refuses_a_symlink_into_a_checkout(data_dir, tmp_path):
+  checkout = _git_tree(tmp_path / "checkout")
+  (checkout / "sub").mkdir()
+  link = tmp_path / "outside" / "link"
+  link.parent.mkdir()
+  link.symlink_to(checkout / "sub", target_is_directory=True)
+  assert _export(data_dir, link / "exp.json") == 2
+  assert not (checkout / "sub" / "exp.json").exists()
+
+
+def test_accepts_a_plain_directory(data_dir, tmp_path):
+  out = tmp_path / "plain" / "exp.json"
+  assert _export(data_dir, out) == 0
+  assert out.exists()

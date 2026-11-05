@@ -3,18 +3,20 @@
 The output holds per-case votes and pipeline inputs, so the Worker can
 re-score the run under other router settings without calling a model. It
 never holds message text, justifications, excerpts, questions, raw model
-output or patient replies. It is written outside the repo (the repo is
-public); the Worker reads it from KV.
+output or patient replies. It is written outside any git checkout (the repo
+is public); the Worker reads it from KV.
 
 Usage:
   python -m counsel_eval.export_experiment --run <stamp> --system full|floor \
-      --id <id> --label <text> --out <path outside the repo>
+      --id <id> --label <text> --out <path outside any checkout>
 
-Exit codes: 0 ok, 2 --out inside the repo, 4 bad arguments or data.
+Exit codes: 0 ok, 2 --out inside the repo or any git checkout, 4 bad
+arguments or data.
 """
 
 import argparse
 import json
+import os
 import pathlib
 import re
 import statistics
@@ -81,6 +83,18 @@ def _human_review(disposition: str | None, reasons: list[str]) -> dict:
       "disposition": disposition,
       "reasons": reasons,
   }
+
+
+def in_checkout(path: pathlib.Path) -> bool:
+  """True when `path` or an ancestor holds a .git directory or file.
+
+  A worktree's .git is a file, and a worktree can sit inside the main
+  checkout, so the nearest repo root alone is not enough.
+
+  Args:
+    path: An absolute, resolved path.
+  """
+  return any(os.path.lexists(p / ".git") for p in (path, *path.parents))
 
 
 def record(e: Mapping[str, Any], reference: str) -> dict[str, Any]:
@@ -159,6 +173,7 @@ def summary(frame: pd.DataFrame, policy: Mapping[str, Any]) -> dict[str, Any]:
       "human_review_rate": rates["human_review_rate"],
       "needs_info_rate": rates["needs_info_rate"],
       "over_triage_rate": sum(over) / len(over),
+      "flagged_rate": float(frame["flagged"].astype(bool).mean()),
       "cost_score": scoring.cost_score(frame, policy),
       "confusion": confusion,
   }
@@ -208,7 +223,9 @@ def build_parser() -> argparse.ArgumentParser:
   p.add_argument("--system", required=True, choices=["full", "floor"])
   p.add_argument("--id", required=True)
   p.add_argument("--label", required=True)
-  p.add_argument("--out", required=True, help="output path outside the repo")
+  p.add_argument(
+      "--out", required=True, help="output path outside any checkout"
+  )
   p.add_argument("--data-dir", default=str(run.ROOT / "data" / "private"))
   p.add_argument("--runs-dir", default=None, help="default: <data-dir>/runs")
   p.add_argument("--policy", default=str(run.ROOT / "policy" / "policy.yaml"))
@@ -219,8 +236,9 @@ def main(argv: Sequence[str] | None = None) -> int:
   """Writes the Experiment JSON and returns the exit code."""
   args = build_parser().parse_args(argv)
   out = pathlib.Path(args.out).resolve()
-  if out.is_relative_to(run.ROOT.resolve()):
-    print("error: --out must be outside the repo", file=sys.stderr)
+  # resolve() follows symlinks, so a link into a checkout is caught too.
+  if out.is_relative_to(run.ROOT.resolve()) or in_checkout(out):
+    print("error: --out must be outside any git checkout", file=sys.stderr)
     return EXIT_OUT_IN_REPO
   if not _ID.match(args.id):
     print("error: --id must match [A-Za-z0-9._-]{1,64}", file=sys.stderr)

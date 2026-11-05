@@ -123,10 +123,9 @@ describe('rescore', () => {
     expect(rescore(exp, policy)).toEqual(exp.summary);
   });
 
-  it('flags more cases when min_top_votes rises', () => {
+  it('raises flagged_rate when min_top_votes rises', () => {
     // S01 (20), S02 (13) and S05 (12 top votes): 14 splits S02 and S05.
-    // Flagging shows in cost_score; human_review_rate counts only the
-    // human_review status, which a split vote does not set.
+    // A split vote flags a case without the human_review status.
     const base = rescore(experiment(), policy);
     const raised = rescore(
       experiment(),
@@ -136,6 +135,8 @@ describe('rescore', () => {
       (policy.loss.human_review_cost * 2) / 6,
       9,
     );
+    expect(base.flagged_rate).toBeCloseTo(2 / 6, 9);
+    expect(raised.flagged_rate).toBeCloseTo(4 / 6, 9);
     expect(raised.human_review_rate).toBe(base.human_review_rate);
   });
 

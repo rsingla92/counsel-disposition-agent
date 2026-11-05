@@ -16,7 +16,12 @@ import {
 } from './overrides';
 import {route, type Deps, type EarlyEvent} from './pipeline';
 import {loadPolicy} from './policy';
-import {rescore, type Experiment} from './rescore';
+import {
+  ExperimentIndexSchema,
+  ExperimentSchema,
+  rescore,
+  type Experiment,
+} from './rescore';
 import {OverrideReasonCodeSchema} from './schema';
 
 /** The read side of a Workers KV namespace, all the Worker uses. */
@@ -50,21 +55,33 @@ const RescoreBody = z.strictObject({
 /** Experiment ids as export_experiment.py writes them. */
 const EXPERIMENT_ID = /^[A-Za-z0-9._-]{1,64}$/;
 
-/** Reads a JSON value from KV; null when the store or key is absent. */
-async function readKv(
+/**
+ * Reads a KV value that parses as `schema`; null when the store or key is
+ * absent, or the value is not JSON or does not match.
+ */
+async function readKv<T>(
   store: ExperimentStore | undefined,
   key: string,
-): Promise<unknown> {
+  schema: z.ZodType<T>,
+): Promise<T | null> {
   const text = store ? await store.get(key) : null;
-  return text === null ? null : JSON.parse(text);
+  if (text === null) return null;
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  const parsed = schema.safeParse(json);
+  return parsed.success ? parsed.data : null;
 }
 
-async function readExperiment(
+function readExperiment(
   store: ExperimentStore | undefined,
   id: string,
 ): Promise<Experiment | null> {
-  if (!EXPERIMENT_ID.test(id)) return null;
-  return (await readKv(store, `experiment:${id}`)) as Experiment | null;
+  if (!EXPERIMENT_ID.test(id)) return Promise.resolve(null);
+  return readKv(store, `experiment:${id}`, ExperimentSchema);
 }
 
 /**
@@ -215,10 +232,8 @@ export function appFor(deps: Deps): Hono<App> {
 
   app.get('/v1/experiments', async c => {
     const store = c.env?.EXPERIMENTS;
-    const index = await readKv(store, 'experiments:index');
-    const ids = Array.isArray(index)
-      ? index.filter((id): id is string => typeof id === 'string')
-      : [];
+    const ids =
+      (await readKv(store, 'experiments:index', ExperimentIndexSchema)) ?? [];
     const experiments = [];
     for (const id of ids) {
       const e = await readExperiment(store, id);

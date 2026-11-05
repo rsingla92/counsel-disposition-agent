@@ -17,6 +17,7 @@ describe('metrics parity with the eval', () => {
     expect(s.human_review_rate).toBeCloseTo(e.human_review_rate, 9);
     expect(s.needs_info_rate).toBeCloseTo(e.needs_info_rate, 9);
     expect(s.over_triage_rate).toBeCloseTo(e.over_triage_rate, 9);
+    expect(s.flagged_rate).toBeCloseTo(e.flagged_rate, 9);
     expect(s.cost_score).toBeCloseTo(e.cost_score, 9);
   });
 

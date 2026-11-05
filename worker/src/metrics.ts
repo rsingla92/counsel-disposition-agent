@@ -16,6 +16,8 @@ export type Summary = {
   human_review_rate: number;
   needs_info_rate: number;
   over_triage_rate: number;
+  /** Share of cases flagged for a physician, whatever their status. */
+  flagged_rate: number;
   cost_score: number;
   confusion: Record<Level, Record<Level | 'human_review', number>>;
 };
@@ -67,6 +69,7 @@ export function summarize(cases: ScoredCase[], policy: Policy): Summary {
     human_review_rate: share(humanReview, n),
     needs_info_rate: share(needsInfo, n),
     over_triage_rate: share(over, n),
+    flagged_rate: share(flagged, n),
     cost_score:
       share(totalCost, n) + policy.loss.human_review_cost * share(flagged, n),
     confusion,

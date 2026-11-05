@@ -557,10 +557,17 @@ describe('GET endpoints', () => {
 });
 
 /** A Map-backed stand-in for the EXPERIMENTS KV namespace. */
-function fakeKv(entries: Record<string, unknown> = {}) {
-  const map = new Map(
-    Object.entries(entries).map(([k, val]) => [k, JSON.stringify(val)]),
-  );
+function fakeKv(
+  entries: Record<string, unknown> = {},
+  raw: Record<string, string> = {},
+) {
+  const map = new Map<string, string>([
+    ...Object.entries(entries).map(([k, val]): [string, string] => [
+      k,
+      JSON.stringify(val),
+    ]),
+    ...Object.entries(raw),
+  ]);
   return {get: async (key: string) => map.get(key) ?? null};
 }
 
@@ -722,6 +729,58 @@ describe('experiment endpoints', () => {
       expect(res.status).toBe(400);
       expect(await res.json()).toEqual({error: 'overrides invalid'});
     }
+  });
+
+  describe('with malformed KV values', () => {
+    const malformed = {...full, id: 'run-c', records: 'not records'};
+    const bad = {
+      ...ENV,
+      EXPERIMENTS: fakeKv(
+        {
+          'experiments:index': ['run-c', 'run-d', 'run-a', 'run-e'],
+          'experiment:run-a': full,
+          'experiment:run-c': malformed,
+          'experiment:run-e': {...full, id: 'run-e', summary: {n: 1}},
+        },
+        {'experiment:run-d': '{not json'},
+      ),
+    };
+
+    it('lists the valid experiments and skips the rest', async () => {
+      const res = await app().request('/v1/experiments', {headers: AUTH}, bad);
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {experiments: {id: string}[]};
+      expect(body.experiments.map(e => e.id)).toEqual(['run-a']);
+    });
+
+    it('answers 404 when re-scoring a malformed experiment', async () => {
+      for (const id of ['run-c', 'run-d', 'run-e']) {
+        const res = await app().request(
+          `/v1/experiments/${id}/rescore`,
+          post({policy: {}}),
+          bad,
+        );
+        expect(res.status).toBe(404);
+      }
+    });
+
+    it('lists nothing for a malformed index', async () => {
+      for (const index of ['{not json', '{"ids": ["run-a"]}', '[1, 2]']) {
+        const res = await app().request(
+          '/v1/experiments',
+          {headers: AUTH},
+          {
+            ...ENV,
+            EXPERIMENTS: fakeKv(
+              {'experiment:run-a': full},
+              {'experiments:index': index},
+            ),
+          },
+        );
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({experiments: []});
+      }
+    });
   });
 
   it('requires a bearer token', async () => {

@@ -159,6 +159,7 @@
     "human_review_rate": 0.14285714285714285,
     "needs_info_rate": 0.14285714285714285,
     "over_triage_rate": 0.2857142857142857,
+    "flagged_rate": 0.2857142857142857,
     "cost_score": 4.485714285714286
   }
 }
