@@ -20,19 +20,28 @@ export function el(tag, attrs = {}, ...children) {
     else if (v === true) node.setAttribute(k, '');
     else node.setAttribute(k, String(v));
   }
-  for (const c of children.flat()) {
-    if (c === null || c === undefined || c === false) continue;
+  for (const c of keepChildren(children)) {
     node.append(c instanceof Node ? c : document.createTextNode(String(c)));
   }
   return node;
 }
 
-/** Appends children, skipping null and false (append would print "null"). */
+/**
+ * Children with nested arrays flattened and null, undefined and false
+ * dropped: the native append and replaceChildren would print them as text.
+ */
+export function keepChildren(children) {
+  return children.flat(Infinity).filter(c => c !== null && c !== undefined && c !== false);
+}
+
+/** Appends children, skipping null, undefined and false. */
 export function appendAll(node, ...children) {
-  for (const c of children.flat()) {
-    if (c === null || c === undefined || c === false) continue;
-    node.append(c);
-  }
+  node.append(...keepChildren(children));
+}
+
+/** Replaces a node's children, skipping null, undefined and false. */
+export function replaceAll(node, ...children) {
+  node.replaceChildren(...keepChildren(children));
 }
 
 /** A warning triangle, for status lines that also carry a text label. */

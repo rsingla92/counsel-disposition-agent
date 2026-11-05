@@ -1,7 +1,7 @@
 // The Operations view: the experiment log, the router settings as sliders,
 // a model picker, and the re-scored metrics with a confusion grid. The
 // chosen settings feed live routes from the other views (liveOverrides).
-import {appendAll, el, storage, warnIcon} from './dom.js';
+import {appendAll, el, replaceAll, storage, warnIcon} from './dom.js';
 import {
   EMERGENCY_WEIGHTS,
   GRID_STEPS,
@@ -305,7 +305,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
   }
 
   function renderHeader() {
-    header.replaceChildren(
+    replaceAll(header,
       el('h2', {class: 'ops-title', text: 'How the agent is set up'}),
       el('p', {
         class: 'note',
@@ -316,7 +316,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
 
   function renderLog() {
     const focused = document.activeElement?.dataset?.exp ?? null;
-    logCard.replaceChildren(el('h2', {class: 'eyebrow', id: 'ops-log-h', text: 'Experiment log'}));
+    replaceAll(logCard, el('h2', {class: 'eyebrow', id: 'ops-log-h', text: 'Experiment log'}));
     if (s.experiments.length === 0) {
       appendAll(
         logCard,
@@ -414,7 +414,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
       const below = emergency && v < policyValue;
       wrap.classList.toggle('changed', v !== policyValue);
       wrap.classList.toggle('whatif', below);
-      hintEl.replaceChildren(
+      replaceAll(hintEl,
         ...(below
           ? [warnIcon(), `What-if only. Live messages use the policy value, ${format(policyValue)}.`]
           : [`Policy ${format(policyValue)}.${hint ? ` ${hint}` : ''}`]),
@@ -452,9 +452,9 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
 
   function updateWhatIf() {
     const slot = controlsCard.querySelector('.whatif-slot');
-    if (slot) slot.replaceChildren(...(isWhatIf(s.overrides, s.policy) ? [whatIfLine()] : []));
+    if (slot) replaceAll(slot, ...(isWhatIf(s.overrides, s.policy) ? [whatIfLine()] : []));
     const next = controlsCard.querySelector('.next-live');
-    if (next) next.replaceChildren(...nextLiveText());
+    if (next) replaceAll(next, ...nextLiveText());
   }
 
   function nextLiveText() {
@@ -470,7 +470,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
   }
 
   function renderControls() {
-    controlsCard.replaceChildren(el('h2', {class: 'eyebrow', id: 'ops-controls-h', text: 'Settings'}));
+    replaceAll(controlsCard, el('h2', {class: 'eyebrow', id: 'ops-controls-h', text: 'Settings'}));
     if (!s.policy) return;
     const exp = selectedExperiment();
     const locked = exp ? !exp.rescorable : true;
@@ -738,7 +738,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     resultsCard.setAttribute('aria-busy', String(s.rescoring));
     resultsCard.classList.toggle('busy', panel.busy === true);
     const exp = selectedExperiment();
-    resultsCard.replaceChildren(el('h2', {class: 'eyebrow', id: 'ops-results-h', text: 'Results on the saved run'}));
+    replaceAll(resultsCard, el('h2', {class: 'eyebrow', id: 'ops-results-h', text: 'Results on the saved run'}));
     if (!exp) {
       appendAll(resultsCard, el('p', {class: 'empty', text: 'Pick a run in the log.'}));
       return;
@@ -797,7 +797,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     renderHeader();
     if (s.problem) {
       const token = s.problem === 'token';
-      root.replaceChildren(
+      replaceAll(root,
         header,
         el(
           'section',
@@ -818,10 +818,10 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
       return;
     }
     if (!s.loaded) {
-      root.replaceChildren(header, el('section', {class: 'card'}, el('p', {class: 'empty', text: 'Loading the policy and saved runs…'})));
+      replaceAll(root, header, el('section', {class: 'card'}, el('p', {class: 'empty', text: 'Loading the policy and saved runs…'})));
       return;
     }
-    root.replaceChildren(header, logCard, body);
+    replaceAll(root, header, logCard, body);
     renderLog();
     renderControls();
     renderResults();
