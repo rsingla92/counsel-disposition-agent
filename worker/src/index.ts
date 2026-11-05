@@ -157,6 +157,21 @@ export function appFor(deps: Deps): Hono<App> {
         description: f.description,
         min_level: f.min_level,
       })),
+      // The tunable router settings, so the Operations view starts its
+      // sliders at the deployed values.
+      sampling: {n: policy.sampling.n, min_valid: policy.sampling.min_valid},
+      review: {
+        min_top_votes: policy.review.min_top_votes,
+        max_span: policy.review.max_span,
+      },
+      loss: {
+        human_review_cost: policy.loss.human_review_cost,
+        boundaries: policy.loss.boundaries.map(b => ({
+          between: b.between,
+          under: b.under,
+          over: b.over,
+        })),
+      },
     });
   });
 

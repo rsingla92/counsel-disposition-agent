@@ -517,6 +517,19 @@ describe('GET endpoints', () => {
         description: f.description,
         min_level: f.min_level,
       })),
+      sampling: {n: policy.sampling.n, min_valid: policy.sampling.min_valid},
+      review: {
+        min_top_votes: policy.review.min_top_votes,
+        max_span: policy.review.max_span,
+      },
+      loss: {
+        human_review_cost: policy.loss.human_review_cost,
+        boundaries: policy.loss.boundaries.map(b => ({
+          between: b.between,
+          under: b.under,
+          over: b.over,
+        })),
+      },
     });
     expect((await app().request('/v1/policy', {}, ENV)).status).toBe(401);
   });

@@ -1,6 +1,8 @@
 // The demo page. Everything is built with DOM calls and textContent, never
 // innerHTML, because messages and results are untrusted text.
 import {WORKER_URL} from './config.js';
+import {appendAll, el, storage} from './dom.js';
+import {createOps} from './ops.js';
 import {
   LEVELS,
   LEVEL_WINDOWS,
@@ -10,6 +12,7 @@ import {
   TIER_LABELS,
   canOverride,
   applyPinned,
+  bannerText,
   emergencyLeads,
   failedRun,
   fallbackFor,
@@ -24,6 +27,7 @@ import {
   readToken,
   replayRun,
   replayTarget,
+  routingBanner,
   takeLines,
   tierOf,
   voteRows,
@@ -47,8 +51,12 @@ const ui = {
   status: $('status'),
   physician: $('physician'),
   patient: $('patient'),
+  ops: $('ops'),
+  inputCard: $('input-card'),
+  routingBanner: $('routing-banner'),
   viewPhysician: $('view-physician'),
   viewPatient: $('view-patient'),
+  viewOps: $('view-ops'),
 };
 
 const state = {
@@ -63,41 +71,6 @@ const state = {
   // Kept while the same demo and message text stay selected.
   pinned: null,
 };
-
-function storage() {
-  try {
-    return window.localStorage;
-  } catch {
-    return undefined;
-  }
-}
-
-// --- tiny DOM builder ------------------------------------------------------
-
-function el(tag, attrs = {}, ...children) {
-  const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (v === false || v === null || v === undefined) continue;
-    if (k === 'class') node.className = v;
-    else if (k === 'text') node.textContent = v;
-    else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
-    else if (v === true) node.setAttribute(k, '');
-    else node.setAttribute(k, String(v));
-  }
-  for (const c of children.flat()) {
-    if (c === null || c === undefined || c === false) continue;
-    node.append(c instanceof Node ? c : document.createTextNode(String(c)));
-  }
-  return node;
-}
-
-/** Appends children, skipping null and false (append would print "null"). */
-function appendAll(node, ...children) {
-  for (const c of children.flat()) {
-    if (c === null || c === undefined || c === false) continue;
-    node.append(c);
-  }
-}
 
 function setStatus(text, isError = false) {
   ui.status.textContent = text;
@@ -488,6 +461,7 @@ function dispositionCard(run) {
   appendAll(card, dl);
 
   appendAll(card, 
+    routedWith(result),
     el('h3', {class: 'subhead', text: 'Votes'}),
     votesChart(result.votes, result.disposition, models[0]?.model, models[1]?.model),
     el('h3', {class: 'subhead', text: 'Justification'}),
@@ -504,6 +478,18 @@ function dispositionCard(run) {
     ),
   );
   return card;
+}
+
+/** Says when a result was routed with non-default models or settings. */
+function routedWith(result) {
+  const text = bannerText(result.trace?.overrides);
+  if (!text) return null;
+  return el(
+    'p',
+    {class: 'routed-with'},
+    el('strong', {text: 'Not the deployed defaults. '}),
+    text.replace(/^Routing with: /, 'Routed with: '),
+  );
 }
 
 function overrideCard(run) {
@@ -685,9 +671,29 @@ function renderPatient(run) {
   );
 }
 
+/**
+ * The banner over the physician and patient views while overrides are
+ * active. A replay shows its saved result, so the banner says so instead.
+ */
+function renderBanner() {
+  const replay = state.run ? state.run.replay === true : ui.replay.checked;
+  const text = routingBanner(ops.liveOverrides(), replay);
+  ui.routingBanner.hidden = text === null || state.view === 'ops';
+  ui.routingBanner.textContent = '';
+  if (text === null) return;
+  appendAll(
+    ui.routingBanner,
+    text,
+    !replay && ops.whatIf()
+      ? el('span', {class: 'note', text: ' · Emergency weights stay at the policy value live.'})
+      : null,
+  );
+}
+
 function render() {
   renderPhysician(state.run);
   renderPatient(state.run);
+  renderBanner();
 }
 
 // --- views -----------------------------------------------------------------
@@ -696,13 +702,36 @@ function setView(view) {
   state.view = view;
   ui.physician.hidden = view !== 'physician';
   ui.patient.hidden = view !== 'patient';
+  ui.ops.hidden = view !== 'ops';
+  ui.inputCard.hidden = view === 'ops';
+  document.body.classList.toggle('ops-mode', view === 'ops');
   ui.viewPhysician.setAttribute('aria-pressed', String(view === 'physician'));
   ui.viewPatient.setAttribute('aria-pressed', String(view === 'patient'));
+  ui.viewOps.setAttribute('aria-pressed', String(view === 'ops'));
+  if (view === 'ops') ops.show();
+  renderBanner();
+}
+
+function openTokenBox() {
+  setView('physician');
+  $('token-box').open = true;
+  ui.token.focus();
 }
 
 // --- token -----------------------------------------------------------------
 
 let sessionToken = '';
+
+const ops = createOps({
+  root: ui.ops,
+  workerUrl: WORKER_URL,
+  getToken: () => currentToken(),
+  onChange: () => renderBanner(),
+  onNeedToken: openTokenBox,
+});
+
+/** Errors that mean the routing settings, not the message, were refused. */
+const OVERRIDE_ERRORS = new Set(['overrides invalid', 'emergency_weight_below_policy']);
 
 function currentToken() {
   return sessionToken || readToken(storage());
@@ -827,16 +856,34 @@ async function routeLive(routed) {
   setStatus('Routing…');
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), LIVE_TIMEOUT_MS);
+  // Clamped so a what-if setting never 400s, and without the re-score-only
+  // review cost (liveOverrides).
+  const overrides = ops.liveOverrides();
   try {
     const res = await fetch(`${WORKER_URL}/v1/route`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
-      body: JSON.stringify({message: routed.message}),
+      body: JSON.stringify(overrides ? {message: routed.message, overrides} : {message: routed.message}),
       signal: ctrl.signal,
     });
     if (!res.ok || !res.body) {
+      let error = '';
+      try {
+        error = (await res.json())?.error ?? '';
+      } catch {
+        error = '';
+      }
+      if (overrides && res.status === 400 && OVERRIDE_ERRORS.has(error)) {
+        // Never stuck: refused settings are reset so the next route works.
+        ops.clearOverrides();
+        throw new LiveError('the Worker refused the routing settings; they are reset to the policy');
+      }
       throw new LiveError(
-        res.status === 401 ? 'access token rejected' : `HTTP ${res.status}`,
+        res.status === 401
+          ? 'access token rejected'
+          : error === 'model not configured'
+            ? 'that model is not configured on the Worker'
+            : `HTTP ${res.status}`,
       );
     }
     const reader = res.body.getReader();
@@ -954,17 +1001,20 @@ function onDemoChange() {
 async function init() {
   ui.viewPhysician.addEventListener('click', () => setView('physician'));
   ui.viewPatient.addEventListener('click', () => setView('patient'));
+  ui.viewOps.addEventListener('click', () => setView('ops'));
   ui.route.addEventListener('click', onRoute);
   ui.demo.addEventListener('change', onDemoChange);
   ui.replay.addEventListener('change', () => {
     updateReplayUi();
     setStatus('');
+    renderBanner();
   });
   ui.saveToken.addEventListener('click', () => {
     sessionToken = ui.token.value.trim();
     writeToken(storage(), sessionToken);
     ui.token.value = '';
     setStatus(sessionToken ? 'Token saved in this browser.' : 'Token cleared.');
+    if (sessionToken && WORKER_URL) ops.load();
   });
   ui.clearToken.addEventListener('click', () => {
     sessionToken = '';
@@ -981,6 +1031,9 @@ async function init() {
   ui.replay.checked = !WORKER_URL;
   updateReplayUi();
   setView('physician');
+  // Loads the policy and any saved settings, so live routes and the banner
+  // use them from the start.
+  if (WORKER_URL && currentToken()) ops.load();
 
   try {
     state.demos = await loadJson('demo-messages.json');
