@@ -40,8 +40,11 @@ export type ScriptOpts = {
   secondary?: Level | 'fail';
   /** Makes the extraction call fail with this LlmError code. */
   extractError?: LlmErrorCode;
-  /** Limits extractError to the primary model's extraction call. */
-  extractErrorOn?: 'primary';
+  /**
+   * Limits extractError to one model's extraction call: PRIMARY's for
+   * 'primary', SECONDARY's for 'secondary'.
+   */
+  extractErrorOn?: 'primary' | 'secondary';
   /** The HTTP status carried by extractError. */
   extractStatus?: number;
   language?: string;
@@ -65,18 +68,28 @@ function messageOf(req: LlmRequest): string {
 
 /**
  * An LlmClient whose extraction call returns an extraction built from opts
- * and whose sample calls return samples. Counts every call.
+ * and whose sample calls return samples. Counts and records every call.
  */
-export function scripted(opts: ScriptOpts): LlmClient & {calls: number} {
+export function scripted(opts: ScriptOpts): LlmClient & {
+  calls: number;
+  requests: {schemaName: string; model: string}[];
+} {
   const policy = loadPolicy();
   let primarySamples = 0;
   const client = {
     calls: 0,
+    requests: [] as {schemaName: string; model: string}[],
     async complete(req: LlmRequest) {
       client.calls++;
+      client.requests.push({schemaName: req.schemaName, model: req.spec.model});
       if (req.schemaName === 'extraction') {
-        const failsHere =
-          opts.extractErrorOn !== 'primary' || req.spec.model === PRIMARY.model;
+        const failsOn =
+          opts.extractErrorOn === 'primary'
+            ? PRIMARY
+            : opts.extractErrorOn === 'secondary'
+              ? SECONDARY
+              : null;
+        const failsHere = !failsOn || req.spec.model === failsOn.model;
         if (opts.extractError && failsHere) {
           throw new LlmError(
             opts.extractError,

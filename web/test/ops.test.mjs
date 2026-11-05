@@ -90,10 +90,21 @@ test('a model choice alone gives no policy object', () => {
   });
 });
 
+test('the policy default model pair sends no models override', () => {
+  // Sonnet plus Flash is the deployed configuration, so it is no override.
+  assert.equal(overridesFromControls(controls({models: 'sonnet+flash'}), POLICY), null);
+  assert.deepEqual(
+    overridesFromControls(controls({models: 'sonnet+flash', max_span: 3}), POLICY),
+    {policy: {max_span: 3}},
+  );
+  // A stored sonnet+flash shows as the policy default.
+  assert.equal(controlsFromOverrides({models: 'sonnet+flash'}, POLICY).models, 'policy');
+});
+
 test('controlsFromOverrides round-trips through overridesFromControls', () => {
-  const o = {models: 'sonnet+flash', policy: {max_span: 3, under_weights: [3, 10, 2, 5, 2, 1.5]}};
+  const o = {models: 'sonnet', policy: {max_span: 3, under_weights: [3, 10, 2, 5, 2, 1.5]}};
   const c = controlsFromOverrides(o, POLICY);
-  assert.equal(c.models, 'sonnet+flash');
+  assert.equal(c.models, 'sonnet');
   assert.equal(c.max_span, 3);
   assert.equal(c.min_valid, 15);
   assert.deepEqual(overridesFromControls(c, POLICY), o);
@@ -160,6 +171,12 @@ test('the ranges table matches the plan', () => {
   assert.deepEqual(OVERRIDE_RANGES.max_span, {min: 0, max: 6, step: 1});
   assert.deepEqual(OVERRIDE_RANGES.human_review_cost, {min: 0.05, max: 2, step: 0.05});
   assert.deepEqual(OVERRIDE_RANGES.under_weight, {min: 0.5, max: 50, step: 0.5});
+});
+
+test('the browser waits 150 s for a live route', () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const src = readFileSync(join(root, 'web/app.js'), 'utf8');
+  assert.match(src, /const LIVE_TIMEOUT_MS = 150_000;/);
 });
 
 test('the ranges table matches worker/src/overrides.ts, the authority', () => {
@@ -238,6 +255,47 @@ test('isWhatIf is true at under_weights[1] = 10 and false at 25', () => {
   assert.equal(isWhatIf({policy: {under_weights: [3, 20, 0.5, 5, 2, 1.5]}}, POLICY), false);
   assert.equal(isWhatIf(null, POLICY), false);
   assert.equal(isWhatIf({models: 'sonnet'}, POLICY), false);
+});
+
+test('isWhatIf covers min_valid below the policy', () => {
+  assert.equal(isWhatIf({policy: {min_valid: 14}}, POLICY), true);
+  assert.equal(isWhatIf({policy: {min_valid: 10}}, POLICY), true);
+  assert.equal(isWhatIf({policy: {min_valid: 15}}, POLICY), false);
+  assert.equal(isWhatIf({policy: {min_valid: 16}}, POLICY), false);
+  assert.equal(isWhatIf({policy: {min_valid: 14}}, null), false);
+});
+
+test('the live clamp raises min_valid to the policy value', () => {
+  // Raised to 15, the policy value, so the field is dropped.
+  const o = {models: 'flash', policy: {min_valid: 12, max_span: 3}};
+  assert.deepEqual(liveOverrides(o, POLICY), {models: 'flash', policy: {max_span: 3}});
+  // Raising past the policy keeps the override.
+  assert.deepEqual(liveOverrides({policy: {min_valid: 18}}, POLICY), {policy: {min_valid: 18}});
+  // The input is not changed.
+  assert.equal(o.policy.min_valid, 12);
+});
+
+test('the live clamp keeps agreement a majority of the clamped min_valid', () => {
+  // min_valid 10 clamps to 15, so agreement 6 would fail the Worker's
+  // majority check (15 needs 8). It is raised to 8.
+  const live = liveOverrides({policy: {min_valid: 10, min_top_votes: 6}}, POLICY);
+  assert.deepEqual(live, {policy: {min_top_votes: 8}});
+  assert.ok(!bannerText(live).includes('agreement 6'));
+  assert.equal(bannerText(live), 'Next live message uses: agreement 8/20');
+  // An agreement already above the majority (9 ≥ 8) is left alone.
+  assert.deepEqual(liveOverrides({policy: {min_valid: 10, min_top_votes: 9}}, POLICY), {
+    policy: {min_top_votes: 9},
+  });
+  // Raised to exactly the policy value, it is dropped.
+  const p13 = {...POLICY, min_top_votes: 8};
+  assert.equal(liveOverrides({policy: {min_valid: 10, min_top_votes: 6}}, p13), null);
+});
+
+test('the live clamp drops min_valid when it lands on the policy', () => {
+  assert.equal(liveOverrides({policy: {min_valid: 10}}, POLICY), null);
+  assert.deepEqual(liveOverrides({models: 'sonnet', policy: {min_valid: 15}}, POLICY), {
+    models: 'sonnet',
+  });
 });
 
 test('the live clamp raises a what-if under_weights[1] of 10 to 20', () => {

@@ -32,6 +32,12 @@ export type Deps = {
   policy: Policy;
   primary: ModelSpec;
   secondary: ModelSpec | null;
+  /**
+   * With no secondary (one-model mode), the other configured model. It
+   * retries a failed extraction only, to carry red-flag floors and the early
+   * event; it never samples or cross-checks.
+   */
+  extractionFallback?: ModelSpec | null;
   log: (line: string) => void;
 };
 
@@ -100,6 +106,8 @@ type Run = {
   };
   extraction: Extraction | null;
   floor: FloorResult | null;
+  /** True when decide()'s deployed-policy guard raised the level. */
+  guardRaised: boolean;
 };
 
 async function sha256Hex(text: string): Promise<string> {
@@ -454,12 +462,14 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
 
   // 2. Extraction (an LlmError is the only failure extract() reports). When
-  // the primary's extraction fails, the secondary tries once, but only to
-  // carry red-flag floors: a failed primary extraction always ends at Human
-  // review, even if the secondary succeeds.
+  // the primary's extraction fails, the secondary (or, in one-model mode,
+  // the extraction fallback) tries once, but only to carry red-flag floors:
+  // a failed primary extraction always ends at Human review, even if the
+  // backup succeeds.
   let ex: Extraction | null = null;
   let salvaged: Extraction['red_flags'] | null = null;
-  for (const spec of [deps.primary, deps.secondary]) {
+  const backup = deps.secondary ?? deps.extractionFallback ?? null;
+  for (const spec of [deps.primary, backup]) {
     if (!spec) continue;
     addSpec(run, spec);
     try {
@@ -493,7 +503,7 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   }
   if (run.extractionModel !== deps.primary) {
     // The primary failed, so the case ends at Human review whatever the
-    // secondary read. Its flags, merged with any salvaged from the primary's
+    // backup read. Its flags, merged with any salvaged from the primary's
     // output, still set the floor.
     run.extraction = {
       ...ex,
@@ -570,6 +580,7 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     },
     policy,
   );
+  run.guardRaised = decision.guardRaised;
   const disposition = decision.disposition;
   if (decision.status === 'human_review' || disposition === null) {
     return humanReview(run, decision.reasons[0] ?? 'sampling_failed', votes);
@@ -622,6 +633,7 @@ export async function route(
     raw: {extraction: null, primary: [], secondary: null},
     extraction: null,
     floor: null,
+    guardRaised: false,
   };
 
   let result: RouteResult;
@@ -638,7 +650,7 @@ export async function route(
   }
 
   try {
-    deps.log(traceLine(result));
+    deps.log(traceLine(result, {guardRaised: run.guardRaised}));
   } catch {
     // Logging must not change the patient's outcome.
   }

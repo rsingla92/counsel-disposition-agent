@@ -197,7 +197,7 @@ export function appFor(deps: Deps): Hono<App> {
     }
     const unsafe = checkLiveSafe(deps.policy, overrides?.policy);
     if (unsafe) return c.json({error: unsafe}, 400);
-    let models: Pick<Deps, 'primary' | 'secondary'>;
+    let models: Pick<Deps, 'primary' | 'secondary' | 'extractionFallback'>;
     try {
       models = selectModels(overrides?.models, deps.primary, deps.secondary);
     } catch {

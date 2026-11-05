@@ -99,43 +99,59 @@ export function applyPolicyOverrides(
 }
 
 /**
- * Null when the overrides may run live. An under weight on a boundary
- * whose more acute side is an emergency (call_911/ed_now and
- * ed_now/in_person_today) may not drop below the deployed policy's, so no
- * live route lands an emergency lower than the deployed policy would.
+ * Null when the overrides may run live, else the error code. Live settings
+ * may raise but never lower two safety settings below the deployed policy:
+ * - an under weight on a boundary whose more acute side is an emergency
+ *   (call_911/ed_now and ed_now/in_person_today), so no live route lands an
+ *   emergency lower than the deployed policy would;
+ * - min_valid, so a live route never trusts fewer valid samples than the
+ *   deployed policy does.
+ * Re-scoring a saved run is not checked: it keeps the full range.
  */
 export function checkLiveSafe(
   policy: Policy,
   o: PolicyOverrides | undefined,
 ): string | null {
   const w = o?.under_weights;
-  if (!w) return null;
-  const lowered = policy.loss.boundaries.some(
-    (b, i) => rank(b.between[0]) >= rank('ed_now') && w[i] < b.under,
-  );
-  return lowered ? 'emergency_weight_below_policy' : null;
+  const lowered =
+    w !== undefined &&
+    policy.loss.boundaries.some(
+      (b, i) => rank(b.between[0]) >= rank('ed_now') && w[i] < b.under,
+    );
+  if (lowered) return 'emergency_weight_below_policy';
+  if (o?.min_valid !== undefined && o.min_valid < policy.sampling.min_valid) {
+    return 'min_valid_below_policy';
+  }
+  return null;
 }
 
 /**
  * The models for a request. `primary` is the env PRIMARY_* spec (Sonnet)
- * and `secondary` the env SECONDARY_* spec (Flash). Throws for flash or
- * sonnet+flash when no secondary is configured.
+ * and `secondary` the env SECONDARY_* spec (Flash). For a one-model choice
+ * the other configured model is `extractionFallback`: it retries a failed
+ * extraction only to carry red-flag floors, and never samples or
+ * cross-checks. Throws for flash or sonnet+flash when no secondary is
+ * configured.
  */
 export function selectModels(
   choice: ModelChoice | undefined,
   primary: ModelSpec,
   secondary: ModelSpec | null,
-): {primary: ModelSpec; secondary: ModelSpec | null} {
+): {
+  primary: ModelSpec;
+  secondary: ModelSpec | null;
+  extractionFallback: ModelSpec | null;
+} {
   switch (choice) {
     case 'sonnet':
-      return {primary, secondary: null};
+      return {primary, secondary: null, extractionFallback: secondary};
     case 'flash':
       if (!secondary) throw new Error('secondary model not configured');
-      return {primary: secondary, secondary: null};
+      return {primary: secondary, secondary: null, extractionFallback: primary};
     case 'sonnet+flash':
       if (!secondary) throw new Error('secondary model not configured');
-      return {primary, secondary};
+      return {primary, secondary, extractionFallback: null};
     default:
-      return {primary, secondary};
+      return {primary, secondary, extractionFallback: null};
   }
 }

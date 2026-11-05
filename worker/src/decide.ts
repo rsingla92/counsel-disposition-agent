@@ -42,6 +42,11 @@ export type Decision = {
   disposition: Level | null;
   reasons: ReasonCode[];
   flagged: boolean;
+  /**
+   * True when the deployed-policy guard raised the disposition above what
+   * the overridden policy chose. Reported for the log; routing is unchanged.
+   */
+  guardRaised: boolean;
 };
 
 function isEmergency(l: Level): boolean {
@@ -61,16 +66,19 @@ export function decide(input: DecideInput, policy: Policy): Decision {
       disposition: isEmergency(floor) ? floor : null,
       reasons: ['sampling_failed'],
       flagged: true,
+      guardRaised: false,
     };
   }
 
   let disposition = chooseLevel(primary, floor, policy);
+  let guardRaised = false;
   if (input.deployedPolicy) {
     // Overridden weights may not route below an emergency the deployed
     // policy would choose (AGENTS.md rule 1).
     const deployed = chooseLevel(primary, floor, input.deployedPolicy);
     if (isEmergency(deployed) && rank(disposition) < rank(deployed)) {
       disposition = deployed;
+      guardRaised = true;
     }
   }
   // A configured secondary with too few valid samples cannot cross-check
@@ -92,5 +100,6 @@ export function decide(input: DecideInput, policy: Policy): Decision {
     disposition,
     reasons,
     flagged: reasons.some(r => REVIEW_REASONS.has(r)),
+    guardRaised,
   };
 }

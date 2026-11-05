@@ -319,6 +319,55 @@ describe('POST /v1/route with overrides', () => {
     expect(calls).toEqual([]);
   });
 
+  it('rejects min_valid below the policy without calling the LLM', async () => {
+    expect(loadPolicy().sampling.min_valid).toBe(15);
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({message: M, overrides: {policy: {min_valid: 14}}}),
+      ENV,
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({error: 'min_valid_below_policy'});
+    expect(calls).toEqual([]);
+  });
+
+  it('allows min_valid above the policy', async () => {
+    const res = await app().request(
+      '/v1/route',
+      post({message: M, overrides: {policy: {min_valid: 16}}}),
+      ENV,
+    );
+    expect(res.status).toBe(200);
+    const result = await resultOf(res);
+    expect(result.trace.overrides).toEqual({policy: {min_valid: 16}});
+  });
+
+  it('backs up a failed Flash extraction with Sonnet for models flash', async () => {
+    const {app, calls} = twoModelApp({
+      extractError: 'timeout',
+      extractErrorOn: 'secondary',
+      flags: {cardiac_chest_pain: 'present'},
+    });
+    const res = await app.request(
+      '/v1/route',
+      post({message: REFILL_WITH_CHEST, overrides: {models: 'flash'}}),
+      ENV,
+    );
+    const events = lines(await res.text());
+    expect(events[0]).toEqual(
+      expect.objectContaining({event: 'early', floor: 'call_911'}),
+    );
+    const result = events[events.length - 1].result as RouteResult;
+    expect(result.status).toBe('human_review');
+    expect(result.human_review.reasons).toEqual(['extraction_failed']);
+    expect(result.disposition).toBe('call_911');
+    expect(calls).toEqual([
+      {step: 'extraction', model: SECONDARY.model},
+      {step: 'extraction', model: PRIMARY.model},
+    ]);
+  });
+
   it('rejects out-of-range and unknown overrides without calling the LLM', async () => {
     for (const overrides of [
       {policy: {min_valid: 30}},
@@ -696,6 +745,15 @@ describe('experiment endpoints', () => {
     const res = await app().request(
       '/v1/experiments/run-a/rescore',
       post({policy: {under_weights: under, human_review_cost: 0.5}}),
+      env,
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it('allows min_valid below the policy when re-scoring', async () => {
+    const res = await app().request(
+      '/v1/experiments/run-a/rescore',
+      post({policy: {min_valid: 10}}),
       env,
     );
     expect(res.status).toBe(200);

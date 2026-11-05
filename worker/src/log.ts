@@ -7,8 +7,13 @@ import type {OverrideReasonCode, RouteResult} from './schema';
  * questions and raw model output are all left out: any of them can repeat
  * patient text (an excerpt may be the whole of a short message). The raw
  * output stays in the HTTP response's trace for traceability.
+ * `guardRaised` is true when the deployed-policy guard raised the level
+ * above what the request's overrides chose.
  */
-export function traceLine(result: RouteResult): string {
+export function traceLine(
+  result: RouteResult,
+  {guardRaised = false}: {guardRaised?: boolean} = {},
+): string {
   const present = result.red_flags.filter(f => f.state === 'present');
   return JSON.stringify({
     kind: 'route',
@@ -42,6 +47,9 @@ export function traceLine(result: RouteResult): string {
       photo: result.info_requests.photo,
     },
     time_sensitive: result.time_sensitive,
+    // True when the request's overrides were applied to this route.
+    overridden: result.trace.overrides !== null,
+    guard_raised: guardRaised,
   });
 }
 

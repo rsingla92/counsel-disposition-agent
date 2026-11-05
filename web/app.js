@@ -34,7 +34,7 @@ import {
   writeToken,
 } from './lib.js';
 
-const LIVE_TIMEOUT_MS = 90_000;
+const LIVE_TIMEOUT_MS = 150_000;
 const HOLDING_WINDOW = 'Physician review within 1 hour';
 
 const $ = id => document.getElementById(id);
@@ -680,7 +680,7 @@ function renderBanner() {
   const text = routingBanner(ops.liveOverrides(), replay);
   ui.routingBanner.hidden = text === null || state.view === 'ops';
   const note = text !== null && !replay && ops.whatIf()
-    ? ' · Emergency weights stay at the policy value live.'
+    ? ' · Emergency weights and valid samples needed stay at least at the policy value live.'
     : '';
   // Rewritten only when it changes, so screen readers do not re-announce
   // the status on every render.
