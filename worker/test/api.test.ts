@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import schemaJson from '../../schema/route-result.schema.json';
-import worker, {appFor, workerFor, type Env} from '../src/index';
+import worker, {appFor, clientTuning, workerFor, type Env} from '../src/index';
 import {summarize} from '../src/metrics';
 import {loadPolicy} from '../src/policy';
 import type {Experiment} from '../src/rescore';
@@ -454,6 +454,30 @@ describe('worker entry', () => {
       where: 'deps',
     });
     expect(logged[0]).not.toContain('secret detail');
+  });
+});
+
+describe('clientTuning', () => {
+  it('keys each configured model to its env tuning', () => {
+    expect(
+      clientTuning({
+        ...ENV,
+        PRIMARY_MODEL: 'sonnet',
+        PRIMARY_MAX_IN_FLIGHT: '2',
+        SECONDARY_MODEL: 'flash',
+        SECONDARY_MAX_IN_FLIGHT: '4',
+        SECONDARY_REASONING_EFFORT: 'low',
+      }),
+    ).toEqual({
+      sonnet: {maxInFlight: 2},
+      flash: {maxInFlight: 4, reasoningEffort: 'low'},
+    });
+  });
+
+  it('leaves out a model with no tuning', () => {
+    expect(
+      clientTuning({...ENV, PRIMARY_MODEL: 'sonnet', SECONDARY_MODEL: ''}),
+    ).toEqual({});
   });
 });
 

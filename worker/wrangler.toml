@@ -11,6 +11,13 @@ PRIMARY_MODEL = "anthropic/claude-sonnet-5.5"
 PRIMARY_PROVIDER = "google-vertex"
 SECONDARY_MODEL = "google/gemini-3.8-flash"
 SECONDARY_PROVIDER = "google-vertex"
+# Vertex rate-limits each model separately, so each model has its own queue
+# (at most 6 connections in all). Sonnet alone at 3 in flight drew HTTP 429s
+# on 2026-11-04. Flash reasons by default: on 2026-11-05 a sample call took
+# 7.4 s with reasoning and 2.7 s with effort "low".
+PRIMARY_MAX_IN_FLIGHT = "2"
+SECONDARY_MAX_IN_FLIGHT = "4"
+SECONDARY_REASONING_EFFORT = "low"
 ALLOWED_ORIGIN = "https://counsel-disposition-web.counsel-demo.workers.dev"
 
 # Saved eval runs for the Operations view (export_experiment.py output), read

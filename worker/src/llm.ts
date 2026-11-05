@@ -36,12 +36,45 @@ export class LlmError extends Error {
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 
 /**
- * Requests in flight per case. A Cloudflare Worker request may hold six
- * connections open at once; three keeps a case under the provider's rate
- * limit. The client queues requests itself so that each timeout measures the
- * provider's time, not the wait for a connection.
+ * Default requests in flight per model, per case. The provider rate-limits
+ * each model separately, so each model gets its own queue. The client queues
+ * requests itself so that each timeout measures the provider's time, not the
+ * wait for a connection.
  */
 export const MAX_IN_FLIGHT = 3;
+
+/** A Cloudflare Worker request may hold six connections open at once. */
+export const WORKER_CONNECTIONS = 6;
+
+export const REASONING_EFFORTS = ['minimal', 'low', 'medium', 'high'] as const;
+export type ReasoningEffort = (typeof REASONING_EFFORTS)[number];
+
+/** Per-model call settings, keyed by model id in openRouterClient. */
+export type ModelTuning = {
+  /** This model's queue size; defaults to the client's maxInFlight. */
+  maxInFlight?: number;
+  /** Sent as OpenRouter's reasoning.effort; omitted when unset. */
+  reasoningEffort?: ReasoningEffort;
+};
+
+/**
+ * Reads a model's tuning from its env vars. A limit must be a whole number
+ * from 1 to WORKER_CONNECTIONS and an effort one of REASONING_EFFORTS;
+ * anything else is ignored, leaving the default.
+ */
+export function tuningFromEnv(
+  maxInFlight: string | undefined,
+  effort: string | undefined,
+): ModelTuning {
+  const tuning: ModelTuning = {};
+  const n = Number(maxInFlight);
+  if (maxInFlight && Number.isInteger(n) && n >= 1 && n <= WORKER_CONNECTIONS) {
+    tuning.maxInFlight = n;
+  }
+  const e = REASONING_EFFORTS.find(x => x === effort);
+  if (e) tuning.reasoningEffort = e;
+  return tuning;
+}
 
 /**
  * Retries for a rate-limited (HTTP 429) request; nothing else is retried.
@@ -77,7 +110,9 @@ function isTimeout(e: unknown): boolean {
 
 /**
  * OpenRouter chat-completions client. The provider is pinned with fallbacks
- * off and zero-data-retention only. Messages are never logged.
+ * off and zero-data-retention only. Messages are never logged. Each model
+ * has its own queue, and all models together hold at most
+ * WORKER_CONNECTIONS connections.
  */
 export function openRouterClient(
   apiKey: string,
@@ -85,15 +120,29 @@ export function openRouterClient(
   maxInFlight = MAX_IN_FLIGHT,
   sleep: (ms: number) => Promise<void> = ms =>
     new Promise(resolve => setTimeout(resolve, ms)),
+  tuning: Record<string, ModelTuning> = {},
 ): LlmClient {
-  const gate = limiter(maxInFlight);
+  const connections = limiter(WORKER_CONNECTIONS);
+  const gates = new Map<string, ReturnType<typeof limiter>>();
+  const gateFor = (model: string) => {
+    let gate = gates.get(model);
+    if (!gate) {
+      gate = limiter(tuning[model]?.maxInFlight ?? maxInFlight);
+      gates.set(model, gate);
+    }
+    return gate;
+  };
   return {
     async complete(req) {
+      const gate = gateFor(req.spec.model);
+      const effort = tuning[req.spec.model]?.reasoningEffort;
       // A rate-limited request rejoins the back of the queue after a backoff,
       // so it does not hold a connection while it waits.
       for (let attempt = 0; ; attempt++) {
         try {
-          return await gate(() => send(apiKey, fetchImpl, req));
+          return await gate(() =>
+            connections(() => send(apiKey, fetchImpl, req, effort)),
+          );
         } catch (e) {
           const limited = e instanceof LlmError && e.status === 429;
           if (!limited || attempt >= (req.maxRetries ?? MAX_RETRIES)) throw e;
@@ -108,8 +157,10 @@ async function send(
   apiKey: string,
   fetchImpl: typeof fetch,
   req: LlmRequest,
+  effort: ReasoningEffort | undefined,
 ): Promise<LlmResponse> {
   const body = JSON.stringify({
+    ...(effort ? {reasoning: {effort}} : {}),
     model: req.spec.model,
     messages: [
       {role: 'system', content: req.system},

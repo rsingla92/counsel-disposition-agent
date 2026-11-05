@@ -56,6 +56,13 @@ only the Human review message ("if this is an emergency, call 911").
 ## What changed
 
 - At most 3 calls in flight per case, down from 6.
+- **2026-11-05:** a queue per model, because Vertex limits each model
+  separately: Sonnet 2 and Flash 4 in flight, at most 6 in all. Sonnet alone
+  had drawn 429s at 3. Flash also runs at reasoning effort `low`: by default
+  it reasons, and a sample call took 7.4 s against 2.7 s at `low`. On nine
+  made-up messages, both models took 40 to 66 s (from a median of 83 s),
+  and Sonnet alone got 19 or 20 valid samples every time. A few 429s still
+  come back from both models, and their retries add time.
 - Extraction gets the same rate-limit retries as sampling: 4, with backoff
   from 1 s. It used to get 1.
 - When the primary model's extraction fails (an error, or output that failed

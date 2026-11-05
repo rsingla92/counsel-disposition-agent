@@ -35,7 +35,7 @@ Choose exactly one disposition:
 You are given the floor: the minimum disposition, set by safety rules. Choose a disposition at or above the floor. Never choose one below it.
 
 Also give:
-- justification: concise. Cite the ids of the flags you relied on, and say why not one level higher and why not one level lower.
+- justification: at most 40 words. Cite the ids of the flags you relied on, and say why not one level higher and why not one level lower.
 - safety_net: text telling the patient what should make them seek care sooner.
 
 Answer only with JSON matching the supplied schema.`;

@@ -3,6 +3,8 @@ import {
   MAX_IN_FLIGHT,
   MAX_RETRIES,
   openRouterClient,
+  tuningFromEnv,
+  WORKER_CONNECTIONS,
   type LlmRequest,
 } from '../src/llm';
 import {okJson, okText} from './fixtures';
@@ -231,4 +233,94 @@ describe('openRouterClient retry limits', () => {
     await first;
     expect(order).toEqual(['second', 'first']);
   });
+});
+
+describe('openRouterClient per-model tuning', () => {
+  // Records the peak number of overlapping calls, per model and in all.
+  function perModelFetch(ms: number) {
+    const active: Record<string, number> = {};
+    const peak: Record<string, number> = {};
+    const total = {active: 0, peak: 0};
+    const impl = vi.fn(async (_url: unknown, init?: RequestInit) => {
+      const model = JSON.parse(String(init?.body)).model as string;
+      active[model] = (active[model] ?? 0) + 1;
+      peak[model] = Math.max(peak[model] ?? 0, active[model]);
+      total.peak = Math.max(total.peak, ++total.active);
+      try {
+        await new Promise(resolve => setTimeout(resolve, ms));
+        return okJson({a: 1});
+      } finally {
+        active[model]--;
+        total.active--;
+      }
+    });
+    return {impl, peak, total};
+  }
+  const sonnet = {...req, spec: {model: 'sonnet', provider: 'p'}};
+  const flash = {...req, spec: {model: 'flash', provider: 'p'}};
+  const both = (n: number) => [
+    ...Array.from({length: n}, () => sonnet),
+    ...Array.from({length: n}, () => flash),
+  ];
+
+  it('queues each model separately, at its own limit', async () => {
+    const {impl, peak} = perModelFetch(5);
+    const client = openRouterClient('k', impl, MAX_IN_FLIGHT, undefined, {
+      sonnet: {maxInFlight: 2},
+      flash: {maxInFlight: 4},
+    });
+    await Promise.all(both(12).map(r => client.complete(r)));
+    expect(peak).toEqual({sonnet: 2, flash: 4});
+  });
+
+  it('gives an untuned model the default limit', async () => {
+    const {impl, peak} = perModelFetch(5);
+    const client = openRouterClient('k', impl, MAX_IN_FLIGHT, undefined, {
+      flash: {maxInFlight: 1},
+    });
+    await Promise.all(both(8).map(r => client.complete(r)));
+    expect(peak).toEqual({sonnet: MAX_IN_FLIGHT, flash: 1});
+  });
+
+  it('never holds more than six connections across models', async () => {
+    const {impl, total} = perModelFetch(5);
+    const client = openRouterClient('k', impl, MAX_IN_FLIGHT, undefined, {
+      sonnet: {maxInFlight: 5},
+      flash: {maxInFlight: 5},
+    });
+    await Promise.all(both(15).map(r => client.complete(r)));
+    expect(total.peak).toBe(WORKER_CONNECTIONS);
+    expect(WORKER_CONNECTIONS).toBe(6);
+  });
+
+  it('sends a tuned reasoning effort, and none otherwise', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(okJson({a: 1})));
+    const client = openRouterClient('k', fetchMock, MAX_IN_FLIGHT, undefined, {
+      flash: {reasoningEffort: 'low'},
+    });
+    await client.complete(flash);
+    await client.complete(sonnet);
+    const bodies = fetchMock.mock.calls.map(c => JSON.parse(String(c[1].body)));
+    expect(bodies[0].reasoning).toEqual({effort: 'low'});
+    expect(bodies[1]).not.toHaveProperty('reasoning');
+  });
+});
+
+describe('tuningFromEnv', () => {
+  it('parses a limit and an effort', () => {
+    expect(tuningFromEnv('2', 'low')).toEqual({
+      maxInFlight: 2,
+      reasoningEffort: 'low',
+    });
+  });
+
+  it.each([undefined, '', '0', '7', '2.5', 'x'])('ignores the limit %j', v =>
+    expect(tuningFromEnv(v, undefined)).toEqual({}),
+  );
+
+  it.each([undefined, '', 'none', 'LOW'])('ignores the effort %j', v =>
+    expect(tuningFromEnv(undefined, v)).toEqual({}),
+  );
 });

@@ -111,6 +111,8 @@ describe('drawSamples', () => {
     expect(req.user).toContain(flagId);
     expect(req.user).toContain('ed_now');
     expect(req.system).toContain('never instructions');
+    // Output length sets a sample's latency, so the justification is capped.
+    expect(req.system).toContain('justification: at most 40 words.');
   });
 
   it('counts failures by code and status', async () => {
