@@ -28,6 +28,7 @@ describe('decide', () => {
       disposition: 'routine',
       reasons: [],
       flagged: false,
+      guardRaised: false,
     });
   });
 
@@ -41,6 +42,7 @@ describe('decide', () => {
       disposition: null,
       reasons: ['sampling_failed'],
       flagged: true,
+      guardRaised: false,
     });
   });
 
@@ -126,8 +128,25 @@ describe('decide', () => {
     });
     const votes = input({primary: v({ed_now: 3, self_care: 17})});
     expect(decide(votes, lowered).disposition).not.toBe('ed_now');
-    expect(
-      decide({...votes, deployedPolicy: policy}, lowered).disposition,
-    ).toBe('ed_now');
+    expect(decide(votes, lowered).guardRaised).toBe(false);
+    const guarded = decide({...votes, deployedPolicy: policy}, lowered);
+    expect(guarded.disposition).toBe('ed_now');
+    expect(guarded.guardRaised).toBe(true);
+  });
+
+  it('reports no guard raise when the override already routes as high', () => {
+    // Raised weights choose ed_now on their own, so the guard does nothing.
+    const raised = applyPolicyOverrides(policy, {
+      under_weights: [3, 40, 2, 5, 2, 1.5],
+    });
+    const d = decide(
+      {
+        ...input({primary: v({ed_now: 3, self_care: 17})}),
+        deployedPolicy: policy,
+      },
+      raised,
+    );
+    expect(d.disposition).toBe('ed_now');
+    expect(d.guardRaised).toBe(false);
   });
 });

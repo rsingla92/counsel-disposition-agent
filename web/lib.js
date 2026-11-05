@@ -506,6 +506,12 @@ export const OVERRIDE_RANGES = {
 /** The model choices the Worker accepts (worker/src/overrides.ts). */
 export const MODEL_CHOICES = ['sonnet', 'flash', 'sonnet+flash'];
 
+/**
+ * The deployed model configuration (primary Sonnet, secondary Flash). A
+ * choice equal to it is no override, so it is never sent.
+ */
+const POLICY_DEFAULT_MODELS = 'sonnet+flash';
+
 /** Short labels, for the banner. */
 export const MODEL_LABELS = {
   sonnet: 'Sonnet only',
@@ -561,12 +567,13 @@ function onStep(x, {min, max, step}) {
 /**
  * Slider and picker state for `overrides` (null for none): every field
  * filled from the policy where the overrides leave it out. `models` is
- * 'policy' for the deployed default.
+ * 'policy' for the deployed default, including a stored Sonnet + Flash.
  */
 export function controlsFromOverrides(overrides, policy) {
   const p = overrides?.policy ?? {};
+  const models = overrides?.models;
   return {
-    models: overrides?.models ?? 'policy',
+    models: models && models !== POLICY_DEFAULT_MODELS ? models : 'policy',
     min_valid: p.min_valid ?? policy.min_valid,
     min_top_votes: p.min_top_votes ?? policy.min_top_votes,
     max_span: p.max_span ?? policy.max_span,
@@ -577,12 +584,14 @@ export function controlsFromOverrides(overrides, policy) {
 
 /**
  * The overrides for `controls`: only the fields that differ from the
- * policy, with all six weights when any one differs. Null when nothing
- * differs.
+ * policy, with all six weights when any one differs. A model choice equal
+ * to the policy default is left out. Null when nothing differs.
  */
 export function overridesFromControls(controls, policy) {
   const out = {};
-  if (MODEL_CHOICES.includes(controls.models)) out.models = controls.models;
+  if (MODEL_CHOICES.includes(controls.models) && controls.models !== POLICY_DEFAULT_MODELS) {
+    out.models = controls.models;
+  }
   const p = {};
   for (const f of POLICY_FIELDS) {
     if (controls[f] !== policy[f]) p[f] = controls[f];
@@ -637,18 +646,25 @@ export function validStoredOverrides(stored, policy) {
   return stored;
 }
 
-/** True when an emergency-guarding weight is below the policy's. */
+/**
+ * True when a raise-only setting is below the policy's: an emergency-guarding
+ * weight or the valid samples needed (checkLiveSafe in
+ * worker/src/overrides.ts). Live routes use the policy value instead.
+ */
 export function isWhatIf(overrides, policy) {
-  const w = overrides?.policy?.under_weights;
-  if (!w || !policy) return false;
-  return EMERGENCY_WEIGHTS.some(i => w[i] < policy.under_weights[i]);
+  const p = overrides?.policy;
+  if (!p || !policy) return false;
+  if (p.min_valid !== undefined && p.min_valid < policy.min_valid) return true;
+  const w = p.under_weights;
+  return Boolean(w) && EMERGENCY_WEIGHTS.some(i => w[i] < policy.under_weights[i]);
 }
 
 /**
  * The overrides a live /v1/route may send: human_review_cost removed (the
- * Worker rejects it live) and each emergency weight raised to at least the
- * policy's, so a what-if setting never 400s a live route. Null when
- * nothing is left.
+ * Worker rejects it live), and min_valid and each emergency weight raised
+ * to at least the policy's, so a what-if setting never 400s a live route.
+ * A field the clamp returns to the policy is dropped. Null when nothing is
+ * left.
  */
 export function liveOverrides(overrides, policy) {
   if (!overrides || !policy) return null;
@@ -656,6 +672,11 @@ export function liveOverrides(overrides, policy) {
   if (overrides.models) out.models = overrides.models;
   const p = {...(overrides.policy ?? {})};
   delete p.human_review_cost;
+  if (p.min_valid !== undefined) {
+    const v = Math.max(p.min_valid, policy.min_valid);
+    if (v === policy.min_valid) delete p.min_valid;
+    else p.min_valid = v;
+  }
   if (p.under_weights) {
     const w = p.under_weights.map((x, i) =>
       EMERGENCY_WEIGHTS.includes(i) ? Math.max(x, policy.under_weights[i]) : x,

@@ -249,31 +249,54 @@ describe('checkLiveSafe', () => {
 
   it('allows no overrides and overrides without weights', () => {
     expect(checkLiveSafe(policy, undefined)).toBeNull();
-    expect(checkLiveSafe(policy, {min_valid: 10})).toBeNull();
+    expect(checkLiveSafe(policy, {max_span: 3})).toBeNull();
+  });
+
+  it('rejects min_valid below the policy and allows it at or above', () => {
+    expect(policy.sampling.min_valid).toBe(15);
+    expect(checkLiveSafe(policy, {min_valid: 14})).toBe(
+      'min_valid_below_policy',
+    );
+    expect(checkLiveSafe(policy, {min_valid: 10})).toBe(
+      'min_valid_below_policy',
+    );
+    expect(checkLiveSafe(policy, {min_valid: 15})).toBeNull();
+    expect(checkLiveSafe(policy, {min_valid: 16})).toBeNull();
   });
 });
 
 describe('selectModels', () => {
   it('maps each choice onto the env specs', () => {
+    // One-model choices keep the other model as an extraction-only backup.
     expect(selectModels('sonnet', PRIMARY, SECONDARY)).toEqual({
       primary: PRIMARY,
       secondary: null,
+      extractionFallback: SECONDARY,
     });
     expect(selectModels('flash', PRIMARY, SECONDARY)).toEqual({
       primary: SECONDARY,
       secondary: null,
+      extractionFallback: PRIMARY,
     });
     expect(selectModels('sonnet+flash', PRIMARY, SECONDARY)).toEqual({
       primary: PRIMARY,
       secondary: SECONDARY,
+      extractionFallback: null,
     });
     expect(selectModels(undefined, PRIMARY, SECONDARY)).toEqual({
       primary: PRIMARY,
       secondary: SECONDARY,
+      extractionFallback: null,
     });
     expect(selectModels(undefined, PRIMARY, null)).toEqual({
       primary: PRIMARY,
       secondary: null,
+      extractionFallback: null,
+    });
+    expect(selectModels('sonnet', PRIMARY, null)).toEqual({
+      primary: PRIMARY,
+      secondary: null,
+      extractionFallback: null,
     });
   });
 

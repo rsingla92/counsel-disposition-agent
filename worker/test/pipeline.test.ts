@@ -632,8 +632,7 @@ describe('route: secondary model', () => {
 });
 
 describe('route: overrides', () => {
-  it('gives Human review when the only model fails to extract', async () => {
-    // models "flash": Flash runs alone, so there is no fallback extraction.
+  it('gives Human review when both models fail to extract in one-model mode', async () => {
     const llm = scripted({extractError: 'provider_error'});
     const models = selectModels('flash', PRIMARY, SECONDARY);
     const r = await route(
@@ -645,9 +644,62 @@ describe('route: overrides', () => {
     expect(r.status).toBe('human_review');
     expect(r.human_review.reasons).toEqual(['extraction_failed']);
     expect(r.disposition).toBeNull();
-    expect(llm.calls).toBe(1);
-    expect(r.trace.models).toEqual([SECONDARY]);
+    // Flash, then Sonnet as the extraction backup.
+    expect(llm.calls).toBe(2);
+    expect(r.trace.models).toEqual([SECONDARY, PRIMARY]);
+    expect(r.trace.extraction_model).toBeNull();
     expect(r.trace.overrides).toEqual({models: 'flash'});
+  });
+
+  it.each([
+    // [choice, model that times out, backup model]
+    ['flash', SECONDARY, PRIMARY],
+    ['sonnet', PRIMARY, SECONDARY],
+  ] as const)(
+    'models %s: the other model backs up a failed extraction, floors only',
+    async (choice, only, backup) => {
+      const onEarly = vi.fn();
+      const llm = scripted({
+        extractError: 'timeout',
+        extractErrorOn: only === PRIMARY ? 'primary' : 'secondary',
+        flags: {cardiac_chest_pain: 'present'},
+        samples: 'routine',
+      });
+      const models = selectModels(choice, PRIMARY, SECONDARY);
+      expect(models.secondary).toBeNull();
+      expect(models.extractionFallback).toEqual(backup);
+      const r = await route(
+        REFILL_WITH_CHEST,
+        {...deps(llm), ...models},
+        {overrides: {models: choice}, onEarly},
+      );
+      expect(r.status).toBe('human_review');
+      expect(r.human_review.reasons).toEqual(['extraction_failed']);
+      expect(r.floor).toBe('call_911');
+      expect(r.disposition).toBe('call_911');
+      expect(onEarly).toHaveBeenCalledWith(
+        expect.objectContaining({floor: 'call_911'}),
+      );
+      expect(r.trace.models).toEqual([only, backup]);
+      expect(r.trace.extraction_model).toEqual(backup);
+      // One extraction each, and the backup never samples.
+      expect(llm.requests).toEqual([
+        {schemaName: 'extraction', model: only.model},
+        {schemaName: 'extraction', model: backup.model},
+      ]);
+      expect(r.votes.secondary).toBeNull();
+    },
+  );
+
+  it('one-model mode never calls the backup when extraction succeeds', async () => {
+    const llm = scripted({samples: 'routine'});
+    const models = selectModels('flash', PRIMARY, SECONDARY);
+    const r = await route(M, {...deps(llm), ...models});
+    expect(r.status).toBe('routed');
+    expect(r.trace.models).toEqual([SECONDARY]);
+    expect(r.trace.extraction_model).toEqual(SECONDARY);
+    expect(llm.requests.every(q => q.model === SECONDARY.model)).toBe(true);
+    expect(r.votes.secondary).toBeNull();
   });
 
   it('keeps an emergency the deployed policy would choose', async () => {
@@ -1093,6 +1145,8 @@ describe('traceLine', () => {
         'human_review',
         'info_requests',
         'time_sensitive',
+        'overridden',
+        'guard_raised',
       ].sort(),
     );
     expect(line).toEqual({
@@ -1114,8 +1168,54 @@ describe('traceLine', () => {
       human_review: r.human_review,
       info_requests: {count: 1, photo: false},
       time_sensitive: false,
+      overridden: false,
+      guard_raised: false,
     });
     expect(traceLine(r)).not.toContain('How long has it lasted?');
+  });
+
+  it('marks overridden routes and a guard raise in the logged line', async () => {
+    // As in "keeps an emergency the deployed policy would choose".
+    const o = {under_weights: [3, 20, 0.5, 0.5, 0.5, 0.5], max_span: 6};
+    const sampleFor = (i: number): Sample => ({
+      disposition: i < 3 ? 'ed_now' : 'self_care',
+      justification: 'Test justification.',
+      safety_net: 'Seek care sooner if it gets worse.',
+    });
+    const logged = async (opts: Parameters<typeof route>[2]) => {
+      const lines: string[] = [];
+      const r = await route(
+        SECRET_MSG,
+        {
+          ...deps(scripted({sampleFor})),
+          policy: applyPolicyOverrides(policy, o),
+          log: l => lines.push(l),
+        },
+        opts,
+      );
+      const raw = lines.find(l => JSON.parse(l).kind === 'route') as string;
+      expect(raw).not.toContain(SECRET_MSG);
+      return {r, line: JSON.parse(raw)};
+    };
+
+    const guarded = await logged({
+      overrides: {policy: o},
+      deployedPolicy: policy,
+    });
+    expect(guarded.r.disposition).toBe('ed_now');
+    expect(guarded.line.overridden).toBe(true);
+    expect(guarded.line.guard_raised).toBe(true);
+
+    // Overridden, but with no deployed policy the guard cannot raise.
+    const unguarded = await logged({overrides: {policy: o}});
+    expect(unguarded.r.disposition).toBe('self_care');
+    expect(unguarded.line.overridden).toBe(true);
+    expect(unguarded.line.guard_raised).toBe(false);
+
+    const plain = await route(M, deps(scripted({})));
+    expect(JSON.parse(traceLine(plain))).toEqual(
+      expect.objectContaining({overridden: false, guard_raised: false}),
+    );
   });
 
   it('lists present flags whose excerpt did not verify', () => {

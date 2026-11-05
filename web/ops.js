@@ -28,13 +28,22 @@ const EXPERIMENT_KEY = 'counsel-demo-experiment';
 const RESCORE_DEBOUNCE_MS = 250;
 
 export const WHAT_IF_TEXT =
-  'What-if only: live messages use the policy value for emergency weights';
+  'What-if only: live messages use the policy value for emergency weights and valid samples needed';
 
+// Sonnet 5.5 + Flash is the deployed configuration, so "Policy default" is
+// that choice; a separate option would only repeat it.
 const MODEL_OPTIONS = [
   {value: 'policy', label: 'Policy default', hint: 'Sonnet 5.5 with Gemini 3.8 Flash as a cross-check'},
-  {value: 'sonnet', label: 'Sonnet 5.5 only', hint: 'One model, no cross-check'},
-  {value: 'flash', label: 'Gemini 3.8 Flash only', hint: 'One model, no cross-check'},
-  {value: 'sonnet+flash', label: 'Sonnet 5.5 + Flash', hint: 'Both models, as deployed'},
+  {
+    value: 'sonnet',
+    label: 'Sonnet 5.5 only',
+    hint: 'One model, no cross-check (Flash still backs up extraction)',
+  },
+  {
+    value: 'flash',
+    label: 'Gemini 3.8 Flash only',
+    hint: 'One model, no cross-check (Sonnet still backs up extraction)',
+  },
 ];
 
 /** Short column heads for the grid; full names are in the readout and table. */
@@ -265,6 +274,9 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     // dropped, so a live route never 400s on them.
     if (stored && !s.overrides) writeJson(OVERRIDES_KEY, null);
     s.controls = controlsFromOverrides(s.overrides, s.policy);
+    // Rebuilt from the controls, so a stored choice equal to the policy
+    // default (such as Sonnet + Flash) is not sent as an override.
+    s.overrides = overridesFromControls(s.controls, s.policy);
     onChange();
 
     const exps = await api('/v1/experiments');
@@ -374,6 +386,8 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     const value = index === undefined ? s.controls[field] : s.controls.under_weights[index];
     const policyValue = index === undefined ? s.policy[field] : s.policy.under_weights[index];
     const emergency = index !== undefined && EMERGENCY_WEIGHTS.includes(index);
+    // Live routes may raise these but never lower them (checkLiveSafe).
+    const raiseOnly = emergency || field === 'min_valid';
     const output = el('output', {for: id, class: 'slider-value'});
     const hintEl = el('p', {class: 'note slider-hint', id: `${id}-hint`});
     const input = el('input', {
@@ -400,7 +414,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     );
     const paint = v => {
       output.textContent = format(v);
-      const below = emergency && v < policyValue;
+      const below = raiseOnly && v < policyValue;
       wrap.classList.toggle('changed', v !== policyValue);
       wrap.classList.toggle('whatif', below);
       replaceAll(hintEl,
@@ -510,7 +524,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
         field: 'min_valid',
         range: OVERRIDE_RANGES.min_valid,
         format: v => `${v} of ${SAMPLES}`,
-        hint: 'Fewer valid answers than this sends the case to Human review.',
+        hint: 'Fewer valid answers than this sends the case to Human review. Live routes can raise it, never lower it.',
         disabled: locked,
       }),
       slider({
@@ -540,7 +554,6 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
         class: 'note',
         text: 'How much worse routing one level too low is than one level too high, at each boundary. The two emergency guards can go lower here as a what-if only.',
       }),
-      el('div', {class: 'whatif-slot'}),
       s.boundaries.map((between, i) =>
         slider({
           id: `ops-under-${i}`,
@@ -565,6 +578,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
             text: 'This run is the rule floor alone: it has no votes to re-score, so the sliders are locked. Settings already chosen still apply to live messages. Pick another run to use the sliders.',
           })
         : null,
+      el('div', {class: 'whatif-slot'}),
       sliders,
       weights,
       el(
@@ -758,7 +772,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     const sum = panel.summary;
     const base = s.base;
     const missedWarn = [];
-    if (whatIf) missedWarn.push('What-if only: emergency weights are below the policy');
+    if (whatIf) missedWarn.push('What-if only: emergency weights or valid samples needed are below the policy');
     if (sum.missed > 0) missedWarn.push(`${plural(sum.missed, 'emergency', 'emergencies')} routed below ED now`);
     appendAll(
       resultsCard,
