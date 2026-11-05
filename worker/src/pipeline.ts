@@ -1,3 +1,4 @@
+import {REVIEW_REASONS, decide} from './decide';
 import {ExtractionInvalidError, extract} from './extract';
 import {ruleFloor, verifyExcerpt, type FloorResult} from './floor';
 import {
@@ -13,7 +14,7 @@ import {LlmError, type LlmClient, type ModelSpec} from './llm';
 import {traceLine} from './log';
 import type {RouteOverrides} from './overrides';
 import type {Policy} from './policy';
-import {chooseLevel, emptyVotes, reviewReasons, type Votes} from './router';
+import {emptyVotes, type Votes} from './router';
 import {drawSamples, type VoteSet} from './sample';
 import {
   RouteResultSchema,
@@ -64,21 +65,6 @@ export const HUMAN_REVIEW_MESSAGE =
 export const FALLBACK_SAFETY_NET =
   'If your symptoms get worse, or you are worried, call 911 or go to the ' +
   'nearest emergency department.';
-
-/** Reasons that put the case in front of a physician for review. */
-const REVIEW_REASONS: ReadonlySet<ReasonCode> = new Set([
-  'too_long',
-  'non_english',
-  'out_of_scope',
-  'extraction_failed',
-  'sampling_failed',
-  'schema_invalid',
-  'split_vote',
-  'wide_spread',
-  'family_disagreement',
-  'unverified_excerpt',
-  'secondary_unavailable',
-]);
 
 const EXPLANATIONS: Record<ReasonCode, string> = {
   too_long: 'The message is longer than the intake limit.',
@@ -533,41 +519,26 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   run.raw.primary = primary.raw;
   run.raw.secondary = secondary?.raw ?? null;
   const votes = {primary: primary.votes, secondary: secondary?.votes ?? null};
-  if (primary.valid < policy.sampling.min_valid) {
-    return humanReview(run, 'sampling_failed', votes);
-  }
 
-  // 7. Choose and flag.
-  let disposition = chooseLevel(primary.votes, floor.floor, policy);
-  if (opts.deployedPolicy) {
-    // Overridden weights may not route below an emergency the deployed
-    // policy would choose (AGENTS.md rule 1).
-    const deployed = chooseLevel(
-      primary.votes,
-      floor.floor,
-      opts.deployedPolicy,
-    );
-    if (isEmergency(deployed) && rank(disposition) < rank(deployed)) {
-      disposition = deployed;
-    }
-  }
-  // A configured secondary with too few valid samples cannot cross-check
-  // the primary. The primary's disposition stands, but a physician looks:
-  // a failed cross-check must not pass silently as an agreeing one.
-  const secondaryFailed =
-    secondary !== null && secondary.valid < policy.sampling.min_valid;
-  const secondaryVotes: Votes | null =
-    secondary && !secondaryFailed ? secondary.votes : null;
-  const crossCheck: ReasonCode[] = secondaryFailed
-    ? ['secondary_unavailable']
-    : [];
-  reasons.unshift(
-    ...reviewReasons(primary.votes, secondaryVotes, policy),
-    ...crossCheck,
+  // 7. Choose and flag (the min_valid check included), shared with re-scoring.
+  const decision = decide(
+    {
+      primary: primary.votes,
+      primaryValid: primary.valid,
+      secondary: secondary?.votes ?? null,
+      secondaryValid: secondary?.valid ?? null,
+      floor: floor.floor,
+      questions: ex.questions.length,
+      photo: ex.photo_needed,
+      baseReasons: reasons,
+      deployedPolicy: opts.deployedPolicy,
+    },
+    policy,
   );
-  const needsInfo = ex.questions.length > 0 || ex.photo_needed;
-  if (ex.questions.length > 0) reasons.push('missing_info');
-  if (ex.photo_needed) reasons.push('photo_needed');
+  const disposition = decision.disposition;
+  if (decision.status === 'human_review' || disposition === null) {
+    return humanReview(run, decision.reasons[0] ?? 'sampling_failed', votes);
+  }
   const top = Math.max(...LEVELS.map(l => primary.votes[l]));
 
   // 8. Explain.
@@ -580,11 +551,11 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
       ? chosen.safety_net
       : fallbackSafetyNet(proposed);
   return assemble(run, {
-    status: needsInfo ? 'needs_info' : 'routed',
+    status: decision.status,
     disposition,
     votes,
     confidence: top / primary.valid,
-    reasons,
+    reasons: decision.reasons,
     justification: chosen
       ? chosen.justification
       : fallbackJustification(disposition, floor, proposed),
