@@ -662,8 +662,9 @@ export function isWhatIf(overrides, policy) {
 /**
  * The overrides a live /v1/route may send: human_review_cost removed (the
  * Worker rejects it live), and min_valid and each emergency weight raised
- * to at least the policy's, so a what-if setting never 400s a live route.
- * A field the clamp returns to the policy is dropped. Null when nothing is
+ * to at least the policy's, and min_top_votes kept a majority of the
+ * resulting min_valid, so a what-if setting never 400s a live route. A
+ * field the clamp returns to the policy is dropped. Null when nothing is
  * left.
  */
 export function liveOverrides(overrides, policy) {
@@ -676,6 +677,13 @@ export function liveOverrides(overrides, policy) {
     const v = Math.max(p.min_valid, policy.min_valid);
     if (v === policy.min_valid) delete p.min_valid;
     else p.min_valid = v;
+  }
+  // Agreement must stay a majority of the effective min_valid after that
+  // clamp, or the Worker rejects the route (majorityOk).
+  if (p.min_top_votes !== undefined) {
+    const t = Math.max(p.min_top_votes, minTopVotes(p.min_valid ?? policy.min_valid));
+    if (t === policy.min_top_votes) delete p.min_top_votes;
+    else p.min_top_votes = t;
   }
   if (p.under_weights) {
     const w = p.under_weights.map((x, i) =>

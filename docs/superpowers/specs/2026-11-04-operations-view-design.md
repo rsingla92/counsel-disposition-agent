@@ -44,9 +44,10 @@ section in the reliability roadmap doc.
    the missed-emergency count, Human review rate, cost score, over-triage
    rate and a 7×7 confusion grid (reference level against routed level).
    Each shows the change from the deployed values.
-5. A model picker with three choices: Sonnet 5.5 only, Gemini 3.8 Flash only,
-   Sonnet 5.5 + Flash. The next live message routed from the demo uses the
-   chosen models.
+5. A model picker with three choices: Policy default (Sonnet 5.5 with
+   Gemini 3.8 Flash as a cross-check, as deployed), Sonnet 5.5 only, Gemini
+   3.8 Flash only (corrected 2026-11-05). The next live message routed from
+   the demo uses the chosen models.
 6. The next live message also uses the slider settings (the user's
    decision, 2026-11-04).
 7. Every result routed under a non-default model or setting says so: in the
@@ -127,8 +128,10 @@ section in the reliability roadmap doc.
 - `models` maps to fixed `ModelSpec`s held in the Worker; any other value is
   a 400. "sonnet" and "flash" run one model (no secondary, so no
   cross-check, which the pipeline already handles at
-  `worker/src/pipeline.ts:512-540`). Extraction falls back only when a
-  secondary exists.
+  `worker/src/pipeline.ts:512-540`). With one model, the other configured
+  model is an extraction-only backup: it carries red-flag floors and the
+  early event, never samples, and the case still ends at Human review
+  (corrected 2026-11-05).
 - Each policy field has a fixed allowed range, validated with Zod; out of
   range is a 400, never silently clamped. Ranges are the builder's call,
   but `min_valid` can never exceed the sample count and `min_top_votes` can

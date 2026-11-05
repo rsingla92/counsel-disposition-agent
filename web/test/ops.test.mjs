@@ -275,6 +275,22 @@ test('the live clamp raises min_valid to the policy value', () => {
   assert.equal(o.policy.min_valid, 12);
 });
 
+test('the live clamp keeps agreement a majority of the clamped min_valid', () => {
+  // min_valid 10 clamps to 15, so agreement 6 would fail the Worker's
+  // majority check (15 needs 8). It is raised to 8.
+  const live = liveOverrides({policy: {min_valid: 10, min_top_votes: 6}}, POLICY);
+  assert.deepEqual(live, {policy: {min_top_votes: 8}});
+  assert.ok(!bannerText(live).includes('agreement 6'));
+  assert.equal(bannerText(live), 'Next live message uses: agreement 8/20');
+  // An agreement already above the majority (9 ≥ 8) is left alone.
+  assert.deepEqual(liveOverrides({policy: {min_valid: 10, min_top_votes: 9}}, POLICY), {
+    policy: {min_top_votes: 9},
+  });
+  // Raised to exactly the policy value, it is dropped.
+  const p13 = {...POLICY, min_top_votes: 8};
+  assert.equal(liveOverrides({policy: {min_valid: 10, min_top_votes: 6}}, p13), null);
+});
+
 test('the live clamp drops min_valid when it lands on the policy', () => {
   assert.equal(liveOverrides({policy: {min_valid: 10}}, POLICY), null);
   assert.deepEqual(liveOverrides({models: 'sonnet', policy: {min_valid: 15}}, POLICY), {
