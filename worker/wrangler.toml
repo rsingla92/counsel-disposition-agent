@@ -12,3 +12,10 @@ PRIMARY_PROVIDER = "google-vertex"
 SECONDARY_MODEL = "google/gemini-3.8-flash"
 SECONDARY_PROVIDER = "google-vertex"
 ALLOWED_ORIGIN = "https://counsel-disposition-web.counsel-demo.workers.dev"
+
+# Saved eval runs for the Operations view (export_experiment.py output), read
+# by GET /v1/experiments and POST /v1/experiments/:id/rescore. The namespace
+# id is not a secret.
+[[kv_namespaces]]
+binding = "EXPERIMENTS"
+id = "b2e6602a6b9a4a8ead5219ce464b81b3"

@@ -1,7 +1,9 @@
 import {describe, expect, it} from 'vitest';
 import schemaJson from '../../schema/route-result.schema.json';
 import worker, {appFor, workerFor, type Env} from '../src/index';
+import {summarize} from '../src/metrics';
 import {loadPolicy} from '../src/policy';
+import type {Experiment} from '../src/rescore';
 import type {LlmClient, LlmRequest} from '../src/llm';
 import {route} from '../src/pipeline';
 import {OverrideReasonCodeSchema, type RouteResult} from '../src/schema';
@@ -551,5 +553,244 @@ describe('GET endpoints', () => {
       ENV,
     );
     expect(preflight.status).toBe(204);
+  });
+});
+
+/** A Map-backed stand-in for the EXPERIMENTS KV namespace. */
+function fakeKv(
+  entries: Record<string, unknown> = {},
+  raw: Record<string, string> = {},
+) {
+  const map = new Map<string, string>([
+    ...Object.entries(entries).map(([k, val]): [string, string] => [
+      k,
+      JSON.stringify(val),
+    ]),
+    ...Object.entries(raw),
+  ]);
+  return {get: async (key: string) => map.get(key) ?? null};
+}
+
+describe('experiment endpoints', () => {
+  const policy = loadPolicy();
+  // Synthetic: one routine case, 19 routine votes and 1 within_few_days.
+  const records: Experiment['records'] = [
+    {
+      case_id: 'S01',
+      reference: 'routine',
+      fixed: null,
+      floor: 'self_care',
+      primary: {
+        call_911: 0,
+        ed_now: 0,
+        in_person_today: 0,
+        physician_contact_today: 0,
+        within_few_days: 1,
+        routine: 19,
+        self_care: 0,
+      },
+      secondary: null,
+      questions: 0,
+      photo: false,
+      base_reasons: [],
+      latency_ms: 900,
+    },
+  ];
+  const summary = summarize(
+    [
+      {
+        reference: 'routine',
+        disposition: 'routine',
+        status: 'routed',
+        flagged: false,
+      },
+    ],
+    policy,
+  );
+  const full: Experiment = {
+    id: 'run-a',
+    label: 'Full system',
+    models: 'default',
+    rescorable: true,
+    records,
+    summary,
+    median_latency_ms: 900,
+  };
+  const floor: Experiment = {
+    ...full,
+    id: 'run-b',
+    label: 'Floor only',
+    rescorable: false,
+  };
+  const env = {
+    ...ENV,
+    EXPERIMENTS: fakeKv({
+      'experiments:index': ['run-a', 'run-b'],
+      'experiment:run-a': full,
+      'experiment:run-b': floor,
+    }),
+  };
+
+  it('lists experiments without their records', async () => {
+    const res = await app().request('/v1/experiments', {headers: AUTH}, env);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      experiments: [full, floor].map(e => ({
+        id: e.id,
+        label: e.label,
+        models: e.models,
+        rescorable: e.rescorable,
+        summary: e.summary,
+        median_latency_ms: e.median_latency_ms,
+      })),
+    });
+  });
+
+  it('lists nothing from an empty KV', async () => {
+    const res = await app().request(
+      '/v1/experiments',
+      {headers: AUTH},
+      {...ENV, EXPERIMENTS: fakeKv()},
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({experiments: []});
+  });
+
+  it('re-scores with the overrides applied', async () => {
+    const res = await app().request(
+      '/v1/experiments/run-a/rescore',
+      post({policy: {min_top_votes: 20, human_review_cost: 0.5}}),
+      env,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      summary: typeof summary;
+      policy_applied: unknown;
+    };
+    expect(body.policy_applied).toEqual({
+      min_top_votes: 20,
+      human_review_cost: 0.5,
+    });
+    // The split vote flags the case; the overridden review cost prices it.
+    expect(body.summary.n).toBe(1);
+    expect(body.summary.cost_score).toBeCloseTo(0.5, 9);
+  });
+
+  it('allows an emergency weight below the policy when re-scoring', async () => {
+    const under = policy.loss.boundaries.map((b, i) =>
+      i === 1 ? 0.5 : b.under,
+    );
+    const res = await app().request(
+      '/v1/experiments/run-a/rescore',
+      post({policy: {under_weights: under, human_review_cost: 0.5}}),
+      env,
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it('answers 404 for an unknown id or an empty KV', async () => {
+    const unknown = await app().request(
+      '/v1/experiments/nope/rescore',
+      post({policy: {}}),
+      env,
+    );
+    expect(unknown.status).toBe(404);
+    const empty = await app().request(
+      '/v1/experiments/run-a/rescore',
+      post({policy: {}}),
+      {...ENV, EXPERIMENTS: fakeKv()},
+    );
+    expect(empty.status).toBe(404);
+  });
+
+  it('answers 409 for an experiment that cannot be re-scored', async () => {
+    const res = await app().request(
+      '/v1/experiments/run-b/rescore',
+      post({policy: {}}),
+      env,
+    );
+    expect(res.status).toBe(409);
+  });
+
+  it('answers 400 for invalid overrides', async () => {
+    for (const body of [
+      {policy: {min_valid: 30}},
+      {policy: {min_top_votes: 7}},
+      {policy: {under_weights: [1, 2]}},
+      {policy: {temperature: 0}},
+      {policy: 'loose'},
+      {policy: {}, extra: true},
+    ]) {
+      const res = await app().request(
+        '/v1/experiments/run-a/rescore',
+        post(body),
+        env,
+      );
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({error: 'overrides invalid'});
+    }
+  });
+
+  describe('with malformed KV values', () => {
+    const malformed = {...full, id: 'run-c', records: 'not records'};
+    const bad = {
+      ...ENV,
+      EXPERIMENTS: fakeKv(
+        {
+          'experiments:index': ['run-c', 'run-d', 'run-a', 'run-e'],
+          'experiment:run-a': full,
+          'experiment:run-c': malformed,
+          'experiment:run-e': {...full, id: 'run-e', summary: {n: 1}},
+        },
+        {'experiment:run-d': '{not json'},
+      ),
+    };
+
+    it('lists the valid experiments and skips the rest', async () => {
+      const res = await app().request('/v1/experiments', {headers: AUTH}, bad);
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {experiments: {id: string}[]};
+      expect(body.experiments.map(e => e.id)).toEqual(['run-a']);
+    });
+
+    it('answers 404 when re-scoring a malformed experiment', async () => {
+      for (const id of ['run-c', 'run-d', 'run-e']) {
+        const res = await app().request(
+          `/v1/experiments/${id}/rescore`,
+          post({policy: {}}),
+          bad,
+        );
+        expect(res.status).toBe(404);
+      }
+    });
+
+    it('lists nothing for a malformed index', async () => {
+      for (const index of ['{not json', '{"ids": ["run-a"]}', '[1, 2]']) {
+        const res = await app().request(
+          '/v1/experiments',
+          {headers: AUTH},
+          {
+            ...ENV,
+            EXPERIMENTS: fakeKv(
+              {'experiment:run-a': full},
+              {'experiments:index': index},
+            ),
+          },
+        );
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({experiments: []});
+      }
+    });
+  });
+
+  it('requires a bearer token', async () => {
+    const list = await app().request('/v1/experiments', {}, env);
+    expect(list.status).toBe(401);
+    const rescore = await app().request(
+      '/v1/experiments/run-a/rescore',
+      post({policy: {}}, {'Content-Type': 'application/json'}),
+      env,
+    );
+    expect(rescore.status).toBe(401);
   });
 });
