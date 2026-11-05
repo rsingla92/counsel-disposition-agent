@@ -18,7 +18,7 @@ is the zero-data-retention route.
 - **Workers Paid, one case at a time, 6 calls in flight per case.** On
   2026-11-04, 22 of 50 cases still ended at Human review with
   `sampling_failed` (too few valid samples), and 4 with `extraction_failed`.
-  One of those extraction failures was an emergency (C02), so the full agent
+  One of those extraction failures was an emergency case, so the full agent
   missed 1 of 14 emergencies. The rule floor alone missed none, because it
   makes one call per case.
 
@@ -28,6 +28,12 @@ is the zero-data-retention route.
   45 s to 79 s. Partway through, the OpenRouter account ran out of credit and
   calls began returning HTTP 402, so that run's rule-floor numbers were
   rerun after a top-up.
+
+- **Sonnet + Flash under the stricter extraction rule, 3 calls in flight.**
+  On 2026-11-05 the full agent missed 0 of 14 emergencies, with 0% Human
+  review, Needs info on 74% of cases, a cost score of 0.808 and a median
+  latency of 83 s. No extraction failed in this run. The full results are
+  in the [2026-11-05 report](../reports/2026-11-05-policy-0.1.0.md).
 
 On the cases that got enough samples, the router behaved as designed. The
 failures come from throughput, not from model judgement.

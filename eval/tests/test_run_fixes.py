@@ -2,6 +2,7 @@
 
 import collections
 import json
+import re
 import threading
 
 import httpx
@@ -72,7 +73,8 @@ def test_repeat_headline_uses_first_run_and_any_repeat_gate_is_stricter(
   assert "Misses: 0 of 2 reference emergency cases" in report
   assert "of 6" not in report
   assert "Missed in any repeat: 1 of 2" in report
-  assert "Any-repeat miss ids: C02" in report
+  assert "miss ids" not in report
+  assert re.search(r"C\d\d", report) is None
   assert "headline metrics use the first run" in report.lower()
   assert "case-runs" not in report
 

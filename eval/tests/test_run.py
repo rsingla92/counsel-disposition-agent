@@ -2,6 +2,7 @@
 
 import json
 import pathlib
+import re
 
 import httpx
 import pandas as pd
@@ -49,11 +50,18 @@ def test_report_sections_and_gate(tmp_path):
   assert "## full" in text
   assert "## always" in text
   assert "Misses: 1" in text
-  assert "C02" in text
   assert "Loss-weight sensitivity" in text
   assert "ROC AUC" in text
   assert "HTTP errors: 0" in text
   assert "URGENT_ESCALATION" in text  # brief confusion matrix
+
+
+def test_report_has_no_case_ids(tmp_path):
+  # The report is public: counts and rates only, even when a case is missed.
+  text = _report(fake_runs(miss="C02"), tmp_path).read_text()
+  assert "Misses: 1" in text
+  assert re.search(r"C\d\d", text) is None
+  assert "Aggregate only: counts and rates." in text
 
 
 def test_report_zero_miss_gate(tmp_path):
@@ -110,7 +118,8 @@ def test_repeatability_reports_cases_below_full_agreement(tmp_path):
   # C06 has three runs: routine, routine, self_care -> 2/3 agreement.
   text = _report(runs, tmp_path, repeat=3).read_text()
   assert "Repeatability" in text
-  assert "C06" in text
+  assert "- Cases below 100%: 1" in text
+  assert re.search(r"C\d\d", text) is None
 
 
 def test_loss_weight_sensitivity_rescores_under_weights():

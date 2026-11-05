@@ -1,8 +1,8 @@
 """The eval CLI: run systems against the Worker, score, write the report.
 
 Raw per-case results go to data/private/runs/ (gitignored, they carry
-message-derived excerpts). The committed report is aggregate only: case ids,
-counts and rates, never message text, excerpts or justifications.
+message-derived excerpts). The committed report is aggregate only: counts
+and rates, never case ids, message text, excerpts or justifications.
 
 Exit codes: see EXIT_CODES_HELP.
 """
@@ -68,8 +68,8 @@ _EMERGENCY_TOP = ("call_911", "ed_now")
 _SAME_DAY_UP = _EMERGENCY_TOP + ("in_person_today", "physician_contact_today")
 _README = """# Reports
 
-Eval reports in this directory are aggregate only: case ids, counts and
-rates. They contain no patient text, no message excerpts and no model
+Eval reports in this directory are aggregate only: counts and rates. They
+contain no case ids, no patient text, no message excerpts and no model
 justification text. Raw per-case results live under `data/private/runs/`,
 which is gitignored.
 
@@ -436,11 +436,9 @@ def _system_section(
       "",
       f"- Misses: {g['misses']} of {g['n_emergencies']} reference emergency "
       "cases routed below ed_now (first run)",
-      f"- Miss ids: {', '.join(sorted(g['miss_ids'])) or 'none'}",
       "- 95% CI upper bound on the miss rate: " + _pct(g["ci_upper"]),
       f"- Missed in any repeat: {a['misses']} of {a['n_emergencies']} "
       "reference emergency cases",
-      f"- Any-repeat miss ids: {', '.join(sorted(a['miss_ids'])) or 'none'}",
       "- 95% CI upper bound on the any-repeat miss rate: "
       + _pct(a["ci_upper"]),
       "",
@@ -535,11 +533,7 @@ def _system_section(
       mean, below = rep
       out += [
           f"- Mean per-case agreement with the modal disposition: {_pct(mean)}",
-          "- Cases below 100%: "
-          + (
-              ", ".join(f"{c} ({_pct(a)})" for c, a in sorted(below.items()))
-              or "none"
-          ),
+          f"- Cases below 100%: {len(below)}",
           "",
       ]
   return out
@@ -550,7 +544,7 @@ def _cohort_line(cohort: str, scored: Sequence[str]) -> str:
   noun = "case" if n == 1 else "cases"
   if cohort == "all":
     return f"Cohort: all ({n} {noun})"
-  return f"Cohort: {cohort} subset ({n} {noun}: {', '.join(scored)})"
+  return f"Cohort: {cohort} subset ({n} {noun})"
 
 
 def write_report(
@@ -602,7 +596,7 @@ def write_report(
       _cohort_line(cohort, scored),
       "",
       *(["Subset run — not a headline result.", ""] if cohort != "all" else []),
-      "Aggregate only: case ids and rates. Headline metrics use the first "
+      "Aggregate only: counts and rates. Headline metrics use the first "
       "run of each case; repeats feed the any-repeat gate line and the "
       "repeatability section only.",
       "",

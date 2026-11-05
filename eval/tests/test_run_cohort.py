@@ -12,8 +12,6 @@ from test_run import ENV
 from test_run import FakeClient
 from test_run import POLICY_PATH
 
-PCP = ["C04", "C08", "C09", "C12", "C16", "C17", "C23", "C26", "C35", "C39"]
-
 
 def _fifty(tmp_path):
   """Writes 50 synthetic cases cycling through the seven levels."""
@@ -81,7 +79,8 @@ def _run(tmp_path, cases):
 
 def test_pcp_report_names_subset_and_warns(tmp_path):
   text = _run(tmp_path, "pcp")
-  assert f"Cohort: pcp subset (10 cases: {', '.join(PCP)})" in text
+  assert "Cohort: pcp subset (10 cases)" in text
+  assert re.search(r"C\d\d", text) is None
   assert "Subset run — not a headline result." in text
   assert "Reviewed cases: 50" not in text
   for n in re.findall(r"of (\d+) reference emergency cases", text):
