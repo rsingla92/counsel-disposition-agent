@@ -144,6 +144,20 @@ def test_estimate_live_calls():
   assert est == pytest.approx((41 + 1) * 10 * 2 * 0.01)
 
 
+def test_default_calls_per_case_follows_models():
+  assert run.effective_calls_per_case(None, None) == 41
+  assert run.effective_calls_per_case("sonnet+flash", None) == 41
+  assert run.effective_calls_per_case("sonnet", None) == 21
+  assert run.effective_calls_per_case("flash", None) == 21
+  assert run.effective_calls_per_case("flash", 30) == 30
+
+
+def test_estimate_flash_uses_21_calls_per_case():
+  calls = run.effective_calls_per_case("flash", None)
+  est = run.estimate_usd(["full"], 10, 1, 0.01, calls)
+  assert est == pytest.approx(21 * 10 * 0.01)
+
+
 def _balances(respx_mock, limit, total=10_000.0, usage=0.0):
   """Mocks the key's spend limit and the account's credit balance."""
   key = respx_mock.get(KEY_URL).respond(
@@ -238,13 +252,15 @@ class FakeClient:
     self.answers = answers or {}
     self.last_meta = {"early": False, "latency_ms": 1.0}
     self.calls = []
+    self.models_seen = []
 
   def policy(self):
     return {"policy_version": self.version}
 
-  def route(self, message, mode="full"):
+  def route(self, message, mode="full", models=None):
     case_id = message.split()[-1]
     self.calls.append((case_id, mode))
+    self.models_seen.append((mode, models))
     level = self.answers.get(case_id, REFERENCE_LEVELS[case_id])
     return make_result(level)
 
@@ -333,6 +349,56 @@ def test_cli_ok_writes_runs_and_report(tmp_path):
   assert ("C01", "floor_only") in client.calls
   report = next((tmp_path / "reports").glob("*-policy-*.md")).read_text()
   assert SENTINEL not in report
+
+
+def test_cli_models_flag_reaches_full_runs_and_meta(tmp_path):
+  client = FakeClient()
+  code = run.main(
+      _argv(
+          tmp_path,
+          "--systems",
+          "full,floor",
+          "--models",
+          "sonnet",
+          "--skip-credit-check",
+      ),
+      client_factory=lambda url, token: client,
+      env=ENV,
+  )
+  assert code == 0
+  stamp = next((tmp_path / "runs").iterdir())
+  entries = [
+      json.loads(x) for x in (stamp / "full.jsonl").read_text().splitlines()
+  ]
+  assert {e["meta"]["models"] for e in entries} == {"sonnet"}
+  full = {m for mode, m in client.models_seen if mode == "full"}
+  floor = {m for mode, m in client.models_seen if mode == "floor_only"}
+  assert full == {"sonnet"}
+  assert floor == {None}
+
+
+def test_cli_without_models_records_default(tmp_path):
+  client = FakeClient()
+  code = run.main(
+      _argv(tmp_path, "--systems", "full", "--skip-credit-check"),
+      client_factory=lambda url, token: client,
+      env=ENV,
+  )
+  assert code == 0
+  stamp = next((tmp_path / "runs").iterdir())
+  line = (stamp / "full.jsonl").read_text().splitlines()[0]
+  assert json.loads(line)["meta"]["models"] == "default"
+  assert {m for _, m in client.models_seen} == {None}
+
+
+def test_cli_rejects_unknown_models(tmp_path):
+  with pytest.raises(SystemExit) as exc:
+    run.main(
+        _argv(tmp_path, "--models", "gpt", "--skip-credit-check"),
+        client_factory=lambda url, token: FakeClient(),
+        env=ENV,
+    )
+  assert exc.value.code == 4
 
 
 def test_cli_pcp_selects_subset(tmp_path):
