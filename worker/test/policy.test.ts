@@ -133,6 +133,32 @@ describe('policy', () => {
       expect(f.subsumes_modifiers).toContain('postpartum');
   });
 
+  it('applies immunosuppression to adults and children', () => {
+    const m = policy.modifiers.find(m => m.id === 'immunosuppression')!;
+    expect(m.groups).toEqual(['adult', 'pediatric']);
+  });
+
+  it('rejects a modifier with no group', () =>
+    expect(() =>
+      PolicySchema.parse({
+        ...policy,
+        modifiers: [{...policy.modifiers[0], groups: []}],
+      }),
+    ).toThrow());
+
+  it.each([
+    ['heavy_bleeding_with_faintness', 'ed_now'],
+    ['heavy_menstrual_bleeding', 'in_person_today'],
+  ])('has a non-obstetric adult flag %s at %s', (id, level) => {
+    const f = policy.red_flags.find(f => f.id === id)!;
+    expect(f.group).toBe('adult');
+    expect(f.min_level).toBe(level);
+    expect(f.description).toMatch(/not during pregnancy or after birth/);
+    expect(f.cases).toEqual([]);
+  });
+
+  it('is policy 0.2.0', () => expect(policy.policy_version).toBe('0.2.0'));
+
   it('caps modifiers at in_person_today', () =>
     expect(policy.modifier_cap).toBe('in_person_today'));
 

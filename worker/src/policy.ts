@@ -58,7 +58,8 @@ export const PolicySchema = z.strictObject({
   modifiers: z.array(
     z.strictObject({
       id: IdSchema,
-      group: GroupSchema,
+      // A risk factor can apply to more than one group (immunosuppression).
+      groups: z.array(GroupSchema).min(1),
       description: z.string().min(1),
     }),
   ),

@@ -3,7 +3,7 @@
 [Back to the README](../README.md)
 
 Every clinical rule the agent follows lives in one file,
-[`policy/policy.yaml`](../policy/policy.yaml), version 0.1.0. It is a draft
+[`policy/policy.yaml`](../policy/policy.yaml), version 0.2.0. It is a draft
 for physician review. The Worker bundles a copy at build time
 (`npm run build-policy`), and the eval reads the same file. The eval refuses
 to run if the deployed Worker reports a different version (exit code 2).
@@ -37,18 +37,24 @@ Two statuses sit beside the levels:
 
 ## Red flags
 
-51 red flags, each with a minimum level. A flag marked present forces at
+53 red flags, each with a minimum level. A flag marked present forces at
 least that level, whatever the models say.
 
 | Group | Call 911 | ED now | In person today | Physician contact today | Within a few days | Total |
 |---|---|---|---|---|---|---|
-| Adult | 9 | 10 | 3 | 1 | 2 | 25 |
+| Adult | 9 | 11 | 4 | 1 | 2 | 27 |
 | Pediatric | 2 | 8 | 3 | 0 | 0 | 13 |
 | Obstetric | 2 | 6 | 4 | 1 | 0 | 13 |
 
 Examples: cardiac-sounding chest pain and stroke signs happening now are Call
 911; a sudden worst-ever headache and a blow to the head on a blood thinner
 are ED now; pain and swelling in one calf is In person today.
+
+Heavy bleeding outside pregnancy and the six weeks after birth has two
+tiers (added in 0.2.0): with lightheadedness, fainting, a racing heart or
+pale, clammy skin it is ED now; heavy menstrual bleeding (a pad or tampon
+soaked every hour for two hours or more, or clots the size of a quarter or
+larger) is In person today.
 
 Five flags add a specific instruction to the patient message: the 988
 crisis line for suicidal thoughts with a plan, Poison Control for a possible
@@ -58,7 +64,7 @@ flags.
 ## Risk factors (modifiers)
 
 12 risk factors, such as age 65 or older, diabetes, a blood thinner, a weak
-immune system, a baby under 3 months, and pregnancy. If any is present, the
+immune system (adults and children), a baby under 3 months, and pregnancy. If any is present, the
 floor rises by one level in total, not one per factor, and never above In
 person today. A flag that already names the risk factor (for example a head
 injury on a blood thinner) does not get an extra level for that factor.

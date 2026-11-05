@@ -14,6 +14,7 @@ from helpers import cases_frame
 from helpers import entry
 from helpers import fake_runs
 from helpers import make_result
+from helpers import POLICY_VERSION
 from helpers import reference_frame
 from helpers import REFERENCE_LEVELS
 from helpers import SENTINEL
@@ -42,7 +43,7 @@ def test_report_has_no_message_text(tmp_path):
   path = _report(runs, tmp_path)
   text = path.read_text()
   assert SENTINEL not in text
-  assert path.name == "2026-11-03-policy-0.1.0.md"
+  assert path.name == f"2026-11-03-policy-{POLICY_VERSION}.md"
 
 
 def test_report_sections_and_gate(tmp_path):
@@ -256,7 +257,7 @@ def test_credit_check_sends_bearer(respx_mock, tmp_path):
 class FakeClient:
   """Stands in for RouteClient. Answers by case id parsed from the message."""
 
-  def __init__(self, version="0.1.0", answers=None):
+  def __init__(self, version=POLICY_VERSION, answers=None):
     self.version = version
     self.answers = answers or {}
     self.last_meta = {"early": False, "latency_ms": 1.0}
@@ -325,7 +326,7 @@ def test_cli_exits_nonzero_on_missed_emergency(tmp_path):
       env=ENV,
   )
   assert code == 1
-  assert list((tmp_path / "reports").glob("*-policy-0.1.0.md"))
+  assert list((tmp_path / "reports").glob(f"*-policy-{POLICY_VERSION}.md"))
 
 
 def test_cli_ok_writes_runs_and_report(tmp_path):
