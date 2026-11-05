@@ -7,7 +7,6 @@ import {
   GRID_STEPS,
   OVERRIDE_RANGES,
   SAMPLES,
-  bannerText,
   confusionGrid,
   controlsFromOverrides,
   delta,
@@ -17,7 +16,9 @@ import {
   liveOverrides,
   minTopVotes,
   overridesFromControls,
+  overridesText,
   policyDefaults,
+  resultsPanel,
   validStoredOverrides,
 } from './lib.js';
 
@@ -204,8 +205,15 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
           : error === 409
             ? 'This run cannot be re-scored.'
             : error === 400
-              ? 'The Worker rejected these settings. Reset to policy and try again.'
-              : problemFor(error, 'the re-score');
+              ? 'The Worker rejected these settings.'
+              : error === 401
+                ? 'The access token was rejected.'
+                : error === 0
+                  ? 'The Worker could not be reached.'
+                  : `The Worker returned an error (HTTP ${error}).`;
+      // Never leave the previous numbers under settings they do not match.
+      s.summary = null;
+      s.base = null;
     } else {
       s.summary = summary;
       s.base = base;
@@ -451,10 +459,10 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
 
   function nextLiveText() {
     const live = liveOverrides(s.overrides, s.policy);
-    const text = bannerText(live);
+    const text = overridesText(live);
     return [
-      el('strong', {text: 'Next live message: '}),
-      text ? text.replace(/^Routing with: /, '') : 'the deployed policy, unchanged',
+      el('strong', {text: 'Next live message uses: '}),
+      text ?? 'the deployed policy, unchanged',
       s.overrides?.policy?.human_review_cost !== undefined
         ? el('span', {class: 'note', text: '. The review cost only changes re-scoring.'})
         : null,
@@ -726,8 +734,9 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
   }
 
   function renderResults() {
+    const panel = resultsPanel({summary: s.summary, error: s.rescoreError, rescoring: s.rescoring});
     resultsCard.setAttribute('aria-busy', String(s.rescoring));
-    resultsCard.classList.toggle('busy', s.rescoring && s.summary !== null);
+    resultsCard.classList.toggle('busy', panel.busy === true);
     const exp = selectedExperiment();
     resultsCard.replaceChildren(el('h2', {class: 'eyebrow', id: 'ops-results-h', text: 'Results on the saved run'}));
     if (!exp) {
@@ -745,11 +754,19 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
           : 'Not re-scorable: the numbers are as recorded.',
       }),
       whatIf ? whatIfLine() : null,
-      s.rescoreError ? el('p', {class: 'status error', role: 'alert', text: s.rescoreError}) : null,
-      s.rescoring && !s.summary ? el('p', {class: 'empty', text: 'Re-scoring…'}) : null,
     );
-    const sum = s.summary;
-    if (!sum) return;
+    if (panel.kind === 'error') {
+      appendAll(
+        resultsCard,
+        el('p', {class: 'warn-line rescore-failed', role: 'alert'}, warnIcon(), el('span', {text: panel.text})),
+      );
+      return;
+    }
+    if (panel.kind !== 'metrics') {
+      appendAll(resultsCard, el('p', {class: 'empty', text: panel.text}));
+      return;
+    }
+    const sum = panel.summary;
     const base = s.base;
     const missedWarn = [];
     if (whatIf) missedWarn.push('What-if only: emergency weights are below the policy');

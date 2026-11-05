@@ -14,6 +14,8 @@ import {
   liveOverrides,
   minTopVotes,
   overridesFromControls,
+  overridesText,
+  resultsPanel,
   policyDefaults,
   routingBanner,
   validStoredOverrides,
@@ -177,15 +179,15 @@ test('the ranges table matches worker/src/overrides.ts, the authority', () => {
 // --- banner ----------------------------------------------------------------
 
 test('banner text for each model choice', () => {
-  assert.equal(bannerText({models: 'sonnet'}), 'Routing with: Sonnet only');
-  assert.equal(bannerText({models: 'flash'}), 'Routing with: Flash only');
-  assert.equal(bannerText({models: 'sonnet+flash'}), 'Routing with: Sonnet + Flash');
+  assert.equal(bannerText({models: 'sonnet'}), 'Next live message uses: Sonnet only');
+  assert.equal(bannerText({models: 'flash'}), 'Next live message uses: Flash only');
+  assert.equal(bannerText({models: 'sonnet+flash'}), 'Next live message uses: Sonnet + Flash');
 });
 
 test('banner text names the settings', () => {
   assert.equal(
     bannerText({models: 'sonnet', policy: {min_top_votes: 14}}),
-    'Routing with: Sonnet only · agreement 14/20',
+    'Next live message uses: Sonnet only · agreement 14/20',
   );
   assert.equal(
     bannerText({
@@ -196,7 +198,7 @@ test('banner text names the settings', () => {
         under_weights: [3, 25, 2, 5, 2, 1.5],
       },
     }),
-    'Routing with: valid samples 12/20 · spread 3 · review cost 0.40 · under-triage weights 3, 25, 2, 5, 2, 1.5',
+    'Next live message uses: valid samples 12/20 · spread 3 · review cost 0.40 · under-triage weights 3, 25, 2, 5, 2, 1.5',
   );
 });
 
@@ -207,10 +209,19 @@ test('banner text is null with no overrides', () => {
   assert.equal(bannerText({policy: {}}), null);
 });
 
+test('overridesText names the settings without a prefix', () => {
+  assert.equal(
+    overridesText({models: 'sonnet', policy: {min_top_votes: 14}}),
+    'Sonnet only · agreement 14/20',
+  );
+  assert.equal(overridesText(null), null);
+  assert.equal(overridesText({policy: {}}), null);
+});
+
 test('a replay never claims the overrides were used', () => {
   const o = {models: 'sonnet'};
   assert.equal(routingBanner(o, true), 'Replay: saved result');
-  assert.equal(routingBanner(o, false), 'Routing with: Sonnet only');
+  assert.equal(routingBanner(o, false), 'Next live message uses: Sonnet only');
   assert.equal(routingBanner(null, true), null);
   assert.equal(routingBanner(null, false), null);
 });
@@ -316,4 +327,25 @@ test('confusionGrid tolerates a missing grid and a missing baseline', () => {
   const g = confusionGrid(undefined, undefined);
   assert.equal(g.max, 0);
   assert.ok(g.rows.every(r => r.cells.every(c => c.count === 0 && c.base === null && c.step === 0)));
+});
+
+// --- results panel -----------------------------------------------------------
+
+const SUM = {n: 50, missed: 0};
+
+test('a failed re-score shows the error, never the old numbers', () => {
+  const p = resultsPanel({summary: SUM, error: 'The Worker rejected these settings.', rescoring: false});
+  assert.equal(p.kind, 'error');
+  assert.equal(p.summary, null);
+  assert.equal(
+    p.text,
+    'Couldn’t re-score these settings — The Worker rejected these settings. Move a slider or Reset to try again.',
+  );
+});
+
+test('results panel states', () => {
+  assert.deepEqual(resultsPanel({summary: SUM, error: '', rescoring: false}), {kind: 'metrics', summary: SUM, busy: false});
+  assert.deepEqual(resultsPanel({summary: SUM, error: '', rescoring: true}), {kind: 'metrics', summary: SUM, busy: true});
+  assert.deepEqual(resultsPanel({summary: null, error: '', rescoring: true}), {kind: 'loading', summary: null, text: 'Re-scoring…'});
+  assert.deepEqual(resultsPanel({summary: null, error: '', rescoring: false}), {kind: 'empty', summary: null, text: 'No result yet.'});
 });

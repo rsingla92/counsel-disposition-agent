@@ -668,10 +668,10 @@ export function liveOverrides(overrides, policy) {
 }
 
 /**
- * One line naming the overrides, such as "Routing with: Sonnet only ·
- * agreement 14/20". Null when there are none.
+ * The overrides named in one line, such as "Sonnet only · agreement
+ * 14/20". Null when there are none.
  */
-export function bannerText(overrides) {
+export function overridesText(overrides) {
   if (!overrides) return null;
   const parts = [];
   if (overrides.models) parts.push(MODEL_LABELS[overrides.models] ?? overrides.models);
@@ -683,7 +683,17 @@ export function bannerText(overrides) {
     parts.push(`review cost ${p.human_review_cost.toFixed(2)}`);
   }
   if (p.under_weights) parts.push(`under-triage weights ${p.under_weights.join(', ')}`);
-  return parts.length ? `Routing with: ${parts.join(' · ')}` : null;
+  return parts.length ? parts.join(' · ') : null;
+}
+
+/**
+ * The banner line for the settings the next live route will send, such as
+ * "Next live message uses: Sonnet only · agreement 14/20". It describes
+ * the settings, not the result on screen. Null when there are none.
+ */
+export function bannerText(overrides) {
+  const text = overridesText(overrides);
+  return text ? `Next live message uses: ${text}` : null;
 }
 
 /**
@@ -710,6 +720,24 @@ export function delta(now, base, kind) {
   if (base === null || base === undefined) return n;
   const b = formatMetric(base, kind);
   return b === n ? `${n}, no change` : `${b} → ${n}`;
+}
+
+/**
+ * What the results panel shows. A failed re-score never keeps the previous
+ * numbers on screen: they would read as the result of settings the
+ * sliders no longer show.
+ */
+export function resultsPanel({summary, error, rescoring}) {
+  if (error) {
+    return {
+      kind: 'error',
+      summary: null,
+      text: `Couldn’t re-score these settings — ${error} Move a slider or Reset to try again.`,
+    };
+  }
+  if (summary) return {kind: 'metrics', summary, busy: rescoring === true};
+  if (rescoring) return {kind: 'loading', summary: null, text: 'Re-scoring…'};
+  return {kind: 'empty', summary: null, text: 'No result yet.'};
 }
 
 /** Shading steps for the confusion grid; 0 is no fill. */

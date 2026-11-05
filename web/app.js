@@ -12,7 +12,6 @@ import {
   TIER_LABELS,
   canOverride,
   applyPinned,
-  bannerText,
   emergencyLeads,
   failedRun,
   fallbackFor,
@@ -23,6 +22,7 @@ import {
   parseNdjson,
   patientBlocks,
   nextPin,
+  overridesText,
   pinFor,
   readToken,
   replayRun,
@@ -482,13 +482,13 @@ function dispositionCard(run) {
 
 /** Says when a result was routed with non-default models or settings. */
 function routedWith(result) {
-  const text = bannerText(result.trace?.overrides);
+  const text = overridesText(result.trace?.overrides);
   if (!text) return null;
   return el(
     'p',
     {class: 'routed-with'},
     el('strong', {text: 'Not the deployed defaults. '}),
-    text.replace(/^Routing with: /, 'Routed with: '),
+    `Routed with: ${text}`,
   );
 }
 
@@ -679,15 +679,17 @@ function renderBanner() {
   const replay = state.run ? state.run.replay === true : ui.replay.checked;
   const text = routingBanner(ops.liveOverrides(), replay);
   ui.routingBanner.hidden = text === null || state.view === 'ops';
+  const note = text !== null && !replay && ops.whatIf()
+    ? ' · Emergency weights stay at the policy value live.'
+    : '';
+  // Rewritten only when it changes, so screen readers do not re-announce
+  // the status on every render.
+  const key = `${text ?? ''}${note}`;
+  if (ui.routingBanner.dataset.text === key) return;
+  ui.routingBanner.dataset.text = key;
   ui.routingBanner.textContent = '';
   if (text === null) return;
-  appendAll(
-    ui.routingBanner,
-    text,
-    !replay && ops.whatIf()
-      ? el('span', {class: 'note', text: ' · Emergency weights stay at the policy value live.'})
-      : null,
-  );
+  appendAll(ui.routingBanner, text, note ? el('span', {class: 'note', text: note}) : null);
 }
 
 function render() {
