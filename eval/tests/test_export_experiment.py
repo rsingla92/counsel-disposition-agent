@@ -344,3 +344,62 @@ def test_accepts_a_plain_directory(data_dir, tmp_path):
   out = tmp_path / "plain" / "exp.json"
   assert _export(data_dir, out) == 0
   assert out.exists()
+
+
+def _sampling_failed(*, flag=None, modifier=None, reasons=("sampling_failed",)):
+  """A sampling_failed result; flag/modifier give excerpt_verified, or None."""
+  result = _result(
+      None,
+      floor="self_care",
+      status="human_review",
+      flagged=True,
+      reasons=reasons,
+      votes={"routine": 12},
+  )
+  result["red_flags"] = [
+      {
+          "id": "synthetic_flag",
+          "state": "present" if flag is not None else "absent",
+          "excerpt": "synthetic" if flag is not None else None,
+          "excerpt_verified": bool(flag),
+      },
+      # Not present, so its unverified excerpt does not count.
+      {
+          "id": "other_flag",
+          "state": "unknown",
+          "excerpt": None,
+          "excerpt_verified": False,
+      },
+  ]
+  result["modifiers"] = (
+      []
+      if modifier is None
+      else [
+          {
+              "id": "synthetic_modifier",
+              "excerpt": "synthetic",
+              "excerpt_verified": modifier,
+          }
+      ]
+  )
+  return result
+
+
+@pytest.mark.parametrize(
+    "kwargs, expected",
+    [
+        ({"flag": False}, ["unverified_excerpt"]),
+        ({"modifier": False}, ["unverified_excerpt"]),
+        ({"flag": True, "modifier": True}, []),
+        ({}, []),
+        (
+            {"flag": False, "reasons": ("unverified_excerpt", "split_vote")},
+            ["unverified_excerpt"],
+        ),
+    ],
+)
+def test_recovers_unverified_excerpt(kwargs, expected):
+  out = export_experiment.record(
+      entry("C06", _sampling_failed(**kwargs)), "routine"
+  )
+  assert out["base_reasons"] == expected

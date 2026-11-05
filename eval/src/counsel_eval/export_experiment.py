@@ -97,6 +97,36 @@ def in_checkout(path: pathlib.Path) -> bool:
   return any(os.path.lexists(p / ".git") for p in (path, *path.parents))
 
 
+def _unverified_excerpt(result: Mapping[str, Any]) -> bool:
+  """The pipeline's rule for unverified_excerpt, from the saved result.
+
+  pipeline.ts adds it when a present red flag (floor.ts ruleFloor) or a
+  present modifier (result modifiers lists only present ones) has an
+  excerpt that is null or not found in the message, which is what
+  excerpt_verified false records.
+  """
+  flags = any(
+      f["state"] == "present" and not f["excerpt_verified"]
+      for f in result.get("red_flags", [])
+  )
+  modifiers = any(
+      not m["excerpt_verified"] for m in result.get("modifiers", [])
+  )
+  return flags or modifiers
+
+
+def _base_reasons(result: Mapping[str, Any], reasons: list[str]) -> list[str]:
+  """Saved reasons decide() does not derive, plus unverified_excerpt.
+
+  A Human review result carries only its own reason, so an unverified
+  excerpt found before sampling failed is recovered from the result.
+  """
+  out = [r for r in reasons if r not in _DERIVED_REASONS]
+  if "unverified_excerpt" not in out and _unverified_excerpt(result):
+    out.append("unverified_excerpt")
+  return out
+
+
 def record(e: Mapping[str, Any], reference: str) -> dict[str, Any]:
   """Returns the Experiment record for one saved-run entry.
 
@@ -126,7 +156,7 @@ def record(e: Mapping[str, Any], reference: str) -> dict[str, Any]:
         secondary=_votes(result["votes"]["secondary"]),
         questions=len(result["info_requests"]["questions"]),
         photo=bool(result["info_requests"]["photo"]),
-        base_reasons=[r for r in reasons if r not in _DERIVED_REASONS],
+        base_reasons=_base_reasons(result, reasons),
     )
     no_votes = sum(primary.values()) == 0
     if result["status"] == "human_review" and (
