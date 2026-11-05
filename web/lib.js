@@ -483,3 +483,339 @@ export function writeToken(storage, token) {
     // Private mode or blocked storage: the token lasts for this page only.
   }
 }
+
+// --- operations view: overrides ----------------------------------------------
+
+/** Samples drawn per model (policy sampling.n); fixed, read-only here. */
+export const SAMPLES = 20;
+
+/**
+ * Allowed ranges for router overrides. A copy of the plan's "Override
+ * ranges" table: worker/src/overrides.ts (PolicyOverridesSchema) is the
+ * authority, and the Worker rejects anything outside it. min_top_votes is
+ * further bounded below by minTopVotes(min_valid).
+ */
+export const OVERRIDE_RANGES = {
+  min_valid: {min: 10, max: 20, step: 1},
+  min_top_votes: {min: 6, max: 20, step: 1},
+  max_span: {min: 0, max: 6, step: 1},
+  human_review_cost: {min: 0.05, max: 2, step: 0.05},
+  under_weight: {min: 0.5, max: 50, step: 0.5},
+};
+
+/** The model choices the Worker accepts (worker/src/overrides.ts). */
+export const MODEL_CHOICES = ['sonnet', 'flash', 'sonnet+flash'];
+
+/** Short labels, for the banner. */
+export const MODEL_LABELS = {
+  sonnet: 'Sonnet only',
+  flash: 'Flash only',
+  'sonnet+flash': 'Sonnet + Flash',
+};
+
+/**
+ * Under-triage weights a live route may raise but never lower: the
+ * boundaries call_911/ed_now and ed_now/in_person_today, in policy order
+ * (checkLiveSafe in worker/src/overrides.ts).
+ */
+export const EMERGENCY_WEIGHTS = [0, 1];
+
+const POLICY_FIELDS = ['min_valid', 'min_top_votes', 'max_span', 'human_review_cost'];
+const WEIGHT_COUNT = 6;
+
+/** The lowest min_top_votes allowed: a simple majority of min_valid. */
+export function minTopVotes(minValid) {
+  return Math.floor(minValid / 2) + 1;
+}
+
+/**
+ * The deployed policy's tunable values from a GET /v1/policy response,
+ * flattened: {min_valid, min_top_votes, max_span, human_review_cost,
+ * under_weights}. Null when the response lacks them.
+ */
+export function policyDefaults(api) {
+  const weights = api?.loss?.boundaries?.map(b => b?.under);
+  const out = {
+    min_valid: api?.sampling?.min_valid,
+    min_top_votes: api?.review?.min_top_votes,
+    max_span: api?.review?.max_span,
+    human_review_cost: api?.loss?.human_review_cost,
+    under_weights: weights,
+  };
+  const ok =
+    POLICY_FIELDS.every(f => Number.isFinite(out[f])) &&
+    Array.isArray(weights) &&
+    weights.length === WEIGHT_COUNT &&
+    weights.every(Number.isFinite);
+  return ok ? out : null;
+}
+
+function onStep(x, {min, max, step}) {
+  if (typeof x !== 'number' || !Number.isFinite(x) || x < min || x > max) {
+    return false;
+  }
+  const k = x / step;
+  return Math.abs(k - Math.round(k)) < 1e-9;
+}
+
+/**
+ * Slider and picker state for `overrides` (null for none): every field
+ * filled from the policy where the overrides leave it out. `models` is
+ * 'policy' for the deployed default.
+ */
+export function controlsFromOverrides(overrides, policy) {
+  const p = overrides?.policy ?? {};
+  return {
+    models: overrides?.models ?? 'policy',
+    min_valid: p.min_valid ?? policy.min_valid,
+    min_top_votes: p.min_top_votes ?? policy.min_top_votes,
+    max_span: p.max_span ?? policy.max_span,
+    human_review_cost: p.human_review_cost ?? policy.human_review_cost,
+    under_weights: [...(p.under_weights ?? policy.under_weights)],
+  };
+}
+
+/**
+ * The overrides for `controls`: only the fields that differ from the
+ * policy, with all six weights when any one differs. Null when nothing
+ * differs.
+ */
+export function overridesFromControls(controls, policy) {
+  const out = {};
+  if (MODEL_CHOICES.includes(controls.models)) out.models = controls.models;
+  const p = {};
+  for (const f of POLICY_FIELDS) {
+    if (controls[f] !== policy[f]) p[f] = controls[f];
+  }
+  if (controls.under_weights.some((w, i) => w !== policy.under_weights[i])) {
+    p.under_weights = [...controls.under_weights];
+  }
+  if (Object.keys(p).length) out.policy = p;
+  return Object.keys(out).length ? out : null;
+}
+
+/**
+ * `stored` if it is a well-formed overrides object inside the ranges
+ * table, else null. Overrides saved under an older policy that no longer
+ * validate are dropped here, so a live route never 400s on them forever.
+ */
+export function validStoredOverrides(stored, policy) {
+  if (!policy || !stored || typeof stored !== 'object' || Array.isArray(stored)) {
+    return null;
+  }
+  const keys = Object.keys(stored);
+  if (keys.length === 0 || keys.some(k => k !== 'models' && k !== 'policy')) {
+    return null;
+  }
+  if ('models' in stored && !MODEL_CHOICES.includes(stored.models)) return null;
+  if ('policy' in stored) {
+    const p = stored.policy;
+    if (!p || typeof p !== 'object' || Array.isArray(p)) return null;
+    const pk = Object.keys(p);
+    if (pk.length === 0) return null;
+    for (const k of pk) {
+      if (k === 'under_weights') {
+        const w = p.under_weights;
+        if (
+          !Array.isArray(w) ||
+          w.length !== WEIGHT_COUNT ||
+          !w.every(x => onStep(x, OVERRIDE_RANGES.under_weight))
+        ) {
+          return null;
+        }
+      } else if (!POLICY_FIELDS.includes(k) || !onStep(p[k], OVERRIDE_RANGES[k])) {
+        return null;
+      }
+    }
+    if (
+      p.min_top_votes !== undefined &&
+      p.min_top_votes < minTopVotes(p.min_valid ?? policy.min_valid)
+    ) {
+      return null;
+    }
+  }
+  return stored;
+}
+
+/** True when an emergency-guarding weight is below the policy's. */
+export function isWhatIf(overrides, policy) {
+  const w = overrides?.policy?.under_weights;
+  if (!w || !policy) return false;
+  return EMERGENCY_WEIGHTS.some(i => w[i] < policy.under_weights[i]);
+}
+
+/**
+ * The overrides a live /v1/route may send: human_review_cost removed (the
+ * Worker rejects it live) and each emergency weight raised to at least the
+ * policy's, so a what-if setting never 400s a live route. Null when
+ * nothing is left.
+ */
+export function liveOverrides(overrides, policy) {
+  if (!overrides || !policy) return null;
+  const out = {};
+  if (overrides.models) out.models = overrides.models;
+  const p = {...(overrides.policy ?? {})};
+  delete p.human_review_cost;
+  if (p.under_weights) {
+    const w = p.under_weights.map((x, i) =>
+      EMERGENCY_WEIGHTS.includes(i) ? Math.max(x, policy.under_weights[i]) : x,
+    );
+    if (w.every((x, i) => x === policy.under_weights[i])) delete p.under_weights;
+    else p.under_weights = w;
+  }
+  if (Object.keys(p).length) out.policy = p;
+  return Object.keys(out).length ? out : null;
+}
+
+/**
+ * The overrides named in one line, such as "Sonnet only · agreement
+ * 14/20". Null when there are none.
+ */
+export function overridesText(overrides) {
+  if (!overrides) return null;
+  const parts = [];
+  if (overrides.models) parts.push(MODEL_LABELS[overrides.models] ?? overrides.models);
+  const p = overrides.policy ?? {};
+  if (p.min_top_votes !== undefined) parts.push(`agreement ${p.min_top_votes}/${SAMPLES}`);
+  if (p.min_valid !== undefined) parts.push(`valid samples ${p.min_valid}/${SAMPLES}`);
+  if (p.max_span !== undefined) parts.push(`spread ${p.max_span}`);
+  if (p.human_review_cost !== undefined) {
+    parts.push(`review cost ${p.human_review_cost.toFixed(2)}`);
+  }
+  if (p.under_weights) parts.push(`under-triage weights ${p.under_weights.join(', ')}`);
+  return parts.length ? parts.join(' · ') : null;
+}
+
+/**
+ * The banner line for the settings the next live route will send, such as
+ * "Next live message uses: Sonnet only · agreement 14/20". It describes
+ * the settings, not the result on screen. Null when there are none.
+ */
+export function bannerText(overrides) {
+  const text = overridesText(overrides);
+  return text ? `Next live message uses: ${text}` : null;
+}
+
+/**
+ * The banner over the physician and patient views. A replay shows its
+ * saved result, so while overrides are active it says that instead of
+ * claiming the overrides were used.
+ */
+export function routingBanner(overrides, replay) {
+  const text = bannerText(overrides);
+  if (!text) return null;
+  return replay ? 'Replay: saved result' : text;
+}
+
+function formatMetric(x, kind) {
+  if (typeof x !== 'number' || Number.isNaN(x)) return '—';
+  if (kind === 'percent') return formatPercent(x);
+  if (kind === 'decimal') return x.toFixed(2);
+  return String(x);
+}
+
+/** "12% → 18%", "0.80 → 0.86" or "0 → 2", from the baseline to now. */
+export function delta(now, base, kind) {
+  const n = formatMetric(now, kind);
+  if (base === null || base === undefined) return n;
+  const b = formatMetric(base, kind);
+  return b === n ? `${n}, no change` : `${b} → ${n}`;
+}
+
+/**
+ * True for a re-score Summary from the Worker. An error object such as
+ * {error: 0} is not one, so it is never shown as numbers.
+ */
+function isSummary(x) {
+  return (
+    x !== null &&
+    typeof x === 'object' &&
+    Number.isFinite(x.n) &&
+    Number.isFinite(x.emergencies) &&
+    Number.isFinite(x.missed) &&
+    x.confusion !== null &&
+    typeof x.confusion === 'object'
+  );
+}
+
+/** One plain reason for a failed re-score, by HTTP status (0: no reply). */
+function rescoreErrorText(status) {
+  if (status === 0) return 'Couldn’t reach the Worker. Check the connection.';
+  if (status === 404) return 'This run is no longer stored on the Worker.';
+  if (status === 409) return 'This run cannot be re-scored.';
+  if (status === 400) return 'The Worker rejected these settings.';
+  if (status === 401) return 'The access token was rejected.';
+  return `The Worker returned an error (HTTP ${status}).`;
+}
+
+/**
+ * Turns a re-score reply ({ok, status, data}, status 0 for a network
+ * failure) into exactly one of {summary} or {error: message}. Failure is
+ * decided by ok and by the shape of the summary, never by the truthiness
+ * of a status, so status 0 is always an error.
+ */
+export function rescoreOutcome(res) {
+  if (res?.ok !== true) {
+    return {error: rescoreErrorText(Number.isInteger(res?.status) ? res.status : 0)};
+  }
+  const summary = res.data?.summary;
+  return isSummary(summary) ? {summary} : {error: 'The Worker sent an unreadable result.'};
+}
+
+/**
+ * What the results panel shows. A failed re-score never keeps the previous
+ * numbers on screen: they would read as the result of settings the
+ * sliders no longer show.
+ */
+export function resultsPanel({summary, error, rescoring}) {
+  if (typeof error === 'string' && error !== '') {
+    return {
+      kind: 'error',
+      summary: null,
+      text: `Couldn’t re-score these settings — ${error} Move a slider or Reset to try again.`,
+    };
+  }
+  if (isSummary(summary)) return {kind: 'metrics', summary, busy: rescoring === true};
+  if (rescoring) return {kind: 'loading', summary: null, text: 'Re-scoring…'};
+  return {kind: 'empty', summary: null, text: 'No result yet.'};
+}
+
+/** Shading steps for the confusion grid; 0 is no fill. */
+export const GRID_STEPS = 7;
+
+/**
+ * The confusion grid: one row per reference level, one column per routed
+ * level plus Human review. Each cell has its count, the baseline count
+ * (null without one) and a shading step from 0 (none) to GRID_STEPS,
+ * scaled to the largest count on the grid.
+ */
+export function confusionGrid(confusion, base) {
+  const columns = [
+    ...LEVELS.map(level => ({key: level, label: levelLabel(level)})),
+    {key: 'human_review', label: 'Human review'},
+  ];
+  const count = (grid, r, c) => {
+    const n = grid?.[r]?.[c];
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+  let max = 0;
+  for (const r of LEVELS) {
+    for (const c of columns) max = Math.max(max, count(confusion, r, c.key));
+  }
+  const rows = LEVELS.map(level => ({
+    level,
+    label: levelLabel(level),
+    cells: columns.map(c => {
+      const n = count(confusion, level, c.key);
+      return {
+        key: c.key,
+        label: c.label,
+        count: n,
+        base: base ? count(base, level, c.key) : null,
+        step: n === 0 ? 0 : Math.max(1, Math.ceil((n / max) * GRID_STEPS)),
+        diagonal: c.key === level,
+      };
+    }),
+  }));
+  return {columns, rows, max};
+}

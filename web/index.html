@@ -6,7 +6,7 @@
     <title>Disposition agent demo</title>
     <meta
       name="description"
-      content="Synthetic demo of a clinical disposition agent: physician and patient views."
+      content="Synthetic demo of a clinical disposition agent: physician, patient and operations views."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,11 +32,16 @@
         <button type="button" id="view-patient" aria-pressed="false">
           Patient view
         </button>
+        <button type="button" id="view-ops" aria-pressed="false">
+          Operations
+        </button>
       </div>
     </header>
 
     <main class="wrap">
-      <section class="card controls" aria-labelledby="input-heading">
+      <p id="routing-banner" class="routing-banner" role="status" hidden></p>
+
+      <section id="input-card" class="card controls" aria-labelledby="input-heading">
         <h2 id="input-heading" class="eyebrow">Message</h2>
         <label for="demo">Demo message</label>
         <select id="demo"></select>
@@ -74,6 +79,7 @@
 
       <section id="physician" aria-label="Physician view"></section>
       <section id="patient" aria-label="Patient view" hidden></section>
+      <section id="ops" class="ops" aria-label="Operations view" hidden></section>
     </main>
   </body>
 </html>
