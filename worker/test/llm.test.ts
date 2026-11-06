@@ -293,6 +293,60 @@ describe('openRouterClient per-model tuning', () => {
     expect(WORKER_CONNECTIONS).toBe(6);
   });
 
+  it('starts the timeout after the wait for a connection', async () => {
+    // Each call takes 40 ms and fails if its signal aborts first.
+    const impl = vi.fn(async (_url: unknown, init?: RequestInit) => {
+      await new Promise((resolve, reject) => {
+        const t = setTimeout(resolve, 40);
+        init?.signal?.addEventListener('abort', () => {
+          clearTimeout(t);
+          reject(init.signal!.reason);
+        });
+      });
+      return okJson({a: 1});
+    });
+    const client = openRouterClient('k', impl, MAX_IN_FLIGHT, undefined, {
+      sonnet: {maxInFlight: 6},
+      flash: {maxInFlight: 6},
+    });
+    // Both queues admit 6 calls at once, so 6 of the 12 wait 40 ms for a
+    // connection: 80 ms in all, longer than each call's 60 ms timeout.
+    const quick = both(6).map(r => ({...r, timeoutMs: 60}));
+    const results = await Promise.allSettled(
+      quick.map(r => client.complete(r)),
+    );
+    expect(results.map(r => r.status)).toEqual(Array(12).fill('fulfilled'));
+  });
+
+  it("retries a 429 through its own model's queue", async () => {
+    let release = () => {};
+    const held = new Promise<void>(resolve => (release = resolve));
+    const calls: string[] = [];
+    let sonnetCalls = 0;
+    const impl = vi.fn(async (_url: unknown, init?: RequestInit) => {
+      const model = JSON.parse(String(init?.body)).model as string;
+      calls.push(model);
+      if (model === 'sonnet' && ++sonnetCalls === 1) {
+        return new Response('{}', {status: 429});
+      }
+      // The second sonnet call holds sonnet's only slot until released.
+      if (model === 'sonnet' && sonnetCalls === 2) await held;
+      return okJson({a: 1});
+    });
+    const client = openRouterClient('k', impl, MAX_IN_FLIGHT, async () => {}, {
+      sonnet: {maxInFlight: 1},
+    });
+    const retried = client.complete(sonnet);
+    const holder = client.complete(sonnet);
+    // Let the first call fail, back off and queue behind the holder.
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await client.complete(flash);
+    expect(calls).toEqual(['sonnet', 'sonnet', 'flash']);
+    release();
+    await Promise.all([retried, holder]);
+    expect(calls).toEqual(['sonnet', 'sonnet', 'flash', 'sonnet']);
+  });
+
   it('sends a tuned reasoning effort, and none otherwise', async () => {
     const fetchMock = vi
       .fn()
