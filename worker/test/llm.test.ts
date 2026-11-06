@@ -294,10 +294,10 @@ describe('openRouterClient per-model tuning', () => {
   });
 
   it('starts the timeout after the wait for a connection', async () => {
-    // Each call takes 40 ms and fails if its signal aborts first.
+    // Each call takes 100 ms and fails if its signal aborts first.
     const impl = vi.fn(async (_url: unknown, init?: RequestInit) => {
       await new Promise((resolve, reject) => {
-        const t = setTimeout(resolve, 40);
+        const t = setTimeout(resolve, 100);
         init?.signal?.addEventListener('abort', () => {
           clearTimeout(t);
           reject(init.signal!.reason);
@@ -309,9 +309,9 @@ describe('openRouterClient per-model tuning', () => {
       sonnet: {maxInFlight: 6},
       flash: {maxInFlight: 6},
     });
-    // Both queues admit 6 calls at once, so 6 of the 12 wait 40 ms for a
-    // connection: 80 ms in all, longer than each call's 60 ms timeout.
-    const quick = both(6).map(r => ({...r, timeoutMs: 60}));
+    // Both queues admit 6 calls at once, so 6 of the 12 wait 100 ms for a
+    // connection: 200 ms in all, longer than each call's 150 ms timeout.
+    const quick = both(6).map(r => ({...r, timeoutMs: 150}));
     const results = await Promise.allSettled(
       quick.map(r => client.complete(r)),
     );
