@@ -8,6 +8,7 @@ import pytest
 from counsel_eval.client import RouteClient
 from counsel_eval.client import SchemaMismatch
 from helpers import ndjson
+from helpers import POLICY_VERSION
 from helpers import VALID_RESULT
 
 URL = "https://worker.test"
@@ -86,6 +87,6 @@ def test_client_raises_when_no_result_event(respx_mock):
 
 def test_policy_returns_json(respx_mock):
   respx_mock.get(f"{URL}/v1/policy").respond(
-      200, json={"policy_version": "0.1.0"}
+      200, json={"policy_version": POLICY_VERSION}
   )
-  assert RouteClient(URL, "t").policy()["policy_version"] == "0.1.0"
+  assert RouteClient(URL, "t").policy()["policy_version"] == POLICY_VERSION

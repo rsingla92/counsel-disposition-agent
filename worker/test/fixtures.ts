@@ -1,6 +1,6 @@
 import {LEVELS, type Level} from '../src/levels';
 import {LlmError, type LlmClient, type LlmRequest} from '../src/llm';
-import type {Policy} from '../src/policy';
+import {loadPolicy, type Policy} from '../src/policy';
 import {emptyVotes, type Votes} from '../src/router';
 import type {Extraction, RouteResult, Sample} from '../src/schema';
 
@@ -116,7 +116,7 @@ export const validResult: RouteResult = {
   patient_message: 'A physician will reply within a week.',
   trace: {
     input_sha256: 'a'.repeat(64),
-    policy_version: '0.1.0',
+    policy_version: loadPolicy().policy_version,
     models: [{model: 'test-model', provider: 'test'}],
     extraction_model: {model: 'test-model', provider: 'test'},
     latency_ms: 10,
