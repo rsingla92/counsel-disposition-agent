@@ -66,7 +66,7 @@ from 2026-11-04: no baseline calls the sampling step.
 | **Sonnet + Flash, as deployed** ([report](../reports/2026-11-07-policy-0.3.0.md)) | **0 of 14** | **0%** | **0.730** | **18 s** | **22 s** |
 | Sonnet only ([report](../reports/2026-11-07-policy-0.3.0-sonnet.md)) | 0 of 14 | 0% | 0.710 | 17 s | 22 s |
 | Flash only ([report](../reports/2026-11-07-policy-0.3.0-flash.md)) | 0 of 14 | 4% | 0.598 | 16 s | 25 s |
-| Rule floor only (2026-11-04) | 0 of 14 | 0% | 1.190 | 9.5 s | |
+| Rule floor only (2026-11-04) | 0 of 14 | 0% | 1.190 | 9.5 s | 13 s |
 | Always escalate | 0 of 14 | 0% | 2.520 | n/a | |
 | Historical | 4 of 14 | 0% | 4.120 | n/a | |
 
@@ -81,13 +81,20 @@ From the reports:
   score (0.730 against 0.710) is the 0.2 penalty: the check flagged 10%
   of cases for a physician, against none for Sonnet only (from the
   experiment log). Needs info: 64% with Flash, 70% without.
-- **Flash only scored lowest** (0.598) and sent 2 of 50 cases to Human
-  review, its only flagged cases (4%). It reached Within a few days on 4 of 7 such cases, against 6 of
-  7 for Sonnet, and asked for more information less often (46%). ROC AUC
-  for emergency or same day was 0.959, against 0.920 for Sonnet.
+- **Flash only had the lowest (best) cost score** (0.598) and sent 2 of
+  50 cases to Human review, its only flagged cases (4%). It routed 4 of 7
+  Within a few days cases at that level or higher (sensitivity 57.1%),
+  against 6 of 7 for Sonnet, and asked for more information less often
+  (46%). ROC AUC for emergency or same day was 0.959, against 0.920 for
+  Sonnet.
 - **Against policy 0.1.0** (Sonnet + Flash, 20 votes, 2026-11-05): cost
   score 0.730 against 0.808, median time 18 s against 83 s, Human review
-  0% in both, flagged for a physician 10% against 14%. ROC AUC for emergency 0.986 against 0.972.
+  0% in both, flagged for a physician 10% against 14%, ROC AUC for
+  emergency 0.986 against 0.972. These are not gains from 5 votes. The
+  0.1.0 run went back to back, so much of its 83 s was rate-limit
+  retries. Its level matrix differs by one case, and the 0.3.0 Sonnet-only
+  run, with the same levels, had an emergency AUC of 0.972. That is
+  run-to-run variation, as the vote-stability report predicts.
 - Cost score with every under-triage weight halved or doubled: Sonnet +
   Flash 0.505 and 1.180, Sonnet only 0.485 and 1.160, Flash only 0.383
   and 1.028. All three beat the rule floor (0.595 and 2.380) at both.
@@ -196,8 +203,8 @@ model; its results are [above](#results-policy-030).
   an emergency, not from routing the rest well.
 - **The flag rate is not in the report yet.** The report gives the Human
   review rate. The wider share flagged for a physician (10% in the
-  2026-11-07 Sonnet + Flash run) feeds the cost score and is shown in the Operations view,
-  but the report does not print it.
+  2026-11-07 Sonnet + Flash run) feeds the cost score and is shown in
+  the Operations view, but the report does not print it.
 
 ## Running it
 

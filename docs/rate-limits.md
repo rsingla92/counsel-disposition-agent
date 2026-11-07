@@ -117,10 +117,13 @@ only the Human review message ("if this is an emergency, call 911").
   five with every vote in, chest pain to Call 911. In the second,
   extraction succeeded on all five and chest pain kept its Call 911
   floor, but sampling ran out of retries, so all five ended at Human
-  review. A burst now costs physician time, not the emergency message.
+  review. In this test a burst cost physician time, not the emergency
+  message. A longer burst can still exhaust extraction's retries and lose
+  the floor ([why it matters](#why-it-matters)).
 - **The page says it is still working.** After 10 s the status line counts
-  up in steps of 10 s and says the message is queued, not lost, and the patient view says
-  the message arrived and to call 911 if this is an emergency.
+  up in steps of 10 s and says the message is queued, not lost, and the
+  patient view says the message arrived and to call 911 if this is an
+  emergency.
 
 ## Roadmap
 

@@ -62,7 +62,10 @@ Full agent: 2026-11-07 run of policy 0.3.0, Sonnet + Flash as deployed,
 cases started 40 s apart so the provider's per-minute rate limit is not
 what gets measured. 10% of its cases were routed but flagged for a
 physician to check, 64% asked for more information (Needs info),
-and the median time to a result was 18 s. Baselines: the 2026-11-04 runs.
+and the median time to a result was 18 s. That spacing is a test
+condition: a burst of messages still hits the limit, and those cases end
+at Human review ([rate limits](docs/rate-limits.md)). Baselines: the
+2026-11-04 runs.
 
 The cost score is the average cost per case of routing mistakes, weighted
 so under-triage costs more than over-triage, plus 0.2 for every case flagged
