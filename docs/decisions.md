@@ -11,7 +11,7 @@ Settled in the PRD before the build. D13 and D14 were stretch goals.
 | D1 | Levels | Seven plain-language levels from Call 911 to Self-care, plus the statuses Needs info and Human review. | Built |
 | D2 | Architecture | Extract clinical findings first, apply a rule floor, then route, so explanations rest on what the message says. | Built |
 | D3 | Final level | An expected-cost router picks the level, never below the rule floor. | Built |
-| D4 | Uncertainty | 20 samples from each of two model families; low agreement or disagreement between families flags it for a physician. | Built |
+| D4 | Uncertainty | 5 samples from each of two model families (20 before policy 0.3.0); low agreement or disagreement between families flags it for a physician. | Built |
 | D5 | Autonomy | Asymmetric: emergency instructions go out at once, while lower levels wait for physician sign-off. | Built |
 | D6 | Ground truth | The author's blind review of all 50 cases is the reference, with the historical labels kept beside it. | Built |
 | D7 | Headline metric | A zero-miss gate on emergencies first, then a cost-weighted score, with confusion matrices, ROC and subscores as secondary outcomes. | Built |
@@ -40,7 +40,7 @@ Calls the planner made where the PRD left a gap.
 
 **Still open for the author:**
 
-- `min_valid` 15: how many of 20 primary answers must be valid to route.
+- `min_valid` 4: how many of 5 primary answers must be valid to route.
 - Temperature 0.7 for the samples.
 - `max_chars` 4000 at intake.
 - The historical-baseline mapping: urgent escalation to ED now, async
@@ -63,3 +63,4 @@ Calls the planner made where the PRD left a gap.
 | 2026-11-05 | The live demo routes with Sonnet + Flash. | Sonnet alone hit rate limits; Flash alone timed out on extraction. |
 | V0 | No per-request LLM tracing to an outside vendor. | It would copy every prompt and response to another company, against the zero-data-retention rule. The Worker's own trace covers V0. See the [roadmap](reliability-roadmap.md#phase-3-observability). |
 | 2026-11-05 | Policy 0.2.0: heavy non-obstetric bleeding gets two flags, ED now with signs of blood loss (lightheadedness, fainting, racing heart, pale and clammy) and In person today for heavy menstrual bleeding. Immunosuppression is tagged adult and pediatric. | Author's clinical call. Uncontrolled bleeding after injury stays under `major_trauma`, and black stools or vomiting blood under `gi_bleeding_signs`. The group tag is a label only; immunosuppression already raised children's floors. |
+| 2026-11-06 | Policy 0.3.0: 5 samples per model, 4 valid needed, 3 agreeing needed. Saved runs with more votes are re-scored with those counts scaled up, rounding up. | Every policy 0.2.0 run sent 92 to 96% of cases to Human review: Vertex's per-minute limit refused about half of 20 samples under back-to-back cases. Re-scoring the clean 20-vote run at 3 to 20 votes routed every case the same ([stability report](../reports/2026-11-06-vote-stability.md)). 5 keeps a meaningful split check (3 of 5); a message drops from 41 calls to 11. |

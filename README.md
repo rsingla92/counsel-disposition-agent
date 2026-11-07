@@ -31,7 +31,7 @@ flowchart TD
   D -- floor is ED now or Call 911 --> E["Emergency instructions<br/>sent at once"]
   D --> F{"4. Scope:<br/>English? a care request?"}
   F -- no --> HR
-  F -- yes --> G["6. Sampling: 20 answers from Sonnet<br/>and 20 from Gemini Flash, in parallel"]
+  F -- yes --> G["6. Sampling: 5 answers from Sonnet<br/>and 5 from Gemini Flash, in parallel"]
   G --> H["7. Decide: lowest expected cost at or above<br/>the floor; flag split or disagreeing answers"]
   H -- too few valid answers --> HR
   H --> I["8. Explain: justification,<br/>safety-netting, patient message"]

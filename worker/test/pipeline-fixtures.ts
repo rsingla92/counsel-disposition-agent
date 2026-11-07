@@ -7,9 +7,8 @@ import {
   type ModelSpec,
 } from '../src/llm';
 import type {Deps} from '../src/pipeline';
-import {loadPolicy} from '../src/policy';
 import type {Sample} from '../src/schema';
-import {fakeExtraction, sample, toWire, withFlags} from './fixtures';
+import {fakeExtraction, policy20, sample, toWire, withFlags} from './fixtures';
 
 // Synthetic messages only: the repo is public.
 export const M = 'I have had a sore throat for two days. What should I do?';
@@ -74,7 +73,7 @@ export function scripted(opts: ScriptOpts): LlmClient & {
   calls: number;
   requests: {schemaName: string; model: string}[];
 } {
-  const policy = loadPolicy();
+  const policy = policy20;
   let primarySamples = 0;
   const client = {
     calls: 0,
@@ -133,7 +132,7 @@ export function scripted(opts: ScriptOpts): LlmClient & {
 export function deps(llm: LlmClient): Deps {
   return {
     llm,
-    policy: loadPolicy(),
+    policy: policy20,
     primary: PRIMARY,
     secondary: null,
     log: () => {},

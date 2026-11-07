@@ -1,8 +1,15 @@
 import {LEVELS, type Level} from '../src/levels';
 import {LlmError, type LlmClient, type LlmRequest} from '../src/llm';
 import {loadPolicy, type Policy} from '../src/policy';
+import {policyForSamples} from '../src/rescore';
 import {emptyVotes, type Votes} from '../src/router';
 import type {Extraction, RouteResult, Sample} from '../src/schema';
+
+/**
+ * The checked-in policy at 20 votes per model (thresholds scaled up, 16 and
+ * 12), for tests of routing mechanics written with 20-vote splits.
+ */
+export const policy20: Policy = policyForSamples(loadPolicy(), 20);
 
 /** Votes with the given counts; levels not named get 0. */
 export function v(partial: Partial<Votes>): Votes {

@@ -61,20 +61,20 @@ this order.
    it is an emergency.
 5. **Floor only.** The eval can stop here (`mode: "floor_only"`) to score the
    rule floor alone as a baseline. Live routes never stop here.
-6. **Sampling.** 20 answers from each model, in parallel, at temperature 0.7.
+6. **Sampling.** 5 answers from each model, in parallel, at temperature 0.7.
    Each answer is a level, a justification and safety-netting text. Any
    answer below the floor is raised to the floor.
 7. **Decide** ([`decide.ts`](../worker/src/decide.ts),
    [`router.ts`](../worker/src/router.ts)).
-   - Fewer than 15 valid primary answers: Human review (`sampling_failed`).
+   - Fewer than 4 valid primary answers: Human review (`sampling_failed`).
    - Otherwise the valid primary answers are treated as a probability for each
      level. The router picks the level, at or above the floor, with the lowest
      expected cost under the policy's cost weights. Ties go to the more
      acute level.
    - The case stays routed but is flagged for a physician to check if fewer
-     than 12 of the valid primary answers agree, if the answers spread more
-     than 2 levels apart, if the two
-     models' most common answers fall in different tiers, if the secondary
+     than 3 of the valid primary answers agree, if the answers spread more
+     than 2 levels apart, if the two models' most common answers fall in
+     different tiers, if the secondary
      returned too few valid answers to cross-check, or if a quote did not
      match the message.
    - If extraction listed questions or asked for a photo, the status is
@@ -117,8 +117,8 @@ the case is flagged `unverified_excerpt` for a physician to check.
   retention).
 - Primary: `anthropic/claude-sonnet-5.5`. Secondary:
   `google/gemini-3.8-flash`.
-- Each message makes 41 model calls: 1 extraction and 20 samples from each
-  model. Each model has its own queue, because Vertex rate-limits each
+- Each message makes 11 model calls: 1 extraction and 5 samples from each
+  model (41 with 20 samples before policy 0.3.0). Each model has its own queue, because Vertex rate-limits each
   model separately: at most 2 Sonnet calls and 4 Flash calls in flight per
   case, and never more than 6 connections in all (the Worker limit).
 - Flash is called with reasoning effort `low`. It reasons by default, which
@@ -154,10 +154,12 @@ design is in
 - **Experiment log.** Saved eval runs, one row each: condition, missed
   emergencies, Human review rate, cost score and median time. It has five
   rows, with "Sonnet + Flash, as deployed (stricter extraction)" first.
-- **Sliders.** Agreement needed (12 of 20), valid answers needed (15),
+- **Sliders.** Agreement needed (3 of 5), valid answers needed (4 of 5),
   widest spread (2), cost of a Human review (0.2), and the six under-triage
   weights. Moving one re-scores the selected run in the Worker from its
-  stored votes, using the same `decide()` function live routing uses.
+  stored votes, using the same `decide()` function live routing uses. A run
+  saved with 20 votes is re-scored with the vote counts scaled to 20,
+  rounding up: 3 of 5 becomes 12 of 20.
 - **Model picker.** Policy default (Sonnet with Flash as a cross-check, as
   deployed), Sonnet only, or Flash only. With one model there is no
   cross-check, but the other model still backs up a failed extraction.

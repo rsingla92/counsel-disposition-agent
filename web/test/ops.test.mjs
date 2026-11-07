@@ -22,8 +22,9 @@ import {
   validStoredOverrides,
 } from '../lib.js';
 
-// The deployed policy's tunable values (policy/policy.yaml), flattened.
+// A 20-vote policy's tunable values, flattened as policyDefaults gives them.
 const POLICY = {
+  samples: 20,
   min_valid: 15,
   min_top_votes: 12,
   max_span: 2,
@@ -31,10 +32,14 @@ const POLICY = {
   under_weights: [3, 20, 2, 5, 2, 1.5],
 };
 
+// The same at 5 votes per model (policy/policy.yaml 0.3.0).
+const POLICY5 = {...POLICY, samples: 5, min_valid: 4, min_top_votes: 3};
+
 function controls(over = {}) {
+  const {samples: _samples, ...tunable} = POLICY;
   return {
     models: 'policy',
-    ...POLICY,
+    ...tunable,
     under_weights: [...POLICY.under_weights],
     ...over,
   };
@@ -57,6 +62,19 @@ test('policyDefaults flattens the /v1/policy response', () => {
     },
   };
   assert.deepEqual(policyDefaults(api), POLICY);
+});
+
+test('policyDefaults reads the votes per model', () => {
+  const api = {
+    sampling: {n: 5, min_valid: 4},
+    review: {min_top_votes: 3, max_span: 2},
+    loss: {
+      human_review_cost: 0.2,
+      boundaries: [3, 20, 2, 5, 2, 1.5].map(under => ({under})),
+    },
+  };
+  assert.deepEqual(policyDefaults(api), POLICY5);
+  assert.equal(policyDefaults({...api, sampling: {min_valid: 4}}), null);
 });
 
 test('policyDefaults is null for a response without the tunable fields', () => {
@@ -150,6 +168,14 @@ test('validStoredOverrides drops every malformed shape', () => {
   }
 });
 
+test('validStoredOverrides drops settings above the votes drawn', () => {
+  // Saved under 0.2.0 (20 votes); meaningless at 5.
+  assert.equal(validStoredOverrides({policy: {min_valid: 15}}, POLICY5), null);
+  assert.equal(validStoredOverrides({policy: {min_top_votes: 6}}, POLICY5), null);
+  const o = {policy: {min_valid: 5, min_top_votes: 4}};
+  assert.deepEqual(validStoredOverrides(o, POLICY5), o);
+});
+
 test('validStoredOverrides is null without a loaded policy', () => {
   assert.equal(validStoredOverrides({models: 'sonnet'}, null), null);
 });
@@ -166,8 +192,8 @@ test('minTopVotes is a simple majority of min_valid', () => {
 });
 
 test('the ranges table matches the plan', () => {
-  assert.deepEqual(OVERRIDE_RANGES.min_valid, {min: 10, max: 20, step: 1});
-  assert.deepEqual(OVERRIDE_RANGES.min_top_votes, {min: 6, max: 20, step: 1});
+  assert.deepEqual(OVERRIDE_RANGES.min_valid, {min: 1, max: 20, step: 1});
+  assert.deepEqual(OVERRIDE_RANGES.min_top_votes, {min: 1, max: 20, step: 1});
   assert.deepEqual(OVERRIDE_RANGES.max_span, {min: 0, max: 6, step: 1});
   assert.deepEqual(OVERRIDE_RANGES.human_review_cost, {min: 0.05, max: 2, step: 0.05});
   assert.deepEqual(OVERRIDE_RANGES.under_weight, {min: 0.5, max: 50, step: 0.5});
@@ -204,7 +230,7 @@ test('banner text for each model choice', () => {
 
 test('banner text names the settings', () => {
   assert.equal(
-    bannerText({models: 'sonnet', policy: {min_top_votes: 14}}),
+    bannerText({models: 'sonnet', policy: {min_top_votes: 14}}, 20),
     'Next live message uses: Sonnet only · agreement 14/20',
   );
   assert.equal(
@@ -215,7 +241,7 @@ test('banner text names the settings', () => {
         human_review_cost: 0.4,
         under_weights: [3, 25, 2, 5, 2, 1.5],
       },
-    }),
+    }, 20),
     'Next live message uses: valid samples 12/20 · spread 3 · review cost 0.40 · under-triage weights 3, 25, 2, 5, 2, 1.5',
   );
 });
@@ -229,9 +255,12 @@ test('banner text is null with no overrides', () => {
 
 test('overridesText names the settings without a prefix', () => {
   assert.equal(
-    overridesText({models: 'sonnet', policy: {min_top_votes: 14}}),
+    overridesText({models: 'sonnet', policy: {min_top_votes: 14}}, 20),
     'Sonnet only · agreement 14/20',
   );
+  assert.equal(overridesText({policy: {min_top_votes: 3}}, 5), 'agreement 3/5');
+  // A saved trace may not say how many votes its run drew.
+  assert.equal(overridesText({policy: {min_top_votes: 3}}), 'agreement 3');
   assert.equal(overridesText(null), null);
   assert.equal(overridesText({policy: {}}), null);
 });
@@ -281,7 +310,7 @@ test('the live clamp keeps agreement a majority of the clamped min_valid', () =>
   const live = liveOverrides({policy: {min_valid: 10, min_top_votes: 6}}, POLICY);
   assert.deepEqual(live, {policy: {min_top_votes: 8}});
   assert.ok(!bannerText(live).includes('agreement 6'));
-  assert.equal(bannerText(live), 'Next live message uses: agreement 8/20');
+  assert.equal(bannerText(live, 20), 'Next live message uses: agreement 8/20');
   // An agreement already above the majority (9 ≥ 8) is left alone.
   assert.deepEqual(liveOverrides({policy: {min_valid: 10, min_top_votes: 9}}, POLICY), {
     policy: {min_top_votes: 9},

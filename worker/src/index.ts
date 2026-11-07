@@ -12,6 +12,7 @@ import {
   applyPolicyOverrides,
   checkLiveSafe,
   majorityOk,
+  withinSamples,
   selectModels,
 } from './overrides';
 import {route, type Deps, type EarlyEvent} from './pipeline';
@@ -272,7 +273,11 @@ export function appFor(deps: Deps): Hono<App> {
 
   app.post('/v1/experiments/:id/rescore', async c => {
     const parsed = RescoreBody.safeParse(await body(c.req.raw));
-    if (!parsed.success || !majorityOk(deps.policy, parsed.data.policy)) {
+    if (
+      !parsed.success ||
+      !majorityOk(deps.policy, parsed.data.policy) ||
+      !withinSamples(deps.policy, parsed.data.policy)
+    ) {
       return c.json({error: 'overrides invalid'}, 400);
     }
     const exp = await readExperiment(c.env?.EXPERIMENTS, c.req.param('id'));

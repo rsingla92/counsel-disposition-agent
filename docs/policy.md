@@ -3,7 +3,7 @@
 [Back to the README](../README.md)
 
 Every clinical rule the agent follows lives in one file,
-[`policy/policy.yaml`](../policy/policy.yaml), version 0.2.0. It is a draft
+[`policy/policy.yaml`](../policy/policy.yaml), version 0.3.0. It is a draft
 for physician review. The Worker bundles a copy at build time
 (`npm run build-policy`), and the eval reads the same file. The eval refuses
 to run if the deployed Worker reports a different version (exit code 2).
@@ -88,13 +88,15 @@ boundaries adds their costs.
 So sending a true ED-now case to In person today costs 20, and sending a
 routine case to Call 911 costs 5.
 
-A worked example. Say 14 of 20 answers say Routine and 6 say In person
-today, with no floor. Choosing Routine is wrong for the 6, at a cost of 9
-each (2 + 5 + 2), for an expected 2.7. Choosing Physician contact today
-costs 2 for each of the 14 (two boundaries over) and 2 for each of the 6 (one
-boundary under), for an expected 2.0, the lowest. The router picks Physician
-contact today, though most answers said Routine. That is the point: when
-some answers see a same-day problem, the cheaper mistake is to look sooner.
+A worked example. Say 3 of 5 answers say Routine and 2 say In person
+today, with no floor. Choosing Routine is wrong for the 2, at a cost of 9
+each (2 + 5 + 2), for an expected 3.6. Choosing Physician contact today
+costs 2 for each of the 3 (two boundaries over) and 2 for each of the 2 (one
+boundary under), for an expected 2.0. Choosing In person today costs 3 for
+each of the 3 (three boundaries over), for an expected 1.8, the lowest. The
+router picks In person today, though most answers said Routine. That is the
+point: when some answers see a same-day problem, the cheaper mistake is to
+look sooner.
 
 The shared test file [`policy/cost_fixtures.json`](../policy/cost_fixtures.json)
 pins the cost rule, so the Worker (TypeScript) and the eval (Python) cannot
@@ -105,12 +107,12 @@ drift apart.
 | Setting | Value | What it does |
 |---|---|---|
 | `intake.max_chars` | 4000 | Longer messages go to Human review |
-| `sampling.n` | 20 | Answers per model |
+| `sampling.n` | 5 | Answers per model (20 before 0.3.0; see the [stability report](../reports/2026-11-06-vote-stability.md)) |
 | `sampling.temperature` | 0.7 | Spread in the answers, so they show uncertainty |
-| `sampling.min_valid` | 15 | Fewer valid primary answers: Human review |
+| `sampling.min_valid` | 4 | Fewer valid primary answers: Human review |
 | `sampling.timeout_ms` | 15000 | Per answer |
 | `extraction.timeout_ms` | 20000 | Per extraction call |
-| `review.min_top_votes` | 12 | Fewer agreeing answers: flagged for a physician |
+| `review.min_top_votes` | 3 | Fewer agreeing answers: flagged for a physician |
 | `review.max_span` | 2 | Answers spread over more levels: flagged |
 | `review.family_tier_disagreement` | true | The two models' top answers in different tiers: flagged |
 | `modifier_cap` | In person today | Highest level a risk factor can raise the floor to |

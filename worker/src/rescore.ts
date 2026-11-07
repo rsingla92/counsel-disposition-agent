@@ -33,6 +33,8 @@ export type Experiment = {
   label: string;
   models: string;
   rescorable: boolean;
+  /** Votes drawn per model; absent on runs saved before it existed (20). */
+  samples_per_model?: number;
   records: ExperimentRecord[];
   summary: Summary;
   median_latency_ms: number;
@@ -95,6 +97,7 @@ export const ExperimentSchema: z.ZodType<Experiment> = z.strictObject({
   label: z.string(),
   models: z.string(),
   rescorable: z.boolean(),
+  samples_per_model: z.number().int().positive().optional(),
   records: z.array(RecordSchema),
   summary: SummarySchema,
   median_latency_ms: z.number(),
@@ -105,6 +108,36 @@ export const ExperimentIndexSchema = z.array(z.string());
 
 function total(votes: Votes): number {
   return LEVELS.reduce((sum, l) => sum + votes[l], 0);
+}
+
+/** Votes per model in every run saved before samples_per_model existed. */
+export const LEGACY_SAMPLES_PER_MODEL = 20;
+
+/** The votes per model a saved run drew. */
+export function samplesPerModel(exp: Experiment): number {
+  return exp.samples_per_model ?? LEGACY_SAMPLES_PER_MODEL;
+}
+
+/**
+ * `policy` with its vote-count thresholds scaled to `n` votes per model,
+ * rounding up so a scaled check is never looser. A run saved with 20 votes
+ * re-scores under a 4-of-5 policy as 16 of 20.
+ */
+export function policyForSamples(policy: Policy, n: number): Policy {
+  if (n === policy.sampling.n) return policy;
+  const scale = (x: number) => Math.ceil((x * n) / policy.sampling.n);
+  return {
+    ...policy,
+    sampling: {
+      ...policy.sampling,
+      n,
+      min_valid: scale(policy.sampling.min_valid),
+    },
+    review: {
+      ...policy.review,
+      min_top_votes: scale(policy.review.min_top_votes),
+    },
+  };
 }
 
 /**
@@ -151,10 +184,19 @@ function scoreRecord(r: ExperimentRecord, policy: Policy): ScoredCase {
   };
 }
 
-/** Recomputes an experiment's summary under `policy` from the saved votes. */
+/** Each record's outcome under `policy`, which is taken as given. */
+export function scoreRecords(
+  records: ExperimentRecord[],
+  policy: Policy,
+): ScoredCase[] {
+  return records.map(r => scoreRecord(r, policy));
+}
+
+/**
+ * Recomputes an experiment's summary under `policy` from the saved votes,
+ * with the vote-count thresholds scaled to the run's votes per model.
+ */
 export function rescore(exp: Experiment, policy: Policy): Summary {
-  return summarize(
-    exp.records.map(r => scoreRecord(r, policy)),
-    policy,
-  );
+  const scaled = policyForSamples(policy, samplesPerModel(exp));
+  return summarize(scoreRecords(exp.records, scaled), scaled);
 }

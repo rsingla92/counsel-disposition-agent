@@ -403,12 +403,12 @@
                   "properties": {
                     "min_valid": {
                       "type": "integer",
-                      "minimum": 10,
+                      "minimum": 1,
                       "maximum": 20
                     },
                     "min_top_votes": {
                       "type": "integer",
-                      "minimum": 6,
+                      "minimum": 1,
                       "maximum": 20
                     },
                     "max_span": {

@@ -6,6 +6,7 @@
   "scripts": {
     "build-policy": "node scripts/build-policy.mjs",
     "export-schema": "tsx scripts/export-schema.ts",
+    "stability": "tsx scripts/stability.ts",
     "prebuild": "npm run build-policy",
     "pretest": "npm run build-policy",
     "predeploy": "npm run build-policy",

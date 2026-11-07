@@ -26,10 +26,11 @@ function stepped(min: number, max: number, step: number) {
  * checked against a given policy.
  */
 export const PolicyOverridesSchema = z.strictObject({
-  // 20 is sampling.n; a test pins it.
-  min_valid: z.number().int().min(10).max(20).optional(),
-  // 6 is a majority of the lowest min_valid; majorityOk() tightens it.
-  min_top_votes: z.number().int().min(6).max(20).optional(),
+  // The schema stands alone, so it parses a trace saved under a policy that
+  // drew up to 20 votes; withinSamples() caps both at the loaded policy's
+  // sampling.n, and majorityOk() ties min_top_votes to min_valid.
+  min_valid: z.number().int().min(1).max(20).optional(),
+  min_top_votes: z.number().int().min(1).max(20).optional(),
   max_span: z.number().int().min(0).max(6).optional(),
   human_review_cost: stepped(0.05, 2, 0.05).optional(),
   // One per loss boundary, in policy order; a test pins the count.
@@ -72,6 +73,19 @@ export function majorityOk(
   return o.min_top_votes >= Math.floor(minValid / 2) + 1;
 }
 
+/**
+ * True when min_valid and min_top_votes, if given, are within the votes the
+ * policy draws per model. Overrides count in those votes; re-scoring a run
+ * saved with more votes scales them up with the policy's own thresholds.
+ */
+export function withinSamples(
+  policy: Policy,
+  o: PolicyOverrides | undefined,
+): boolean {
+  const n = policy.sampling.n;
+  return (o?.min_valid ?? 0) <= n && (o?.min_top_votes ?? 0) <= n;
+}
+
 export type RouteOverrides = z.infer<typeof RouteOverridesSchema>;
 
 /**
@@ -106,7 +120,9 @@ export function applyPolicyOverrides(
  *   emergency lower than the deployed policy would;
  * - min_valid, so a live route never trusts fewer valid samples than the
  *   deployed policy does.
- * Re-scoring a saved run is not checked: it keeps the full range.
+ * Nor may min_valid or min_top_votes exceed the votes a live route draws,
+ * which would send every case to Human review. Re-scoring a saved run is
+ * not checked: it keeps the full range.
  */
 export function checkLiveSafe(
   policy: Policy,
@@ -121,6 +137,12 @@ export function checkLiveSafe(
   if (lowered) return 'emergency_weight_below_policy';
   if (o?.min_valid !== undefined && o.min_valid < policy.sampling.min_valid) {
     return 'min_valid_below_policy';
+  }
+  if (o?.min_valid !== undefined && o.min_valid > policy.sampling.n) {
+    return 'min_valid_above_samples';
+  }
+  if (o?.min_top_votes !== undefined && o.min_top_votes > policy.sampling.n) {
+    return 'min_top_votes_above_samples';
   }
   return null;
 }

@@ -2,7 +2,13 @@ import {describe, expect, it} from 'vitest';
 import {summarize, type ScoredCase} from '../src/metrics';
 import {applyPolicyOverrides} from '../src/overrides';
 import {loadPolicy} from '../src/policy';
-import {rescore, type Experiment, type ExperimentRecord} from '../src/rescore';
+import {
+  policyForSamples,
+  rescore,
+  samplesPerModel,
+  type Experiment,
+  type ExperimentRecord,
+} from '../src/rescore';
 import {v} from './fixtures';
 
 const policy = loadPolicy();
@@ -124,12 +130,13 @@ describe('rescore', () => {
   });
 
   it('raises flagged_rate when min_top_votes rises', () => {
-    // S01 (20), S02 (13) and S05 (12 top votes): 14 splits S02 and S05.
+    // S01 (20), S02 (13) and S05 (12 top votes). Overrides count in the
+    // policy's votes: 4 of 5 is 16 of 20, which splits S02 and S05.
     // A split vote flags a case without the human_review status.
     const base = rescore(experiment(), policy);
     const raised = rescore(
       experiment(),
-      applyPolicyOverrides(policy, {min_top_votes: 14}),
+      applyPolicyOverrides(policy, {min_top_votes: 4}),
     );
     expect(raised.cost_score - base.cost_score).toBeCloseTo(
       (policy.loss.human_review_cost * 2) / 6,
@@ -145,7 +152,7 @@ describe('rescore', () => {
     for (const o of [
       {},
       {min_valid: 10},
-      {min_valid: 20, min_top_votes: 20},
+      {min_valid: 5, min_top_votes: 5},
       {max_span: 0, under_weights: UNDER.map(() => 0.5)},
     ]) {
       const s = rescore(exp, applyPolicyOverrides(policy, o));
@@ -157,7 +164,7 @@ describe('rescore', () => {
   it('re-routes a fixed sampling_failed record once min_valid is reached', () => {
     const exp = experiment([RECORDS[3]], [SAVED[3]]);
     expect(rescore(exp, policy).confusion.routine.human_review).toBe(1);
-    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 12}));
+    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 3}));
     expect(s.confusion.routine.human_review).toBe(0);
     expect(s.confusion.routine.routine).toBe(1);
     expect(s.human_review_rate).toBe(0);
@@ -169,7 +176,7 @@ describe('rescore', () => {
       base_reasons: ['unverified_excerpt'],
     };
     const exp = experiment([unverified], [SAVED[3]]);
-    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 12}));
+    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 3}));
     expect(s.human_review_rate).toBe(0);
     expect(s.confusion.routine.routine).toBe(1);
     expect(s.flagged_rate).toBe(1);
@@ -178,7 +185,7 @@ describe('rescore', () => {
   it('sends a routed record to Human review when min_valid rises past its votes', () => {
     const exp = experiment([RECORDS[3]], [SAVED[3]]);
     const routed = {...exp, records: [{...RECORDS[3], fixed: null}]};
-    const s = rescore(routed, applyPolicyOverrides(policy, {min_valid: 13}));
+    const s = rescore(routed, applyPolicyOverrides(policy, {min_valid: 4}));
     expect(s.human_review_rate).toBe(1);
   });
 
@@ -193,5 +200,44 @@ describe('rescore', () => {
     );
     expect(s.missed).toBe(1);
     expect(s.confusion.ed_now.in_person_today).toBe(1);
+  });
+});
+
+describe('re-scoring a run made with more votes than the policy draws', () => {
+  // A five-vote policy, whatever the checked-in policy says.
+  const p5 = {
+    ...policy,
+    sampling: {...policy.sampling, n: 5, min_valid: 4},
+    review: {...policy.review, min_top_votes: 3},
+  };
+
+  it('scales the count thresholds up to the run, rounding up', () => {
+    const p = policyForSamples(p5, 20);
+    expect(p.sampling.n).toBe(20);
+    expect(p.sampling.min_valid).toBe(16);
+    expect(p.review.min_top_votes).toBe(12);
+    expect(p.review.max_span).toBe(p5.review.max_span);
+  });
+
+  it('leaves the policy as is at its own vote count', () =>
+    expect(policyForSamples(p5, 5)).toEqual(p5));
+
+  it('reads the votes per model from the run, defaulting to 20', () => {
+    expect(samplesPerModel({...experiment(), samples_per_model: 5})).toBe(5);
+    // Every run saved before samples_per_model existed drew 20.
+    expect(samplesPerModel(experiment())).toBe(20);
+  });
+
+  it('needs 16 of 20 valid votes under a 4-of-5 policy', () => {
+    const run = (votes: number) =>
+      rescore(
+        experiment([
+          record({primary: v({routine: 20})}),
+          record({primary: v({routine: votes})}),
+        ]),
+        p5,
+      ).human_review_rate;
+    expect(run(15)).toBe(0.5);
+    expect(run(16)).toBe(0);
   });
 });

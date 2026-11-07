@@ -486,18 +486,16 @@ export function writeToken(storage, token) {
 
 // --- operations view: overrides ----------------------------------------------
 
-/** Samples drawn per model (policy sampling.n); fixed, read-only here. */
-export const SAMPLES = 20;
-
 /**
  * Allowed ranges for router overrides. A copy of the plan's "Override
  * ranges" table: worker/src/overrides.ts (PolicyOverridesSchema) is the
  * authority, and the Worker rejects anything outside it. min_top_votes is
- * further bounded below by minTopVotes(min_valid).
+ * further bounded below by minTopVotes(min_valid), and both above by the
+ * policy's votes per model (`samples`).
  */
 export const OVERRIDE_RANGES = {
-  min_valid: {min: 10, max: 20, step: 1},
-  min_top_votes: {min: 6, max: 20, step: 1},
+  min_valid: {min: 1, max: 20, step: 1},
+  min_top_votes: {min: 1, max: 20, step: 1},
   max_span: {min: 0, max: 6, step: 1},
   human_review_cost: {min: 0.05, max: 2, step: 0.05},
   under_weight: {min: 0.5, max: 50, step: 0.5},
@@ -536,12 +534,14 @@ export function minTopVotes(minValid) {
 
 /**
  * The deployed policy's tunable values from a GET /v1/policy response,
- * flattened: {min_valid, min_top_votes, max_span, human_review_cost,
- * under_weights}. Null when the response lacks them.
+ * flattened: {samples, min_valid, min_top_votes, max_span,
+ * human_review_cost, under_weights}, where samples is the votes drawn per
+ * model. Null when the response lacks them.
  */
 export function policyDefaults(api) {
   const weights = api?.loss?.boundaries?.map(b => b?.under);
   const out = {
+    samples: api?.sampling?.n,
     min_valid: api?.sampling?.min_valid,
     min_top_votes: api?.review?.min_top_votes,
     max_span: api?.review?.max_span,
@@ -549,6 +549,8 @@ export function policyDefaults(api) {
     under_weights: weights,
   };
   const ok =
+    Number.isInteger(out.samples) &&
+    out.samples >= 1 &&
     POLICY_FIELDS.every(f => Number.isFinite(out[f])) &&
     Array.isArray(weights) &&
     weights.length === WEIGHT_COUNT &&
@@ -642,6 +644,10 @@ export function validStoredOverrides(stored, policy) {
     ) {
       return null;
     }
+    // Saved under a policy that drew more votes; a live route rejects it.
+    if ((p.min_valid ?? 0) > policy.samples || (p.min_top_votes ?? 0) > policy.samples) {
+      return null;
+    }
   }
   return stored;
 }
@@ -697,16 +703,18 @@ export function liveOverrides(overrides, policy) {
 }
 
 /**
- * The overrides named in one line, such as "Sonnet only · agreement
- * 14/20". Null when there are none.
+ * The overrides named in one line, such as "Sonnet only · agreement 3/5".
+ * `samples` is the votes per model they count against; without it, as for
+ * a saved trace, the counts stand alone. Null when there are none.
  */
-export function overridesText(overrides) {
+export function overridesText(overrides, samples) {
   if (!overrides) return null;
   const parts = [];
   if (overrides.models) parts.push(MODEL_LABELS[overrides.models] ?? overrides.models);
   const p = overrides.policy ?? {};
-  if (p.min_top_votes !== undefined) parts.push(`agreement ${p.min_top_votes}/${SAMPLES}`);
-  if (p.min_valid !== undefined) parts.push(`valid samples ${p.min_valid}/${SAMPLES}`);
+  const of = samples ? `/${samples}` : '';
+  if (p.min_top_votes !== undefined) parts.push(`agreement ${p.min_top_votes}${of}`);
+  if (p.min_valid !== undefined) parts.push(`valid samples ${p.min_valid}${of}`);
   if (p.max_span !== undefined) parts.push(`spread ${p.max_span}`);
   if (p.human_review_cost !== undefined) {
     parts.push(`review cost ${p.human_review_cost.toFixed(2)}`);
@@ -717,11 +725,11 @@ export function overridesText(overrides) {
 
 /**
  * The banner line for the settings the next live route will send, such as
- * "Next live message uses: Sonnet only · agreement 14/20". It describes
- * the settings, not the result on screen. Null when there are none.
+ * "Next live message uses: Sonnet only · agreement 3/5". It describes the
+ * settings, not the result on screen. Null when there are none.
  */
-export function bannerText(overrides) {
-  const text = overridesText(overrides);
+export function bannerText(overrides, samples) {
+  const text = overridesText(overrides, samples);
   return text ? `Next live message uses: ${text}` : null;
 }
 
@@ -730,8 +738,8 @@ export function bannerText(overrides) {
  * saved result, so while overrides are active it says that instead of
  * claiming the overrides were used.
  */
-export function routingBanner(overrides, replay) {
-  const text = bannerText(overrides);
+export function routingBanner(overrides, replay, samples) {
+  const text = bannerText(overrides, samples);
   if (!text) return null;
   return replay ? 'Replay: saved result' : text;
 }

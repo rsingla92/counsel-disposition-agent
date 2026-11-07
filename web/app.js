@@ -677,7 +677,7 @@ function renderPatient(run) {
  */
 function renderBanner() {
   const replay = state.run ? state.run.replay === true : ui.replay.checked;
-  const text = routingBanner(ops.liveOverrides(), replay);
+  const text = routingBanner(ops.liveOverrides(), replay, ops.samples());
   ui.routingBanner.hidden = text === null || state.view === 'ops';
   const note = text !== null && !replay && ops.whatIf()
     ? ' · Emergency weights and valid samples needed stay at least at the policy value live.'

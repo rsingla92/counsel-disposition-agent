@@ -9,7 +9,6 @@ import {
 } from '../src/pipeline';
 import {LlmError} from '../src/llm';
 import {applyPolicyOverrides, selectModels} from '../src/overrides';
-import {loadPolicy} from '../src/policy';
 import {RouteResultSchema, type Sample} from '../src/schema';
 import {
   M,
@@ -22,9 +21,9 @@ import {
   scripted,
   tick,
 } from './pipeline-fixtures';
-import {validResult, type WireExtraction} from './fixtures';
+import {policy20, validResult, type WireExtraction} from './fixtures';
 
-const policy = loadPolicy();
+const policy = policy20;
 const HR_MESSAGE =
   'Thanks for your message. A Counsel physician will review it within 1 ' +
   'hour. If this is an emergency, call 911 now.';
@@ -863,7 +862,7 @@ describe('route: extraction fallback', () => {
   });
 
   describe('sample_errors log', () => {
-    // Fails the first 3 primary sample calls with a 429 and 2 with a timeout.
+    // Fails the first 3 primary sample calls with a 429 and 1 with a timeout.
     function failingSamples() {
       const llm = scripted({samples: 'routine'});
       const inner = llm.complete.bind(llm);
@@ -873,7 +872,7 @@ describe('route: extraction fallback', () => {
           return inner(req);
         const i = n++;
         if (i < 3) throw new LlmError('provider_error', 'limited', 429);
-        if (i < 5) throw new LlmError('timeout', 'timed out');
+        if (i < 4) throw new LlmError('timeout', 'timed out');
         return inner(req);
       };
       return llm;
@@ -894,9 +893,9 @@ describe('route: extraction fallback', () => {
         {
           kind: 'sample_errors',
           model: PRIMARY.model,
-          valid: 15,
+          valid: 16,
           n: 20,
-          failures: {'provider_error:429': 3, timeout: 2},
+          failures: {'provider_error:429': 3, timeout: 1},
         },
       ]);
       expect(lines.join('\n')).not.toContain('SYNTHETIC-SECRET');

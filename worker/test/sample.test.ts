@@ -1,10 +1,16 @@
 import {describe, expect, it} from 'vitest';
 import {LlmError, type LlmClient} from '../src/llm';
-import {loadPolicy} from '../src/policy';
 import {drawSamples} from '../src/sample';
-import {fakeExtraction, flakyLlm, sample, stubLlm, withFlags} from './fixtures';
+import {
+  fakeExtraction,
+  flakyLlm,
+  policy20,
+  sample,
+  stubLlm,
+  withFlags,
+} from './fixtures';
 
-const policy = loadPolicy();
+const policy = policy20;
 const spec = {model: 'anthropic/test', provider: 'anthropic'};
 const M = 'My chest hurts.';
 const ex = fakeExtraction(policy);
