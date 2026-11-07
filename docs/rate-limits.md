@@ -4,9 +4,10 @@ Notes for the presentation and for the reliability roadmap.
 
 ## What happened
 
-The agent makes 41 model calls per case: one extraction, then 20 samples from
-each of two models. Both models run on Google Vertex through OpenRouter, which
-is the zero-data-retention route.
+Until policy 0.3.0 the agent made 41 model calls per case: one extraction,
+then 20 samples from each of two models. It now makes 11 (5 samples each).
+Both models run on Google Vertex through OpenRouter, which is the
+zero-data-retention route.
 
 - **First run, 4 cases at a time, Workers free plan.** Almost every case failed.
   Vertex returned HTTP 429 for both models (20 to 25 per case), and the
@@ -34,6 +35,17 @@ is the zero-data-retention route.
   review, Needs info on 74% of cases, a cost score of 0.808 and a median
   latency of 83 s. No extraction failed in this run. The full results are
   in the [2026-11-05 report](../reports/2026-11-05-policy-0.1.0.md).
+- **Policy 0.2.0, queue per model (Sonnet 2, Flash 4), 20 samples.** On
+  2026-11-06, every run sent most cases to Human review: Sonnet + Flash
+  96%, Sonnet only 96%, Flash only 92%, each with 0 of 14 emergencies
+  missed. The Worker log showed why: every lost sample was an HTTP 429
+  that outlasted its 4 retries, for both models. The limit is per minute,
+  not per connection. Cases now finished in about 40 s instead of 83 s, so
+  back-to-back cases sent twice as many calls per minute. Single test
+  messages had passed because the limit refilled between them. Reports:
+  [Sonnet + Flash](../reports/2026-11-07-policy-0.2.0.md),
+  [Sonnet only](../reports/2026-11-07-policy-0.2.0-sonnet.md),
+  [Flash only](../reports/2026-11-07-policy-0.2.0-flash.md).
 
 On the cases that got enough samples, the router behaved as designed. The
 failures come from throughput, not from model judgement.
@@ -76,7 +88,10 @@ only the Human review message ("if this is an emergency, call 911").
   message text.
 - The trace records which model's extraction was used
   (`trace.extraction_model`).
-- Sampling stays at 20 calls per model.
+- **2026-11-06, policy 0.3.0:** 5 samples per model instead of 20, so a
+  case makes 11 calls, not 41. Re-scoring the clean 20-vote run at 3 to 20
+  votes routed every case the same
+  ([stability report](../reports/2026-11-06-vote-stability.md)).
 
 ## Roadmap
 

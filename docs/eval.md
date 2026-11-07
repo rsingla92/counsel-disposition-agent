@@ -7,7 +7,9 @@ deployed Worker, scores the results and writes an aggregate report to
 [`reports/`](../reports/). The latest is
 [policy 0.1.0, 2026-11-05](../reports/2026-11-05-policy-0.1.0.md). The
 [2026-11-04 report](../reports/2026-11-04-policy-0.1.0.md) is kept as
-history.
+history, and the policy 0.2.0 runs and the
+[vote-stability report](../reports/2026-11-06-vote-stability.md) are
+described [below](#policy-020-and-the-move-to-5-votes).
 
 ## The cases
 
@@ -23,7 +25,7 @@ history.
 
 | System | What it is |
 |---|---|
-| Full agent | The whole pipeline: extraction, floor, 20 + 20 samples, router |
+| Full agent | The whole pipeline: extraction, floor, 5 + 5 samples (20 + 20 before policy 0.3.0), router |
 | Rule floor only | Extraction and the red-flag floor, no sampling (1 model call) |
 | Always escalate | Every case sent to ED now |
 | Historical | The real-world dispositions, mapped to levels |
@@ -93,6 +95,26 @@ More from the 2026-11-05 full-agent run, quoted from the report:
 - From the experiment log (the same run, re-scored in the Worker): 14% of
   cases flagged for physician review, and 18% over-triage.
 
+## Policy 0.2.0 and the move to 5 votes
+
+Every policy 0.2.0 run, at 20 samples per model, sent most cases to Human
+review because the provider's per-minute rate limit refused about half the
+samples ([rate limits](rate-limits.md)). No emergency was missed.
+
+| Condition (policy 0.2.0, 2026-11-06) | Missed emergencies | Sent to Human review | Cost score | Median time |
+|---|---|---|---|---|
+| Sonnet + Flash | 0 of 14 | 96% | 2.256 | 40 s |
+| Sonnet only | 0 of 14 | 96% | 2.232 | 37 s |
+| Flash only | 0 of 14 | 92% | 2.164 | 32 s |
+| Rule floor only | 0 of 14 | 0% | 1.190 | 9.8 s |
+
+The [vote-stability report](../reports/2026-11-06-vote-stability.md)
+re-scores the clean 2026-11-05 run with 3 to 20 votes per model, drawn
+from its saved votes: every case lands at the same level, with no
+emergency missed and the same cost score. Sonnet put all its votes on one
+level in 192 of 195 saved cases. Policy 0.3.0 therefore draws 5 votes per
+model. Its eval runs live at 5 votes; results to follow.
+
 ## What the conditions taught us
 
 - **The failures were throughput, not judgement.** At 6 calls in flight,
@@ -150,7 +172,7 @@ Options: `--systems full,floor,always,historical`, `--cases all|pcp`,
 
 Before a run the eval checks OpenRouter has 1.2 times the estimated spend
 left, as the smaller of the key's limit and the account balance. A full
-case is 41 calls.
+case is 1 + 2n calls, n being the policy's samples per model: 11 at 5.
 
 | Exit code | Meaning |
 |---|---|

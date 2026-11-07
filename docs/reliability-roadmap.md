@@ -23,9 +23,9 @@ that would make it dependable at Counsel's scale.
 - **Requests are synchronous and stateless.** A case lives only inside one
   HTTP request. If the request dies, the case is gone: there is no queue,
   no retry later, and no record of where it stopped.
-- **41 model calls per message.** 1 extraction plus 20 samples from each of
-  two models. That multiplies every rate limit, cost and latency problem by
-  41.
+- **11 model calls per message.** 1 extraction plus 5 samples from each of
+  two models (41 with 20 samples before policy 0.3.0). That multiplies every
+  rate limit, cost and latency problem by 11.
 
 ## Phase 1: survive outages
 
@@ -55,7 +55,7 @@ that would make it dependable at Counsel's scale.
   [rate limits](rate-limits.md#roadmap).
 
 The rate-limit finding to design for: one model alone is cheaper (21 calls
-per case instead of 41), but it does not ease rate limits. With Sonnet
+per case instead of 41, at 20 samples), but it does not ease rate limits. With Sonnet
 only, Sonnet gets all 3 slots per case and is called about twice as fast, so it hit HTTP 429 on every failed sample and 96% of cases
 went to Human review. Capacity planning has to be per model, not per case.
 
@@ -101,8 +101,8 @@ went to Human review. Capacity planning has to be per model, not per case.
 ## Phase 4: scale
 
 - **Adaptive sampling.** Stop early when the first answers agree strongly,
-  and draw more only when they split. Most cases would need far fewer than
-  41 calls.
+  and draw more only when they split. Most cases would need fewer than 11
+  calls.
 - **Extraction caching.** Reuse an extraction when the same message is
   routed again, for example on a retry.
 - **Quotas and back-pressure.** Limit how much one source can send, and slow
