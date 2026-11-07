@@ -21,6 +21,8 @@ import {
   levelLabel,
   parseNdjson,
   patientBlocks,
+  SLOW_WAIT_MS,
+  waitingStatus,
   nextPin,
   overridesText,
   pinFor,
@@ -34,7 +36,7 @@ import {
   writeToken,
 } from './lib.js';
 
-const LIVE_TIMEOUT_MS = 150_000;
+const LIVE_TIMEOUT_MS = 210_000;
 const HOLDING_WINDOW = 'Physician review within 1 hour';
 
 const $ = id => document.getElementById(id);
@@ -632,7 +634,8 @@ function renderPatient(run) {
     root.append(el('p', {class: 'empty', text: 'No message routed yet.'}));
     return;
   }
-  const blocks = patientBlocks(run.result, run.early, run.failed === true);
+  const waited = run.startedAt ? Date.now() - run.startedAt : 0;
+  const blocks = patientBlocks(run.result, run.early, run.failed === true, waited);
   const reply = el(
     'div',
     {class: 'reply'},
@@ -850,17 +853,31 @@ async function routeLive(routed) {
   // Events for any call but the latest are dropped, so a late answer for a
   // message no longer on screen never renders.
   const current = () => call === callSeq;
-  const run = {message: routed.message, early: null, result: null, replay: false};
+  const startedAt = Date.now();
+  const run = {message: routed.message, early: null, result: null, replay: false, startedAt};
   // While waiting, a pinned live instruction for this message keeps leading.
   const pin = pinFor(state.pinned, routed);
   state.run = pin ? {...run, early: pin.early} : run;
   render();
-  setStatus('Routing…');
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), LIVE_TIMEOUT_MS);
   // Clamped so a what-if setting never 400s, and without the re-score-only
   // review cost (liveOverrides).
   const overrides = ops.liveOverrides();
+  setStatus(waitingStatus(0));
+  // A rate-limited call can wait a minute or more, so the status counts up
+  // and the patient view says the message arrived once the wait is slow.
+  let slow = false;
+  const ticker = setInterval(() => {
+    if (!current() || run.result) return;
+    const waited = Date.now() - startedAt;
+    const text = waitingStatus(waited);
+    if (ui.status.textContent !== text) setStatus(text);
+    if (!slow && waited >= SLOW_WAIT_MS) {
+      slow = true;
+      render();
+    }
+  }, 1000);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), LIVE_TIMEOUT_MS);
   try {
     const res = await fetch(`${WORKER_URL}/v1/route`, {
       method: 'POST',
@@ -914,14 +931,21 @@ async function routeLive(routed) {
       handle(got.events);
     }
     handle(parseNdjson(buffer + decoder.decode()));
+    clearInterval(ticker);
     if (!run.result) throw new LiveError('no result in the stream');
     if (!current()) return;
     const {replaced} = showRun(routed, run);
     if (replaced) setStatus(RESULT_HIDDEN_NOTE, true);
     else setStatus('Live result.');
   } catch (e) {
+    clearInterval(ticker);
     if (!current()) return;
-    const why = e instanceof LiveError ? e.message : 'the Worker could not be reached';
+    const why =
+      e instanceof LiveError
+        ? e.message
+        : e?.name === 'AbortError'
+          ? 'timed out waiting for the Worker'
+          : 'the Worker could not be reached';
     // After a live early event the call never falls back to a saved run
     // (fallbackFor), so none is loaded and replay is not switched on: the
     // live instruction stays pinned for this message. The same holds when an
@@ -948,6 +972,7 @@ async function routeLive(routed) {
     );
   } finally {
     clearTimeout(timer);
+    clearInterval(ticker);
   }
 }
 

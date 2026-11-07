@@ -199,10 +199,10 @@ test('the ranges table matches the plan', () => {
   assert.deepEqual(OVERRIDE_RANGES.under_weight, {min: 0.5, max: 50, step: 0.5});
 });
 
-test('the browser waits 150 s for a live route', () => {
+test('the browser waits 210 s for a live route', () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
   const src = readFileSync(join(root, 'web/app.js'), 'utf8');
-  assert.match(src, /const LIVE_TIMEOUT_MS = 150_000;/);
+  assert.match(src, /const LIVE_TIMEOUT_MS = 210_000;/);
 });
 
 test('the ranges table matches worker/src/overrides.ts, the authority', () => {

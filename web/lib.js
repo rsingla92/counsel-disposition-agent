@@ -430,11 +430,29 @@ function splitSafetyNet(message, safetyNet) {
 }
 
 /**
+ * After this long, a live call counts as slow: the models are rate-limited
+ * and the Worker is waiting its turn, so the page says so.
+ */
+export const SLOW_WAIT_MS = 10_000;
+
+/**
+ * The status line while a live call has waited `waitedMs`. The count moves
+ * in steps of 10 s, so the live region is not re-read every second.
+ */
+export function waitingStatus(waitedMs) {
+  if (waitedMs < SLOW_WAIT_MS) return 'Routing…';
+  const s = Math.floor(waitedMs / 10_000) * 10;
+  return `Still routing (${s} s). The models are busy, so the message is queued; it has not been lost.`;
+}
+
+/**
  * The patient view, as ordered blocks of {kind, text}. kind is one of
  * emergency, draft, message, safety_net, pending. An Emergency instruction
  * always comes first; Self-care is a draft until a physician signs it off.
+ * waitedMs is how long a live call has waited; a slow wait tells the
+ * patient the message arrived and where to go meanwhile.
  */
-export function patientBlocks(result, early, failed = false) {
+export function patientBlocks(result, early, failed = false, waitedMs = 0) {
   const blocks = [];
   if (!result) {
     for (const text of emergencyLeads(null, early)) {
@@ -443,7 +461,14 @@ export function patientBlocks(result, early, failed = false) {
     blocks.push(
       failed
         ? {kind: 'failed', text: FAILED_MESSAGE}
-        : {kind: 'pending', text: 'Checking the rest of your message.'},
+        : {
+            kind: 'pending',
+            text:
+              waitedMs < SLOW_WAIT_MS
+                ? 'Checking the rest of your message.'
+                : 'We have your message and are still checking it. ' +
+                  'If this is an emergency, call 911 now.',
+          },
     );
     return blocks;
   }

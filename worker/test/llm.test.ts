@@ -1,5 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {
+  EXTRACTION_MAX_RETRIES,
   MAX_IN_FLIGHT,
   MAX_RETRIES,
   openRouterClient,
@@ -214,6 +215,18 @@ describe('openRouterClient retry limits', () => {
       }),
     ).rejects.toMatchObject({status: 429});
     expect(impl).toHaveBeenCalledTimes(2);
+  });
+
+  it('waits about a minute in all at the extraction retry cap', async () => {
+    const waits: number[] = [];
+    await openRouterClient('k', tooMany, 6, async ms => {
+      waits.push(ms);
+    })
+      .complete({...req, maxRetries: EXTRACTION_MAX_RETRIES})
+      .catch(() => {});
+    const total = waits.reduce((a, b) => a + b, 0);
+    expect(total).toBeGreaterThanOrEqual(60_000);
+    expect(total).toBeLessThan(70_000);
   });
 
   it('gives up its slot while it backs off', async () => {

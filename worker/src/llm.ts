@@ -83,6 +83,13 @@ export function tuningFromEnv(
  */
 export const MAX_RETRIES = 4;
 
+/**
+ * Retries for the primary's extraction, which sets the red-flag floor and
+ * the early Emergency event: six retries wait about 63 s in all, long enough
+ * for a per-minute rate limit to refill.
+ */
+export const EXTRACTION_MAX_RETRIES = 6;
+
 /** Runs at most `max` tasks at a time, in the order they arrive. */
 function limiter(max: number) {
   let active = 0;

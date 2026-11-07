@@ -92,6 +92,24 @@ only the Human review message ("if this is an emergency, call 911").
   case makes 11 calls, not 41. Re-scoring the clean 20-vote run at 3 to 20
   votes routed every case the same
   ([stability report](../reports/2026-11-06-vote-stability.md)).
+- **2026-11-06, burst test on 0.3.0.** Five made-up messages sent at once
+  all routed, in about 30 s. A second burst 30 s later failed extraction on
+  all five, for both models, so the chest-pain message got no early 911
+  message. After 90 s idle, a third burst routed four of five (chest pain to
+  Call 911, all votes in, 19 s); one went to Human review with too few
+  votes. The limit refills, but over more than a minute.
+- **Extraction waits out the limit.** The primary model's extraction now
+  retries a 429 up to 6 times (about 63 s of backoff) instead of 4 (about
+  15 s), because extraction sets the red-flag floor and the early Emergency
+  message. Under load that message arrives late, not never: up to about
+  90 s when the primary finally succeeds, and about 2 minutes when it fails
+  and the backup (which keeps the default 4 retries) sets the floor. The
+  slowest full case, a late extraction followed by rate-limited sampling,
+  takes about 140 s, so the web page now waits 210 s instead of 150 s and
+  says when it gave up waiting.
+- **The page says it is still working.** After 10 s the status line counts
+  up in steps of 10 s and says the message is queued, not lost, and the patient view says
+  the message arrived and to call 911 if this is an emergency.
 
 ## Roadmap
 
@@ -104,9 +122,9 @@ only the Human review message ("if this is an emergency, call 911").
   primary's samples go ahead of the secondary's.
 - Alerting on the Human review rate and on 429 counts, from the log lines
   above and OpenRouter traces.
-- One deadline for extraction across both models, so the early 911 or ED
-  message is never more than about 20 s late. The fallback can double that
-  today.
+- One deadline per case, across extraction and sampling. Under a rate limit
+  the early 911 or ED message can now be about 90 s late, or about 2 minutes
+  when the backup sets the floor. A higher provider limit is the real fix.
 - Alerting on account credit, since a 402 fails every call at once.
 - A deterministic keyword backstop for emergencies when extraction fails
   entirely.

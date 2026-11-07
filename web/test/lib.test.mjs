@@ -6,6 +6,7 @@ import {dirname, join} from 'node:path';
 import {
   LEVELS,
   LEVEL_WINDOWS,
+  SLOW_WAIT_MS,
   OVERRIDE_REASON_LABELS,
   REASON_LABELS,
   applyPinned,
@@ -28,6 +29,7 @@ import {
   takeLines,
   tierOf,
   voteRows,
+  waitingStatus,
   writeToken,
 } from '../lib.js';
 
@@ -359,6 +361,37 @@ test('patientBlocks shows only the early instruction while waiting', () => {
     {kind: 'emergency', text: 'Call 911 now.'},
     {kind: 'pending', text: 'Checking the rest of your message.'},
   ]);
+});
+
+test('patientBlocks reassures the patient once the wait is slow', () => {
+  const early = {event: 'early', floor: 'call_911', patient_message: 'Call 911 now.'};
+  assert.deepEqual(patientBlocks(null, null, false, SLOW_WAIT_MS - 1), [
+    {kind: 'pending', text: 'Checking the rest of your message.'},
+  ]);
+  const slow = {
+    kind: 'pending',
+    text:
+      'We have your message and are still checking it. ' +
+      'If this is an emergency, call 911 now.',
+  };
+  assert.deepEqual(patientBlocks(null, null, false, SLOW_WAIT_MS), [slow]);
+  // The live Emergency instruction still leads.
+  assert.deepEqual(patientBlocks(null, early, false, SLOW_WAIT_MS), [
+    {kind: 'emergency', text: 'Call 911 now.'},
+    slow,
+  ]);
+});
+
+test('waitingStatus says the message is queued once the wait is slow', () => {
+  assert.equal(SLOW_WAIT_MS, 10_000);
+  assert.equal(waitingStatus(0), 'Routing…');
+  assert.equal(waitingStatus(9_999), 'Routing…');
+  const at = s =>
+    `Still routing (${s} s). The models are busy, so the message is queued; it has not been lost.`;
+  // Steps of 10 s, so a screen reader is not re-read the line every second.
+  assert.equal(waitingStatus(10_000), at(10));
+  assert.equal(waitingStatus(19_999), at(10));
+  assert.equal(waitingStatus(20_000), at(20));
 });
 
 test('patientBlocks never drops an early instruction the result lacks', () => {
