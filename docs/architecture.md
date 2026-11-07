@@ -128,7 +128,8 @@ the case is flagged `unverified_excerpt` for a physician to check.
 - Only HTTP 429 (rate limited) is retried, with backoff doubling from 1
   second: up to 4 times (about 15 s), or 6 (about 63 s) for the primary
   model's extraction, which sets the red-flag floor and the early message.
-  After 10 s the web page says the message is queued.
+  After 10 s the web page says the message is queued; it waits up to 210 s
+  for the result.
 - Time limits: 20 seconds for extraction, 15 seconds per sample.
 
 [Rate limits](rate-limits.md) tells the story of why the limit is 3.

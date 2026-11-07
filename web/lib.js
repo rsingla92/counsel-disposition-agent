@@ -435,10 +435,13 @@ function splitSafetyNet(message, safetyNet) {
  */
 export const SLOW_WAIT_MS = 10_000;
 
-/** The status line while a live call has waited `waitedMs`. */
+/**
+ * The status line while a live call has waited `waitedMs`. The count moves
+ * in steps of 10 s, so the live region is not re-read every second.
+ */
 export function waitingStatus(waitedMs) {
   if (waitedMs < SLOW_WAIT_MS) return 'Routing…';
-  const s = Math.floor(waitedMs / 1000);
+  const s = Math.floor(waitedMs / 10_000) * 10;
   return `Still routing (${s} s). The models are busy, so the message is queued; it has not been lost.`;
 }
 

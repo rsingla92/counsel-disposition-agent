@@ -36,7 +36,7 @@ import {
   writeToken,
 } from './lib.js';
 
-const LIVE_TIMEOUT_MS = 150_000;
+const LIVE_TIMEOUT_MS = 210_000;
 const HOLDING_WINDOW = 'Physician review within 1 hour';
 
 const $ = id => document.getElementById(id);
@@ -859,6 +859,9 @@ async function routeLive(routed) {
   const pin = pinFor(state.pinned, routed);
   state.run = pin ? {...run, early: pin.early} : run;
   render();
+  // Clamped so a what-if setting never 400s, and without the re-score-only
+  // review cost (liveOverrides).
+  const overrides = ops.liveOverrides();
   setStatus(waitingStatus(0));
   // A rate-limited call can wait a minute or more, so the status counts up
   // and the patient view says the message arrived once the wait is slow.
@@ -866,7 +869,8 @@ async function routeLive(routed) {
   const ticker = setInterval(() => {
     if (!current() || run.result) return;
     const waited = Date.now() - startedAt;
-    setStatus(waitingStatus(waited));
+    const text = waitingStatus(waited);
+    if (ui.status.textContent !== text) setStatus(text);
     if (!slow && waited >= SLOW_WAIT_MS) {
       slow = true;
       render();
@@ -874,9 +878,6 @@ async function routeLive(routed) {
   }, 1000);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), LIVE_TIMEOUT_MS);
-  // Clamped so a what-if setting never 400s, and without the re-score-only
-  // review cost (liveOverrides).
-  const overrides = ops.liveOverrides();
   try {
     const res = await fetch(`${WORKER_URL}/v1/route`, {
       method: 'POST',
@@ -939,7 +940,12 @@ async function routeLive(routed) {
   } catch (e) {
     clearInterval(ticker);
     if (!current()) return;
-    const why = e instanceof LiveError ? e.message : 'the Worker could not be reached';
+    const why =
+      e instanceof LiveError
+        ? e.message
+        : e?.name === 'AbortError'
+          ? 'timed out waiting for the Worker'
+          : 'the Worker could not be reached';
     // After a live early event the call never falls back to a saved run
     // (fallbackFor), so none is loaded and replay is not switched on: the
     // live instruction stays pinned for this message. The same holds when an

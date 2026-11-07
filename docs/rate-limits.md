@@ -101,11 +101,14 @@ only the Human review message ("if this is an emergency, call 911").
 - **Extraction waits out the limit.** The primary model's extraction now
   retries a 429 up to 6 times (about 63 s of backoff) instead of 4 (about
   15 s), because extraction sets the red-flag floor and the early Emergency
-  message. Under load that message arrives late, not never. The backup
-  extraction keeps the default 4, so a case stays inside the web page's
-  150 s wait.
+  message. Under load that message arrives late, not never: up to about
+  90 s when the primary finally succeeds, and about 2 minutes when it fails
+  and the backup (which keeps the default 4 retries) sets the floor. The
+  slowest full case, a late extraction followed by rate-limited sampling,
+  takes about 140 s, so the web page now waits 210 s instead of 150 s and
+  says when it gave up waiting.
 - **The page says it is still working.** After 10 s the status line counts
-  up and says the message is queued, not lost, and the patient view says
+  up in steps of 10 s and says the message is queued, not lost, and the patient view says
   the message arrived and to call 911 if this is an emergency.
 
 ## Roadmap
@@ -119,10 +122,9 @@ only the Human review message ("if this is an emergency, call 911").
   primary's samples go ahead of the secondary's.
 - Alerting on the Human review rate and on 429 counts, from the log lines
   above and OpenRouter traces.
-- One deadline for extraction across both models. Under a rate limit the
-  early 911 or ED message can now be about a minute late (the primary waits
-  out the limit), and the fallback can add to that. A higher provider limit
-  is the real fix.
+- One deadline per case, across extraction and sampling. Under a rate limit
+  the early 911 or ED message can now be about 90 s late, or about 2 minutes
+  when the backup sets the floor. A higher provider limit is the real fix.
 - Alerting on account credit, since a 402 fails every call at once.
 - A deterministic keyword backstop for emergencies when extraction fails
   entirely.

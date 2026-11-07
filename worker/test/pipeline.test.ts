@@ -690,6 +690,23 @@ describe('route: overrides', () => {
     },
   );
 
+  it.each(['flash', 'sonnet'] as const)(
+    'models %s: the only model waits out a rate limit, the backup briefly',
+    async choice => {
+      const llm = scripted({
+        extractError: 'provider_error',
+        extractStatus: 429,
+        samples: 'routine',
+      });
+      const models = selectModels(choice, PRIMARY, SECONDARY);
+      await route(M, {...deps(llm), ...models}, {overrides: {models: choice}});
+      expect(llm.extractionRetries).toEqual([
+        EXTRACTION_MAX_RETRIES,
+        undefined,
+      ]);
+    },
+  );
+
   it('one-model mode never calls the backup when extraction succeeds', async () => {
     const llm = scripted({samples: 'routine'});
     const models = selectModels('flash', PRIMARY, SECONDARY);

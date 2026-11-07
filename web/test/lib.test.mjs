@@ -386,10 +386,12 @@ test('waitingStatus says the message is queued once the wait is slow', () => {
   assert.equal(SLOW_WAIT_MS, 10_000);
   assert.equal(waitingStatus(0), 'Routing…');
   assert.equal(waitingStatus(9_999), 'Routing…');
-  assert.equal(
-    waitingStatus(12_400),
-    'Still routing (12 s). The models are busy, so the message is queued; it has not been lost.',
-  );
+  const at = s =>
+    `Still routing (${s} s). The models are busy, so the message is queued; it has not been lost.`;
+  // Steps of 10 s, so a screen reader is not re-read the line every second.
+  assert.equal(waitingStatus(10_000), at(10));
+  assert.equal(waitingStatus(19_999), at(10));
+  assert.equal(waitingStatus(20_000), at(20));
 });
 
 test('patientBlocks never drops an early instruction the result lacks', () => {
