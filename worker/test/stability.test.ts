@@ -92,6 +92,14 @@ describe('stabilityCurve', () => {
     expect(k20.agreement).toBe(1);
   });
 
+  it('skips k above the votes the run drew', () => {
+    const exp = {...experiment([record({primary: v({routine: 5})})])};
+    exp.samples_per_model = 5;
+    const rows = stabilityCurve(exp, policy, [3, 5, 8, 20], 10, 1);
+    expect(rows.map(r => r.k)).toEqual([3, 5]);
+    for (const r of rows) expect(r.human_review_rate).toBe(0);
+  });
+
   it('reports the thresholds scaled to each k', () => {
     const exp = experiment([record({})]);
     const [k5] = stabilityCurve(exp, policy, [5], 1, 1);

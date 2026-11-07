@@ -55,7 +55,8 @@ export type StabilityRow = {
 /**
  * How routing holds up with k votes per model instead of the run's own:
  * each draw subsamples k votes from every saved case, both models, and
- * re-decides with the thresholds scaled to k. Reads votes only.
+ * re-decides with the thresholds scaled to k. A k above the run's own votes
+ * per model is skipped. Reads votes only.
  */
 export function stabilityCurve(
   exp: Experiment,
@@ -65,48 +66,49 @@ export function stabilityCurve(
   seed: number,
 ): StabilityRow[] {
   const rand = seededRandom(seed);
-  const full = scoreRecords(
-    exp.records,
-    policyForSamples(policy, samplesPerModel(exp)),
-  );
-  return ks.map(k => {
-    const p = policyForSamples(policy, k);
-    let missed = 0;
-    let anyMiss = 0;
-    let agreement = 0;
-    let flagged = 0;
-    let humanReview = 0;
-    const costs: number[] = [];
-    for (let d = 0; d < draws; d++) {
-      const records: ExperimentRecord[] = exp.records.map(r => ({
-        ...r,
-        primary: subsample(r.primary, k, rand),
-        secondary: r.secondary ? subsample(r.secondary, k, rand) : null,
-      }));
-      const cases = scoreRecords(records, p);
-      const s = summarize(cases, p);
-      missed += s.missed;
-      if (s.missed > 0) anyMiss++;
-      flagged += s.flagged_rate;
-      humanReview += s.human_review_rate;
-      costs.push(s.cost_score);
-      const same = cases.filter(
-        (c, i) => c.disposition === full[i].disposition,
-      ).length;
-      agreement += cases.length ? same / cases.length : 1;
-    }
-    costs.sort((a, b) => a - b);
-    return {
-      k,
-      min_valid: p.sampling.min_valid,
-      min_top_votes: p.review.min_top_votes,
-      missed_mean: missed / draws,
-      any_miss_rate: anyMiss / draws,
-      agreement: agreement / draws,
-      flagged_rate: flagged / draws,
-      human_review_rate: humanReview / draws,
-      cost_mean: costs.reduce((a, b) => a + b, 0) / draws,
-      cost_p90: costs[Math.min(draws - 1, Math.floor(0.9 * draws))],
-    };
-  });
+  const drawn = samplesPerModel(exp);
+  const full = scoreRecords(exp.records, policyForSamples(policy, drawn));
+  // A draw cannot hold more votes than the run saved.
+  return ks
+    .filter(k => k <= drawn)
+    .map(k => {
+      const p = policyForSamples(policy, k);
+      let missed = 0;
+      let anyMiss = 0;
+      let agreement = 0;
+      let flagged = 0;
+      let humanReview = 0;
+      const costs: number[] = [];
+      for (let d = 0; d < draws; d++) {
+        const records: ExperimentRecord[] = exp.records.map(r => ({
+          ...r,
+          primary: subsample(r.primary, k, rand),
+          secondary: r.secondary ? subsample(r.secondary, k, rand) : null,
+        }));
+        const cases = scoreRecords(records, p);
+        const s = summarize(cases, p);
+        missed += s.missed;
+        if (s.missed > 0) anyMiss++;
+        flagged += s.flagged_rate;
+        humanReview += s.human_review_rate;
+        costs.push(s.cost_score);
+        const same = cases.filter(
+          (c, i) => c.disposition === full[i].disposition,
+        ).length;
+        agreement += cases.length ? same / cases.length : 1;
+      }
+      costs.sort((a, b) => a - b);
+      return {
+        k,
+        min_valid: p.sampling.min_valid,
+        min_top_votes: p.review.min_top_votes,
+        missed_mean: missed / draws,
+        any_miss_rate: anyMiss / draws,
+        agreement: agreement / draws,
+        flagged_rate: flagged / draws,
+        human_review_rate: humanReview / draws,
+        cost_mean: costs.reduce((a, b) => a + b, 0) / draws,
+        cost_p90: costs[Math.min(draws - 1, Math.floor(0.9 * draws))],
+      };
+    });
 }
