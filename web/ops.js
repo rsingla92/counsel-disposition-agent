@@ -6,7 +6,6 @@ import {
   EMERGENCY_WEIGHTS,
   GRID_STEPS,
   OVERRIDE_RANGES,
-  SAMPLES,
   confusionGrid,
   controlsFromOverrides,
   delta,
@@ -462,7 +461,7 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
 
   function nextLiveText() {
     const live = liveOverrides(s.overrides, s.policy);
-    const text = overridesText(live);
+    const text = overridesText(live, s.policy.samples);
     return [
       el('strong', {text: 'Next live message uses: '}),
       text ?? 'the deployed policy, unchanged',
@@ -513,8 +512,12 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
         id: 'ops-min_top_votes',
         label: 'Agreement needed to route',
         field: 'min_top_votes',
-        range: {...OVERRIDE_RANGES.min_top_votes, min: minTopVotes(s.controls.min_valid)},
-        format: v => `${v} of ${SAMPLES} votes`,
+        range: {
+          ...OVERRIDE_RANGES.min_top_votes,
+          min: minTopVotes(s.controls.min_valid),
+          max: s.policy.samples,
+        },
+        format: v => `${v} of ${s.policy.samples} votes`,
         hint: 'Fewer agreeing votes than this flags the case for a physician.',
         disabled: locked,
       }),
@@ -522,8 +525,8 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
         id: 'ops-min_valid',
         label: 'Valid samples needed',
         field: 'min_valid',
-        range: OVERRIDE_RANGES.min_valid,
-        format: v => `${v} of ${SAMPLES}`,
+        range: {...OVERRIDE_RANGES.min_valid, max: s.policy.samples},
+        format: v => `${v} of ${s.policy.samples}`,
         hint: 'Fewer valid answers than this sends the case to Human review. Live routes can raise it, never lower it.',
         disabled: locked,
       }),
@@ -585,7 +588,9 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
         'dl',
         {class: 'fixed'},
         el('dt', {text: 'Samples per model'}),
-        el('dd', {text: `${SAMPLES}, fixed. Changing it needs a new run.`}),
+        el('dd', {
+          text: `${s.policy.samples}, fixed. Saved runs with more votes are re-scored in proportion.`,
+        }),
         el('dt', {text: 'Red-flag floors'}),
         el('dd', {text: 'Fixed. A red flag always sets at least its minimum level.'}),
       ),
@@ -838,6 +843,8 @@ export function createOps({root, workerUrl, getToken, onChange, onNeedToken}) {
     },
     /** What a live route sends: clamped, without the re-score-only field. */
     liveOverrides: () => liveOverrides(s.overrides, s.policy),
+    /** Votes per model in the deployed policy; undefined before it loads. */
+    samples: () => s.policy?.samples,
     whatIf: () => isWhatIf(s.overrides, s.policy),
     clearOverrides,
   };
