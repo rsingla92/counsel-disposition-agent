@@ -508,3 +508,76 @@ def test_cli_requires_token(tmp_path):
       env={},
   )
   assert code == 4
+
+
+class _FakeTime:
+  """A clock that moves only when slept on."""
+
+  def __init__(self):
+    self.now = 100.0
+    self.sleeps = []
+
+  def monotonic(self):
+    return self.now
+
+  def sleep(self, s):
+    self.sleeps.append(s)
+    self.now += s
+
+
+def test_pacer_spaces_starts_by_the_gap():
+  t = _FakeTime()
+  pacer = run.Pacer(40.0, clock=t.monotonic, sleep=t.sleep)
+  for _ in range(3):
+    pacer.wait()
+  assert t.sleeps == [40.0, 40.0]
+
+
+def test_pacer_counts_time_already_spent():
+  t = _FakeTime()
+  pacer = run.Pacer(40.0, clock=t.monotonic, sleep=t.sleep)
+  pacer.wait()
+  t.now += 30.0  # the first case took 30 s
+  pacer.wait()
+  t.now += 50.0  # the second took longer than the gap
+  pacer.wait()
+  assert t.sleeps == [10.0]
+
+
+def test_pacer_with_no_gap_never_sleeps():
+  t = _FakeTime()
+  pacer = run.Pacer(0.0, clock=t.monotonic, sleep=t.sleep)
+  for _ in range(3):
+    pacer.wait()
+  assert not t.sleeps
+
+
+def test_cli_gap_spaces_full_cases_only(tmp_path, monkeypatch):
+  t = _FakeTime()
+  monkeypatch.setattr(run.time, "monotonic", t.monotonic)
+  monkeypatch.setattr(run.time, "sleep", t.sleep)
+  client = FakeClient()
+  code = run.main(
+      _argv(
+          tmp_path,
+          "--systems",
+          "full,floor",
+          "--gap-s",
+          "40",
+          "--skip-credit-check",
+      ),
+      client_factory=lambda url, token: client,
+      env=ENV,
+  )
+  assert code == 0
+  # Seven full cases, so six waits; the one-call floor run is not paced.
+  assert t.sleeps == [40.0] * 6
+
+
+def test_cli_rejects_a_negative_gap(tmp_path):
+  with pytest.raises(SystemExit):
+    run.main(
+        _argv(tmp_path, "--systems", "full", "--gap-s", "-1"),
+        client_factory=lambda url, token: FakeClient(),
+        env=ENV,
+    )

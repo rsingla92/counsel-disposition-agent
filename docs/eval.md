@@ -168,7 +168,10 @@ reads `OPENROUTER_API_KEY` from
 `--skip-credit-check` to skip it.
 
 Options: `--systems full,floor,always,historical`, `--cases all|pcp`,
-`--repeat N`, `--models sonnet|flash|sonnet+flash`, `--concurrency N`.
+`--repeat N`, `--models sonnet|flash|sonnet+flash`, `--concurrency N`,
+`--gap-s S`. `--gap-s` starts full-agent cases at least S seconds apart, so
+a run stays under the provider's per-minute rate limit and measures routing
+rather than the limit; the 0.3.0 runs used `--concurrency 1 --gap-s 40`.
 
 Before a run the eval checks OpenRouter has 1.2 times the estimated spend
 left, as the smaller of the key's limit and the account balance. A full
