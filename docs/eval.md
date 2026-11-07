@@ -4,9 +4,10 @@
 
 The eval ([`eval/`](../eval/), Python) sends each reviewed case to the
 deployed Worker, scores the results and writes an aggregate report to
-[`reports/`](../reports/). The latest is
-[policy 0.1.0, 2026-11-05](../reports/2026-11-05-policy-0.1.0.md). The
-[2026-11-04 report](../reports/2026-11-04-policy-0.1.0.md) is kept as
+[`reports/`](../reports/). The latest are the
+[policy 0.3.0 runs, 2026-11-07](#results-policy-030). The policy 0.1.0
+reports ([2026-11-05](../reports/2026-11-05-policy-0.1.0.md),
+[2026-11-04](../reports/2026-11-04-policy-0.1.0.md)) are kept as
 history, and the policy 0.2.0 runs and the
 [vote-stability report](../reports/2026-11-06-vote-stability.md) are
 described [below](#policy-020-and-the-move-to-5-votes).
@@ -52,13 +53,65 @@ author ([decisions](decisions.md#v0-calls)).
 
 Headline numbers use the first run of each case.
 
+## Results, policy 0.3.0
+
+Policy 0.3.0 draws 5 votes per model instead of 20. Each configuration
+ran all 50 cases once on 2026-11-07, one case at a time, with cases
+started 40 s apart (`--concurrency 1 --gap-s 40`) so the provider's
+per-minute rate limit is not what gets measured. Baselines are unchanged
+from 2026-11-04: no baseline calls the sampling step.
+
+| Condition (policy 0.3.0, 2026-11-07) | Missed emergencies | Sent to Human review (not routed) | Cost score | Median time | p95 time |
+|---|---|---|---|---|---|
+| **Sonnet + Flash, as deployed** ([report](../reports/2026-11-07-policy-0.3.0.md)) | **0 of 14** | **0%** | **0.730** | **18 s** | **22 s** |
+| Sonnet only ([report](../reports/2026-11-07-policy-0.3.0-sonnet.md)) | 0 of 14 | 0% | 0.710 | 17 s | 22 s |
+| Flash only ([report](../reports/2026-11-07-policy-0.3.0-flash.md)) | 0 of 14 | 4% | 0.598 | 16 s | 25 s |
+| Rule floor only (2026-11-04) | 0 of 14 | 0% | 1.190 | 9.5 s | 13 s |
+| Always escalate | 0 of 14 | 0% | 2.520 | n/a | |
+| Historical | 4 of 14 | 0% | 4.120 | n/a | |
+
+From the reports:
+
+- **Every run passed the gate**, and the early emergency message fired
+  on every emergency case. Every quote for a present red flag was
+  verified (100%), and no run had an HTTP error or a schema mismatch.
+- **Sonnet + Flash and Sonnet only have identical confusion matrices.**
+  The primary model sets the level; Flash adds the cross-family check.
+  With the same levels the mean cost is the same, so the gap in cost
+  score (0.730 against 0.710) is the 0.2 penalty: the check flagged 10%
+  of cases for a physician, against none for Sonnet only (from the
+  experiment log). Needs info: 64% with Flash, 70% without.
+- **Flash only had the lowest (best) cost score** (0.598) and sent 2 of
+  50 cases to Human review, its only flagged cases (4%). It routed 4 of 7
+  Within a few days cases at that level or higher (sensitivity 57.1%),
+  against 6 of 7 for Sonnet, and asked for more information less often
+  (46%). ROC AUC for emergency or same day was 0.959, against 0.920 for
+  Sonnet.
+- **Against policy 0.1.0** (Sonnet + Flash, 20 votes, 2026-11-05): cost
+  score 0.730 against 0.808, median time 18 s against 83 s, Human review
+  0% in both, flagged for a physician 10% against 14%, ROC AUC for
+  emergency 0.986 against 0.972. These are not gains from 5 votes. The
+  0.1.0 run went back to back, so much of its 83 s was rate-limit
+  retries. Its level matrix differs by one case, and the 0.3.0 Sonnet-only
+  run, with the same levels, had an emergency AUC of 0.972. That is
+  run-to-run variation, as the vote-stability report predicts.
+- Cost score with every under-triage weight halved or doubled: Sonnet +
+  Flash 0.505 and 1.180, Sonnet only 0.485 and 1.160, Flash only 0.383
+  and 1.028. All three beat the rule floor (0.595 and 2.380) at both.
+
+The 40 s gap is the condition, not the deployment: a burst of messages
+still runs into the rate limit ([rate limits](rate-limits.md)). The live
+demo keeps Sonnet + Flash, since the cross-family check is the design's
+guard against one model's blind spots.
+
 ## Results, policy 0.1.0
 
 The full agent's numbers come from the 2026-11-05 run, Sonnet + Flash as
 deployed, with the stricter extraction rule. The baselines come from the
 2026-11-04 runs. The other rows are earlier conditions from the Operations
-view's experiment log, which now has five rows, with "Sonnet + Flash, as
-deployed (stricter extraction)" first.
+view's experiment log. That log now has eight rows, with the three policy
+0.3.0 runs first and "Sonnet + Flash, 20 votes (stricter extraction)"
+after them.
 
 "Sent to Human review" counts only cases the agent did not route. Routed
 cases flagged for a physician to check are counted in the cost score, and
@@ -113,7 +166,7 @@ re-scores the clean 2026-11-05 run with 3 to 20 votes per model, drawn
 from its saved votes: every case lands at the same level, with no
 emergency missed and the same cost score. Sonnet put all its votes on one
 level in 192 of 195 saved cases. Policy 0.3.0 therefore draws 5 votes per
-model. Its eval runs live at 5 votes; results to follow.
+model; its results are [above](#results-policy-030).
 
 ## What the conditions taught us
 
@@ -149,9 +202,9 @@ model. Its eval runs live at 5 votes; results to follow.
   catches 0% of Routine cases. Its low cost score comes from never missing
   an emergency, not from routing the rest well.
 - **The flag rate is not in the report yet.** The report gives the Human
-  review rate. The wider share flagged for a physician (14% in the
-  2026-11-05 run) feeds the cost score and is shown in the Operations view,
-  but the report does not print it.
+  review rate. The wider share flagged for a physician (10% in the
+  2026-11-07 Sonnet + Flash run) feeds the cost score and is shown in
+  the Operations view, but the report does not print it.
 
 ## Running it
 

@@ -47,20 +47,24 @@ message ([reliability roadmap](docs/reliability-roadmap.md)).
 
 ## Results
 
-From [the policy 0.1.0 report](reports/2026-11-05-policy-0.1.0.md): 50
+From [the policy 0.3.0 report](reports/2026-11-07-policy-0.3.0.md): 50
 cases reviewed blind by a physician, 14 of them emergencies (Call 911 or
 ED now). Aggregate numbers only.
 
 | System | Missed emergencies | Sent to Human review (not routed) | Cost score (lower is better) |
 |---|---|---|---|
-| **Full agent** (Sonnet + Flash) | **0 of 14** | **0%** | **0.808** |
+| **Full agent** (Sonnet + Flash, 5 + 5 votes) | **0 of 14** | **0%** | **0.730** |
 | Rule floor only | 0 of 14 | 0% | 1.190 |
 | Always escalate to ED | 0 of 14 | 0% | 2.520 |
 | Historical dispositions | 4 of 14 | 0% | 4.120 |
 
-Full agent: 2026-11-05 run, Sonnet + Flash as deployed, with the stricter
-extraction rule. 14% of its cases were routed but flagged for a physician
-to check, and 74% asked for more information (Needs info). Baselines: the
+Full agent: 2026-11-07 run of policy 0.3.0, Sonnet + Flash as deployed,
+cases started 40 s apart so the provider's per-minute rate limit is not
+what gets measured. 10% of its cases were routed but flagged for a
+physician to check, 64% asked for more information (Needs info),
+and the median time to a result was 18 s. That spacing is a test
+condition: a burst of messages still hits the limit, and those cases end
+at Human review ([rate limits](docs/rate-limits.md)). Baselines: the
 2026-11-04 runs.
 
 The cost score is the average cost per case of routing mistakes, weighted
