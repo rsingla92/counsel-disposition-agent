@@ -12,6 +12,7 @@ import collections
 import copy
 import datetime
 import json
+import math
 import os
 import pathlib
 import sys
@@ -218,7 +219,8 @@ class Pacer:
       now = self._clock()
       if self._next is not None and now < self._next:
         self._sleep(self._next - now)
-        now = self._next
+        # Measured from the real start, in case the sleep overshot.
+        now = self._clock()
       self._next = now + self._gap
 
 
@@ -665,10 +667,13 @@ class _Parser(argparse.ArgumentParser):
 
 
 def _non_negative(text: str) -> float:
-  """An argparse type: a float of at least 0."""
-  value = float(text)
-  if value < 0:
-    raise argparse.ArgumentTypeError("must be at least 0")
+  """An argparse type: a finite float of at least 0."""
+  try:
+    value = float(text)
+  except ValueError as e:
+    raise argparse.ArgumentTypeError("must be a number") from e
+  if not math.isfinite(value) or value < 0:
+    raise argparse.ArgumentTypeError("must be a finite number of at least 0")
   return value
 
 

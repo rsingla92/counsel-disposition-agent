@@ -574,10 +574,30 @@ def test_cli_gap_spaces_full_cases_only(tmp_path, monkeypatch):
   assert t.sleeps == [40.0] * 6
 
 
-def test_cli_rejects_a_negative_gap(tmp_path):
-  with pytest.raises(SystemExit):
+@pytest.mark.parametrize("gap", ["-1", "nan", "inf"])
+def test_cli_rejects_a_gap_that_is_not_a_finite_non_negative_number(
+    tmp_path, capsys, gap
+):
+  with pytest.raises(SystemExit) as exit_info:
     run.main(
-        _argv(tmp_path, "--systems", "full", "--gap-s", "-1"),
+        _argv(tmp_path, "--systems", "full", f"--gap-s={gap}"),
         client_factory=lambda url, token: FakeClient(),
         env=ENV,
     )
+  assert exit_info.value.code == run.EXIT_CONFIG
+  assert "--gap-s: must be a finite number of at least 0" in (
+      capsys.readouterr().err
+  )
+
+
+def test_pacer_measures_from_the_real_start_after_an_overshoot():
+  t = _FakeTime()
+
+  def late_sleep(s):
+    t.sleep(s + 1.0)  # the OS wakes the thread a second late
+
+  pacer = run.Pacer(40.0, clock=t.monotonic, sleep=late_sleep)
+  pacer.wait()
+  pacer.wait()  # asks for 40, really starts at 41
+  pacer.wait()
+  assert t.sleeps == [41.0, 41.0]
