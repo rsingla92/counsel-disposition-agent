@@ -2,7 +2,13 @@ import {describe, expect, it} from 'vitest';
 import {summarize, type ScoredCase} from '../src/metrics';
 import {applyPolicyOverrides} from '../src/overrides';
 import {loadPolicy} from '../src/policy';
-import {rescore, type Experiment, type ExperimentRecord} from '../src/rescore';
+import {
+  policyForSamples,
+  rescore,
+  samplesPerModel,
+  type Experiment,
+  type ExperimentRecord,
+} from '../src/rescore';
 import {v} from './fixtures';
 
 const policy = loadPolicy();
@@ -193,5 +199,44 @@ describe('rescore', () => {
     );
     expect(s.missed).toBe(1);
     expect(s.confusion.ed_now.in_person_today).toBe(1);
+  });
+});
+
+describe('re-scoring a run made with more votes than the policy draws', () => {
+  // A five-vote policy, whatever the checked-in policy says.
+  const p5 = {
+    ...policy,
+    sampling: {...policy.sampling, n: 5, min_valid: 4},
+    review: {...policy.review, min_top_votes: 3},
+  };
+
+  it('scales the count thresholds up to the run, rounding up', () => {
+    const p = policyForSamples(p5, 20);
+    expect(p.sampling.n).toBe(20);
+    expect(p.sampling.min_valid).toBe(16);
+    expect(p.review.min_top_votes).toBe(12);
+    expect(p.review.max_span).toBe(p5.review.max_span);
+  });
+
+  it('leaves the policy as is at its own vote count', () =>
+    expect(policyForSamples(p5, 5)).toEqual(p5));
+
+  it('reads the votes per model from the run, defaulting to 20', () => {
+    expect(samplesPerModel({...experiment(), samples_per_model: 5})).toBe(5);
+    // Every run saved before samples_per_model existed drew 20.
+    expect(samplesPerModel(experiment())).toBe(20);
+  });
+
+  it('needs 16 of 20 valid votes under a 4-of-5 policy', () => {
+    const run = (votes: number) =>
+      rescore(
+        experiment([
+          record({primary: v({routine: 20})}),
+          record({primary: v({routine: votes})}),
+        ]),
+        p5,
+      ).human_review_rate;
+    expect(run(15)).toBe(0.5);
+    expect(run(16)).toBe(0);
   });
 });
