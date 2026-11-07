@@ -155,15 +155,22 @@ def test_estimate_live_calls():
 
 
 def test_default_calls_per_case_follows_models():
-  assert run.effective_calls_per_case(None, None) == 41
-  assert run.effective_calls_per_case("sonnet+flash", None) == 41
-  assert run.effective_calls_per_case("sonnet", None) == 21
-  assert run.effective_calls_per_case("flash", None) == 21
-  assert run.effective_calls_per_case("flash", 30) == 30
+  assert run.effective_calls_per_case(None, None, 20) == 41
+  assert run.effective_calls_per_case("sonnet+flash", None, 20) == 41
+  assert run.effective_calls_per_case("sonnet", None, 20) == 21
+  assert run.effective_calls_per_case("flash", None, 20) == 21
+  assert run.effective_calls_per_case("flash", 30, 20) == 30
+
+
+def test_calls_per_case_follow_the_policy_sample_count():
+  # One extraction plus n samples per model.
+  assert run.effective_calls_per_case("sonnet+flash", None, 5) == 11
+  assert run.effective_calls_per_case("sonnet", None, 5) == 6
+  assert run.effective_calls_per_case(None, 30, 5) == 30
 
 
 def test_estimate_flash_uses_21_calls_per_case():
-  calls = run.effective_calls_per_case("flash", None)
+  calls = run.effective_calls_per_case("flash", None, 20)
   est = run.estimate_usd(["full"], 10, 1, 0.01, calls)
   assert est == pytest.approx(21 * 10 * 0.01)
 
@@ -445,7 +452,7 @@ def test_cli_repeat_runs_each_case_n_times(tmp_path):
 
 
 def test_cli_refuses_on_insufficient_credit(respx_mock, tmp_path):
-  _balances(respx_mock, 1.0)
+  _balances(respx_mock, 0.01)
   env_file = _env_file(tmp_path)
   client = FakeClient()
   code = run.main(

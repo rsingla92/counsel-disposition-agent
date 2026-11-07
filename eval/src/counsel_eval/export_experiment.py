@@ -209,6 +209,34 @@ def summary(frame: pd.DataFrame, policy: Mapping[str, Any]) -> dict[str, Any]:
   }
 
 
+# Votes per model under policies before sampling.n became 5 (0.3.0).
+_LEGACY_SAMPLES = {"0.1.0": 20, "0.2.0": 20}
+
+
+def samples_per_model(
+    entries: Sequence[Mapping[str, Any]], policy: Mapping[str, Any]
+) -> int:
+  """Returns the votes per model the run drew, from its policy version.
+
+  Raises:
+    ValueError: The run mixes versions, has none, or names a version that
+      is neither the current policy's nor a known earlier one.
+  """
+  versions = {
+      e["result"]["trace"]["policy_version"]
+      for e in entries
+      if isinstance(e.get("result"), dict)
+  }
+  if len(versions) != 1:
+    raise ValueError("expected one policy version in the run")
+  (version,) = versions
+  if version == policy["policy_version"]:
+    return int(policy["sampling"]["n"])
+  if version in _LEGACY_SAMPLES:
+    return _LEGACY_SAMPLES[version]
+  raise ValueError("unknown policy version")
+
+
 def experiment(
     entries: Sequence[Mapping[str, Any]],
     reference: pd.DataFrame,
@@ -237,6 +265,12 @@ def experiment(
       "label": label,
       "models": "floor_only" if system == "floor" else "+".join(models),
       "rescorable": system == "full",
+      # A floor run samples nothing and is never re-scored.
+      "samples_per_model": (
+          samples_per_model(first, policy)
+          if system == "full"
+          else int(policy["sampling"]["n"])
+      ),
       "records": [record(e, levels_by_case[e["case_id"]]) for e in first],
       "summary": summary(frame, policy),
       "median_latency_ms": float(statistics.median(timed)) if timed else 0.0,

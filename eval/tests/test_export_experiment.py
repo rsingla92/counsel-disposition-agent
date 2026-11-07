@@ -7,6 +7,7 @@ import pytest
 from counsel_eval import export_experiment
 from counsel_eval import levels
 from counsel_eval import run
+from counsel_eval.data import load_policy
 from helpers import entry
 from helpers import make_result
 from helpers import REFERENCE_LEVELS
@@ -18,6 +19,7 @@ TOP_KEYS = {
     "label",
     "models",
     "rescorable",
+    "samples_per_model",
     "records",
     "summary",
     "median_latency_ms",
@@ -403,3 +405,34 @@ def test_recovers_unverified_excerpt(kwargs, expected):
       entry("C06", _sampling_failed(**kwargs)), "routine"
   )
   assert out["base_reasons"] == expected
+
+
+def _restamp(data_dir, version):
+  """Rewrites the saved run as if made under policy `version`."""
+  path = data_dir / "runs" / STAMP / "full.jsonl"
+  lines = []
+  for line in path.read_text(encoding="utf-8").splitlines():
+    e = json.loads(line)
+    if isinstance(e.get("result"), dict):
+      e["result"]["trace"]["policy_version"] = version
+    lines.append(json.dumps(e))
+  path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def test_samples_per_model_is_the_current_policy_n(data_dir, tmp_path):
+  out = tmp_path / "exp.json"
+  assert _export(data_dir, out) == 0
+  n = load_policy(run.ROOT / "policy" / "policy.yaml")["sampling"]["n"]
+  assert json.loads(out.read_text())["samples_per_model"] == n
+
+
+def test_samples_per_model_is_20_before_policy_0_3_0(data_dir, tmp_path):
+  _restamp(data_dir, "0.2.0")
+  out = tmp_path / "exp.json"
+  assert _export(data_dir, out) == 0
+  assert json.loads(out.read_text())["samples_per_model"] == 20
+
+
+def test_refuses_an_unknown_policy_version(data_dir, tmp_path):
+  _restamp(data_dir, "9.9.9")
+  assert _export(data_dir, tmp_path / "exp.json") == 4

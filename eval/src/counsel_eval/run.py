@@ -106,16 +106,21 @@ def live_calls_per_case(system: str, calls_per_case: int) -> int:
   return {"full": calls_per_case, "floor": 1}.get(system, 0)
 
 
-def effective_calls_per_case(models: str | None, explicit: int | None) -> int:
+def effective_calls_per_case(
+    models: str | None, explicit: int | None, n: int
+) -> int:
   """Returns the OpenRouter calls one full case costs.
 
   Args:
     models: The --models flag, or None.
     explicit: The --calls-per-case flag, or None. It wins when given.
+    n: The policy's samples per model (sampling.n).
+
+  One extraction, then n samples from each model sampled.
   """
   if explicit is not None:
     return explicit
-  return 21 if models in _SINGLE_MODELS else 41
+  return 1 + n * (1 if models in _SINGLE_MODELS else 2)
 
 
 def estimate_usd(
@@ -640,8 +645,8 @@ def build_parser() -> argparse.ArgumentParser:
       "--calls-per-case",
       type=int,
       default=None,
-      help="credit-estimate calls per full case (default 41, or 21 when "
-      "--models is sonnet or flash)",
+      help="credit-estimate calls per full case (default 1 + 2n, or 1 + n "
+      "when --models is sonnet or flash, n being the policy's sampling.n)",
   )
   p.add_argument(
       "--models",
@@ -724,7 +729,9 @@ def _main(
       len(cases),
       args.repeat,
       args.per_call_usd,
-      effective_calls_per_case(args.models, args.calls_per_case),
+      effective_calls_per_case(
+          args.models, args.calls_per_case, policy["sampling"]["n"]
+      ),
   )
   if not args.skip_credit_check and estimate > 0:
     env_file = env.get("OPENROUTER_ENV_FILE", _DEFAULT_ENV_FILE)
