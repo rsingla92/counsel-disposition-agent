@@ -12,9 +12,12 @@ import collections
 import copy
 import datetime
 import json
+import math
 import os
 import pathlib
 import sys
+import threading
+import time
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
@@ -189,14 +192,49 @@ def credit_check(
 # --- running ----------------------------------------------------------------
 
 
+class Pacer:
+  """Starts calls at least gap_s seconds apart, across threads.
+
+  Spacing cases keeps each model's calls under the provider's per-minute
+  rate limit, so a run measures routing rather than the limit.
+  """
+
+  def __init__(
+      self,
+      gap_s: float,
+      clock: Callable[[], float] | None = None,
+      sleep: Callable[[float], None] | None = None,
+  ):
+    self._gap = gap_s
+    self._clock = clock or time.monotonic
+    self._sleep = sleep or time.sleep
+    self._lock = threading.Lock()
+    self._next: float | None = None
+
+  def wait(self) -> None:
+    """Blocks until gap_s after the previous start, then records this one."""
+    if self._gap <= 0:
+      return
+    with self._lock:
+      now = self._clock()
+      if self._next is not None and now < self._next:
+        self._sleep(self._next - now)
+        # Measured from the real start, in case the sleep overshot.
+        now = self._clock()
+      self._next = now + self._gap
+
+
 def _call_full(
     client: Any,
     tasks: Sequence[tuple[str, str, int]],
     concurrency: int,
     models: str | None = None,
+    pacer: Pacer | None = None,
 ) -> list[dict[str, Any]]:
   def one(task: tuple[str, str, int]) -> dict[str, Any]:
     case_id, message, repeat = task
+    if pacer is not None:
+      pacer.wait()
     try:
       if models is None:
         result = client.route(message)
@@ -234,6 +272,7 @@ def run_system(
     repeat: int,
     concurrency: int,
     models: str | None = None,
+    pacer: Pacer | None = None,
 ) -> list[dict[str, Any]]:
   """Runs one system and returns its saved-run entries.
 
@@ -244,6 +283,7 @@ def run_system(
     repeat: Repeats per case.
     concurrency: Worker threads.
     models: Model override for the full system only; other systems ignore it.
+    pacer: Spaces the full system's case starts; other systems ignore it.
   """
   if system == "full":
     tasks = [
@@ -251,7 +291,7 @@ def run_system(
         for r in range(repeat)
         for c, m in zip(cases["case_id"], cases["message"])
     ]
-    return _call_full(client, tasks, concurrency, models)
+    return _call_full(client, tasks, concurrency, models, pacer)
   if system == "floor":
     out = []
     for r in range(repeat):
@@ -626,6 +666,17 @@ class _Parser(argparse.ArgumentParser):
     sys.exit(EXIT_CONFIG)
 
 
+def _non_negative(text: str) -> float:
+  """An argparse type: a finite float of at least 0."""
+  try:
+    value = float(text)
+  except ValueError as e:
+    raise argparse.ArgumentTypeError("must be a number") from e
+  if not math.isfinite(value) or value < 0:
+    raise argparse.ArgumentTypeError("must be a finite number of at least 0")
+  return value
+
+
 def build_parser() -> argparse.ArgumentParser:
   """Returns the CLI argument parser."""
   p = _Parser(
@@ -639,6 +690,12 @@ def build_parser() -> argparse.ArgumentParser:
   p.add_argument("--cases", choices=["all", "pcp"], default="all")
   p.add_argument("--repeat", type=int, default=1)
   p.add_argument("--concurrency", type=int, default=4)
+  p.add_argument(
+      "--gap-s",
+      type=_non_negative,
+      default=0.0,
+      help="Seconds between full-agent case starts (rate limits)",
+  )
   p.add_argument("--skip-credit-check", action="store_true")
   p.add_argument("--per-call-usd", type=float, default=0.0075)
   p.add_argument(
@@ -754,6 +811,7 @@ def _main(
         repeat=args.repeat,
         concurrency=args.concurrency,
         models=args.models,
+        pacer=Pacer(args.gap_s),
     )
     runs[system] = entries
     with open(runs_dir / f"{system}.jsonl", "w", encoding="utf-8") as f:
