@@ -7,7 +7,7 @@ import {
   traceLine,
   type EarlyEvent,
 } from '../src/pipeline';
-import {LlmError} from '../src/llm';
+import {EXTRACTION_MAX_RETRIES, LlmError} from '../src/llm';
 import {applyPolicyOverrides, selectModels} from '../src/overrides';
 import {RouteResultSchema, type Sample} from '../src/schema';
 import {
@@ -779,6 +779,17 @@ describe('route: overrides', () => {
 });
 
 describe('route: extraction fallback', () => {
+  it('lets the primary extraction wait out a rate limit, the backup only briefly', async () => {
+    const llm = scripted({
+      extractError: 'provider_error',
+      extractErrorOn: 'primary',
+      extractStatus: 429,
+      samples: 'routine',
+    });
+    await route(REFILL_WITH_CHEST, {...deps(llm), secondary: SECONDARY});
+    expect(llm.extractionRetries).toEqual([EXTRACTION_MAX_RETRIES, undefined]);
+  });
+
   it('ends at Human review but carries the secondary floor when the primary fails', async () => {
     const onEarly = vi.fn();
     const llm = scripted({

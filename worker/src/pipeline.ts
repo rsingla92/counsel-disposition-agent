@@ -10,7 +10,12 @@ import {
   tierOf,
   type Level,
 } from './levels';
-import {LlmError, type LlmClient, type ModelSpec} from './llm';
+import {
+  EXTRACTION_MAX_RETRIES,
+  LlmError,
+  type LlmClient,
+  type ModelSpec,
+} from './llm';
 import {traceLine} from './log';
 import type {RouteOverrides} from './overrides';
 import type {Policy} from './policy';
@@ -465,7 +470,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
   // the primary's extraction fails, the secondary (or, in one-model mode,
   // the extraction fallback) tries once, but only to carry red-flag floors:
   // a failed primary extraction always ends at Human review, even if the
-  // backup succeeds.
+  // backup succeeds. The primary waits out a rate limit for about a minute
+  // (EXTRACTION_MAX_RETRIES); the backup gets the default retries, so a case
+  // stays inside the web page's wait.
   let ex: Extraction | null = null;
   let salvaged: Extraction['red_flags'] | null = null;
   const backup = deps.secondary ?? deps.extractionFallback ?? null;
@@ -473,7 +480,9 @@ async function pipeline(run: Run, opts: RouteOptions): Promise<RouteResult> {
     if (!spec) continue;
     addSpec(run, spec);
     try {
-      const got = await extract(message, spec, deps.llm, policy);
+      const got = await extract(message, spec, deps.llm, policy, {
+        maxRetries: spec === deps.primary ? EXTRACTION_MAX_RETRIES : undefined,
+      });
       run.raw.extraction = got.raw;
       run.extractionModel = spec;
       ex = got.extraction;

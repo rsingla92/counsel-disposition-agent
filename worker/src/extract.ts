@@ -89,13 +89,15 @@ export function wrapPatientMessage(message: string): string {
 
 /**
  * Extracts red flags and modifiers from a patient message. Throws LlmError;
- * a response that fails the extraction schema is 'invalid_json'.
+ * a response that fails the extraction schema is 'invalid_json'. maxRetries
+ * caps the rate-limit retries; the client's default when unset.
  */
 export async function extract(
   message: string,
   spec: ModelSpec,
   llm: LlmClient,
   policy: Policy,
+  opts: {maxRetries?: number} = {},
 ): Promise<{extraction: Extraction; raw: string}> {
   const schema = extractionSchema(policy);
   const res = await llm.complete({
@@ -106,6 +108,7 @@ export async function extract(
     jsonSchema: extractionJsonSchema(policy),
     temperature: 0,
     timeoutMs: policy.extraction.timeout_ms,
+    ...(opts.maxRetries === undefined ? {} : {maxRetries: opts.maxRetries}),
   });
   const parsed = schema.safeParse(res.json);
   if (!parsed.success) {

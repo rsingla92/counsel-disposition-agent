@@ -72,16 +72,20 @@ function messageOf(req: LlmRequest): string {
 export function scripted(opts: ScriptOpts): LlmClient & {
   calls: number;
   requests: {schemaName: string; model: string}[];
+  /** Each extraction request's rate-limit retry cap, in call order. */
+  extractionRetries: (number | undefined)[];
 } {
   const policy = policy20;
   let primarySamples = 0;
   const client = {
     calls: 0,
     requests: [] as {schemaName: string; model: string}[],
+    extractionRetries: [] as (number | undefined)[],
     async complete(req: LlmRequest) {
       client.calls++;
       client.requests.push({schemaName: req.schemaName, model: req.spec.model});
       if (req.schemaName === 'extraction') {
+        client.extractionRetries.push(req.maxRetries);
         const failsOn =
           opts.extractErrorOn === 'primary'
             ? PRIMARY
