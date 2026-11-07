@@ -766,9 +766,11 @@ describe('experiment endpoints', () => {
   });
 
   it('re-scores with the overrides applied', async () => {
+    // Overrides count in the policy's votes; all n must agree.
+    const n = policy.sampling.n;
     const res = await app().request(
       '/v1/experiments/run-a/rescore',
-      post({policy: {min_top_votes: 20, human_review_cost: 0.5}}),
+      post({policy: {min_top_votes: n, human_review_cost: 0.5}}),
       env,
     );
     expect(res.status).toBe(200);
@@ -777,12 +779,28 @@ describe('experiment endpoints', () => {
       policy_applied: unknown;
     };
     expect(body.policy_applied).toEqual({
-      min_top_votes: 20,
+      min_top_votes: n,
       human_review_cost: 0.5,
     });
     // The split vote flags the case; the overridden review cost prices it.
     expect(body.summary.n).toBe(1);
     expect(body.summary.cost_score).toBeCloseTo(0.5, 9);
+  });
+
+  it('rejects re-score counts above the votes the policy draws', async () => {
+    // Overrides count in the policy's votes, so n + 1 has no meaning.
+    for (const o of [
+      {min_valid: policy.sampling.n + 1},
+      {min_top_votes: policy.sampling.n + 1},
+    ]) {
+      const res = await app().request(
+        '/v1/experiments/run-a/rescore',
+        post({policy: o}),
+        env,
+      );
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({error: 'overrides invalid'});
+    }
   });
 
   it('allows an emergency weight below the policy when re-scoring', async () => {
@@ -800,7 +818,7 @@ describe('experiment endpoints', () => {
   it('allows min_valid below the policy when re-scoring', async () => {
     const res = await app().request(
       '/v1/experiments/run-a/rescore',
-      post({policy: {min_valid: 10}}),
+      post({policy: {min_valid: policy.sampling.min_valid - 1}}),
       env,
     );
     expect(res.status).toBe(200);

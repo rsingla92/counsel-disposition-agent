@@ -26,8 +26,9 @@ function stepped(min: number, max: number, step: number) {
  * checked against a given policy.
  */
 export const PolicyOverridesSchema = z.strictObject({
-  // Up to 20, the most votes any saved run drew; checkLiveSafe caps a live
-  // route at sampling.n, and majorityOk() ties min_top_votes to min_valid.
+  // The schema stands alone, so it parses a trace saved under a policy that
+  // drew up to 20 votes; withinSamples() caps both at the loaded policy's
+  // sampling.n, and majorityOk() ties min_top_votes to min_valid.
   min_valid: z.number().int().min(1).max(20).optional(),
   min_top_votes: z.number().int().min(1).max(20).optional(),
   max_span: z.number().int().min(0).max(6).optional(),
@@ -70,6 +71,19 @@ export function majorityOk(
   if (o?.min_top_votes === undefined) return true;
   const minValid = o.min_valid ?? policy.sampling.min_valid;
   return o.min_top_votes >= Math.floor(minValid / 2) + 1;
+}
+
+/**
+ * True when min_valid and min_top_votes, if given, are within the votes the
+ * policy draws per model. Overrides count in those votes; re-scoring a run
+ * saved with more votes scales them up with the policy's own thresholds.
+ */
+export function withinSamples(
+  policy: Policy,
+  o: PolicyOverrides | undefined,
+): boolean {
+  const n = policy.sampling.n;
+  return (o?.min_valid ?? 0) <= n && (o?.min_top_votes ?? 0) <= n;
 }
 
 export type RouteOverrides = z.infer<typeof RouteOverridesSchema>;

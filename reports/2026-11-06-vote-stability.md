@@ -16,8 +16,10 @@ missed. Fewer votes means fewer calls.
 votes and no message text. For each k, it draws k votes per model without
 replacement from every saved case, 500 times with seed 1, and re-decides
 each case with the policy's thresholds scaled to k, rounding up. "Same
-level as full run" compares each draw with the run's own 20 votes,
-re-scored the same way.
+level as full run" compares each draw's level with the run's own 20
+votes, re-scored the same way. It compares the level only: a change in
+whether a case is flagged for a physician shows in the Flagged column, and
+a change to Human review in the Human review column.
 
 The draw assumes all k votes come back. So the curve is meaningful only on
 a run where they did: a run that lost votes to rate limits sent cases to
@@ -55,7 +57,7 @@ Three votes would route these cases the same, but a split of 2 against 1
 is too coarse to flag real uncertainty. At 5, a case needs 3 agreeing
 votes to route without a flag and 4 valid votes to route at all. A
 Sonnet + Flash case drops from 41 calls to 11; five people sending at once
-make about 30 Sonnet calls, not about 205.
+make about 30 Sonnet calls, not about 105 (55 calls in all, not 205).
 
 ## Runs left out
 

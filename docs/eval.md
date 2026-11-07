@@ -101,7 +101,7 @@ Every policy 0.2.0 run, at 20 samples per model, sent most cases to Human
 review because the provider's per-minute rate limit refused about half the
 samples ([rate limits](rate-limits.md)). No emergency was missed.
 
-| Condition (policy 0.2.0, 2026-11-06) | Missed emergencies | Sent to Human review | Cost score | Median time |
+| Condition (policy 0.2.0, 2026-11-06; reports dated 2026-11-07 UTC) | Missed emergencies | Sent to Human review | Cost score | Median time |
 |---|---|---|---|---|
 | Sonnet + Flash | 0 of 14 | 96% | 2.256 | 40 s |
 | Sonnet only | 0 of 14 | 96% | 2.232 | 37 s |

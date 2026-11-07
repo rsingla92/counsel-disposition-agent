@@ -72,9 +72,9 @@ this order.
      expected cost under the policy's cost weights. Ties go to the more
      acute level.
    - The case stays routed but is flagged for a physician to check if fewer
-     than 12 of the valid primary answers agree, if the answers spread more
-     than 2 levels apart, if the two
-     models' most common answers fall in different tiers, if the secondary
+     than 3 of the valid primary answers agree, if the answers spread more
+     than 2 levels apart, if the two models' most common answers fall in
+     different tiers, if the secondary
      returned too few valid answers to cross-check, or if a quote did not
      match the message.
    - If extraction listed questions or asked for a photo, the status is
