@@ -15,6 +15,11 @@ import {validResult} from './fixtures';
 import {PRIMARY, SECONDARY} from './pipeline-fixtures';
 
 const policy = loadPolicy();
+
+/** A 20-vote policy needing 15 valid, for the majority and floor rules. */
+const p15 = structuredClone(policy);
+p15.sampling.n = 20;
+p15.sampling.min_valid = 15;
 const UNDER = policy.loss.boundaries.map(b => b.under);
 
 function ok(o: unknown): boolean {
@@ -84,17 +89,17 @@ describe('PolicyOverridesSchema', () => {
     expect(ok({under_weights: [...UNDER, 1]})).toBe(false);
   });
 
-  it('accepts min_valid 10 to 20', () => {
-    expect(ok({min_valid: 10})).toBe(true);
+  it('accepts min_valid 1 to 20', () => {
+    expect(ok({min_valid: 1})).toBe(true);
     expect(ok({min_valid: 20})).toBe(true);
-    expect(ok({min_valid: 9})).toBe(false);
+    expect(ok({min_valid: 0})).toBe(false);
     expect(ok({min_valid: 21})).toBe(false);
     expect(ok({min_valid: 15.5})).toBe(false);
   });
 
-  it('bounds min_top_votes below by 6 on its own', () => {
-    expect(ok({min_top_votes: 5})).toBe(false);
-    expect(ok({min_top_votes: 6})).toBe(true);
+  it('bounds min_top_votes below by 1 on its own', () => {
+    expect(ok({min_top_votes: 0})).toBe(false);
+    expect(ok({min_top_votes: 1})).toBe(true);
   });
 
   it('accepts min_top_votes up to 20', () => {
@@ -141,9 +146,12 @@ describe('PolicyOverridesSchema', () => {
 });
 
 describe('policy pins', () => {
-  it('has 20 samples', () => {
-    // overrides.ts caps min_valid at 20 assuming sampling.n is 20.
-    expect(policy.sampling.n).toBe(20);
+  it('draws 5 votes per model, needing 4 valid and 3 agreeing', () => {
+    // The schema still allows up to 20, for runs saved with 20 votes;
+    // checkLiveSafe caps a live route at sampling.n.
+    expect(policy.sampling.n).toBe(5);
+    expect(policy.sampling.min_valid).toBe(4);
+    expect(policy.review.min_top_votes).toBe(3);
   });
 
   it('has 6 loss boundaries', () => {
@@ -154,7 +162,7 @@ describe('policy pins', () => {
 
 describe('majorityOk', () => {
   it('bounds min_top_votes by a majority of the effective min_valid', () => {
-    const at = (o: object) => majorityOk(policy, o);
+    const at = (o: object) => majorityOk(p15, o);
     expect(at({min_valid: 15, min_top_votes: 7})).toBe(false);
     expect(at({min_valid: 15, min_top_votes: 8})).toBe(true);
     expect(at({min_valid: 10, min_top_votes: 5})).toBe(false);
@@ -162,18 +170,18 @@ describe('majorityOk', () => {
     expect(at({min_valid: 20, min_top_votes: 10})).toBe(false);
     expect(at({min_valid: 20, min_top_votes: 11})).toBe(true);
     // Without min_valid, the given policy's (15 here) applies.
-    expect(policy.sampling.min_valid).toBe(15);
+    expect(p15.sampling.min_valid).toBe(15);
     expect(at({min_top_votes: 7})).toBe(false);
     expect(at({min_top_votes: 8})).toBe(true);
     expect(at({min_valid: 10})).toBe(true);
-    expect(majorityOk(policy, undefined)).toBe(true);
+    expect(majorityOk(p15, undefined)).toBe(true);
   });
 
   it('uses the policy it is given', () => {
-    const p = structuredClone(policy);
+    const p = structuredClone(p15);
     p.sampling.min_valid = 10;
     expect(majorityOk(p, {min_top_votes: 6})).toBe(true);
-    expect(majorityOk(policy, {min_top_votes: 6})).toBe(false);
+    expect(majorityOk(p15, {min_top_votes: 6})).toBe(false);
   });
 });
 
@@ -247,21 +255,28 @@ describe('checkLiveSafe', () => {
     expect(checkLiveSafe(policy, at(5, 0.5))).toBeNull();
   });
 
+  it('rejects min_valid or min_top_votes above the votes drawn', () => {
+    const n = policy.sampling.n;
+    expect(checkLiveSafe(policy, {min_valid: n + 1})).toBe(
+      'min_valid_above_samples',
+    );
+    expect(checkLiveSafe(policy, {min_top_votes: n + 1})).toBe(
+      'min_top_votes_above_samples',
+    );
+    expect(checkLiveSafe(policy, {min_valid: n, min_top_votes: n})).toBeNull();
+  });
+
   it('allows no overrides and overrides without weights', () => {
     expect(checkLiveSafe(policy, undefined)).toBeNull();
     expect(checkLiveSafe(policy, {max_span: 3})).toBeNull();
   });
 
   it('rejects min_valid below the policy and allows it at or above', () => {
-    expect(policy.sampling.min_valid).toBe(15);
-    expect(checkLiveSafe(policy, {min_valid: 14})).toBe(
-      'min_valid_below_policy',
-    );
-    expect(checkLiveSafe(policy, {min_valid: 10})).toBe(
-      'min_valid_below_policy',
-    );
-    expect(checkLiveSafe(policy, {min_valid: 15})).toBeNull();
-    expect(checkLiveSafe(policy, {min_valid: 16})).toBeNull();
+    expect(p15.sampling.min_valid).toBe(15);
+    expect(checkLiveSafe(p15, {min_valid: 14})).toBe('min_valid_below_policy');
+    expect(checkLiveSafe(p15, {min_valid: 10})).toBe('min_valid_below_policy');
+    expect(checkLiveSafe(p15, {min_valid: 15})).toBeNull();
+    expect(checkLiveSafe(p15, {min_valid: 16})).toBeNull();
   });
 });
 

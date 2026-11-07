@@ -32,8 +32,13 @@ const ENV: Env = {
 const AUTH = {Authorization: `Bearer ${TOKEN}`};
 const JSON_AUTH = {...AUTH, 'Content-Type': 'application/json'};
 
+/** Deps on the checked-in policy, as the deployed Worker has them. */
+function liveDeps(llm: Parameters<typeof deps>[0]) {
+  return {...deps(llm), policy: loadPolicy()};
+}
+
 function app(opts: ScriptOpts = {}, log: (line: string) => void = () => {}) {
-  return appFor({...deps(scripted(opts)), log});
+  return appFor({...liveDeps(scripted(opts)), log});
 }
 
 function post(body: unknown, headers: Record<string, string> = JSON_AUTH) {
@@ -50,7 +55,7 @@ function lines(text: string): {event: string; [k: string]: unknown}[] {
 describe('POST /v1/route', () => {
   it('rejects empty messages with 400', async () => {
     const llm = scripted({});
-    const res = await appFor(deps(llm)).request(
+    const res = await appFor(liveDeps(llm)).request(
       '/v1/route',
       post({message: ''}),
       ENV,
@@ -73,7 +78,7 @@ describe('POST /v1/route', () => {
 
   it('requires a bearer token', async () => {
     const llm = scripted({});
-    const res = await appFor(deps(llm)).request(
+    const res = await appFor(liveDeps(llm)).request(
       '/v1/route',
       post({message: M}, {'Content-Type': 'application/json'}),
       ENV,
@@ -190,7 +195,7 @@ describe('POST /v1/route with overrides', () => {
 
   function twoModelApp(opts: ScriptOpts = {}) {
     const {client, calls} = recording(scripted(opts));
-    const app = appFor({...deps(client), secondary: SECONDARY});
+    const app = appFor({...liveDeps(client), secondary: SECONDARY});
     return {app, calls};
   }
 
@@ -245,7 +250,7 @@ describe('POST /v1/route with overrides', () => {
 
   it('answers 503 for flash with no secondary configured', async () => {
     const llm = scripted({});
-    const res = await appFor(deps(llm)).request(
+    const res = await appFor(liveDeps(llm)).request(
       '/v1/route',
       post({message: M, overrides: {models: 'flash'}}),
       ENV,
@@ -257,7 +262,7 @@ describe('POST /v1/route with overrides', () => {
 
   it('answers 503 for sonnet+flash with no secondary configured', async () => {
     const llm = scripted({});
-    const res = await appFor(deps(llm)).request(
+    const res = await appFor(liveDeps(llm)).request(
       '/v1/route',
       post({message: M, overrides: {models: 'sonnet+flash'}}),
       ENV,
@@ -320,11 +325,11 @@ describe('POST /v1/route with overrides', () => {
   });
 
   it('rejects min_valid below the policy without calling the LLM', async () => {
-    expect(loadPolicy().sampling.min_valid).toBe(15);
+    const minValid = loadPolicy().sampling.min_valid;
     const {app, calls} = twoModelApp();
     const res = await app.request(
       '/v1/route',
-      post({message: M, overrides: {policy: {min_valid: 14}}}),
+      post({message: M, overrides: {policy: {min_valid: minValid - 1}}}),
       ENV,
     );
     expect(res.status).toBe(400);
@@ -333,14 +338,30 @@ describe('POST /v1/route with overrides', () => {
   });
 
   it('allows min_valid above the policy', async () => {
+    const n = loadPolicy().sampling.n;
     const res = await app().request(
       '/v1/route',
-      post({message: M, overrides: {policy: {min_valid: 16}}}),
+      post({message: M, overrides: {policy: {min_valid: n}}}),
       ENV,
     );
     expect(res.status).toBe(200);
     const result = await resultOf(res);
-    expect(result.trace.overrides).toEqual({policy: {min_valid: 16}});
+    expect(result.trace.overrides).toEqual({policy: {min_valid: n}});
+  });
+
+  it('rejects min_valid above the votes drawn without calling the LLM', async () => {
+    const {app, calls} = twoModelApp();
+    const res = await app.request(
+      '/v1/route',
+      post({
+        message: M,
+        overrides: {policy: {min_valid: loadPolicy().sampling.n + 1}},
+      }),
+      ENV,
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({error: 'min_valid_above_samples'});
+    expect(calls).toEqual([]);
   });
 
   it('backs up a failed Flash extraction with Sonnet for models flash', async () => {
@@ -372,7 +393,7 @@ describe('POST /v1/route with overrides', () => {
     for (const overrides of [
       {policy: {min_valid: 30}},
       {policy: {min_valid: 15, min_top_votes: 7}},
-      {policy: {min_top_votes: 7}},
+      {policy: {min_top_votes: 0}},
       {policy: {under_weights: [1, 2, 3]}},
       {models: 'gpt'},
       {temperature: 0},
@@ -392,6 +413,8 @@ describe('POST /v1/route with overrides', () => {
   });
 
   it('applies policy overrides to the route', async () => {
+    // All n votes must agree; one of the n disagrees.
+    const n = loadPolicy().sampling.n;
     const res = await app({
       sampleFor: i => ({
         disposition: i === 0 ? 'within_few_days' : 'routine',
@@ -400,12 +423,12 @@ describe('POST /v1/route with overrides', () => {
       }),
     }).request(
       '/v1/route',
-      post({message: M, overrides: {policy: {min_top_votes: 20}}}),
+      post({message: M, overrides: {policy: {min_top_votes: n}}}),
       ENV,
     );
     const result = await resultOf(res);
     expect(result.human_review.reasons).toContain('split_vote');
-    expect(result.trace.overrides).toEqual({policy: {min_top_votes: 20}});
+    expect(result.trace.overrides).toEqual({policy: {min_top_votes: n}});
     expect(result.trace.policy_version).toBe(loadPolicy().policy_version);
   });
 
@@ -417,7 +440,7 @@ describe('POST /v1/route with overrides', () => {
       ENV,
     );
     const result = await resultOf(res);
-    const direct = await route(REFILL_WITH_CHEST, deps(scripted(opts)));
+    const direct = await route(REFILL_WITH_CHEST, liveDeps(scripted(opts)));
     expect(result.trace.overrides).toBeNull();
     expect({
       ...result,
@@ -810,7 +833,8 @@ describe('experiment endpoints', () => {
   it('answers 400 for invalid overrides', async () => {
     for (const body of [
       {policy: {min_valid: 30}},
-      {policy: {min_top_votes: 7}},
+      {policy: {min_top_votes: 0}},
+      {policy: {min_valid: 10, min_top_votes: 5}},
       {policy: {under_weights: [1, 2]}},
       {policy: {temperature: 0}},
       {policy: 'loose'},

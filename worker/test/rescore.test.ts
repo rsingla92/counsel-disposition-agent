@@ -130,12 +130,13 @@ describe('rescore', () => {
   });
 
   it('raises flagged_rate when min_top_votes rises', () => {
-    // S01 (20), S02 (13) and S05 (12 top votes): 14 splits S02 and S05.
+    // S01 (20), S02 (13) and S05 (12 top votes). Overrides count in the
+    // policy's votes: 4 of 5 is 16 of 20, which splits S02 and S05.
     // A split vote flags a case without the human_review status.
     const base = rescore(experiment(), policy);
     const raised = rescore(
       experiment(),
-      applyPolicyOverrides(policy, {min_top_votes: 14}),
+      applyPolicyOverrides(policy, {min_top_votes: 4}),
     );
     expect(raised.cost_score - base.cost_score).toBeCloseTo(
       (policy.loss.human_review_cost * 2) / 6,
@@ -151,7 +152,7 @@ describe('rescore', () => {
     for (const o of [
       {},
       {min_valid: 10},
-      {min_valid: 20, min_top_votes: 20},
+      {min_valid: 5, min_top_votes: 5},
       {max_span: 0, under_weights: UNDER.map(() => 0.5)},
     ]) {
       const s = rescore(exp, applyPolicyOverrides(policy, o));
@@ -163,7 +164,7 @@ describe('rescore', () => {
   it('re-routes a fixed sampling_failed record once min_valid is reached', () => {
     const exp = experiment([RECORDS[3]], [SAVED[3]]);
     expect(rescore(exp, policy).confusion.routine.human_review).toBe(1);
-    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 12}));
+    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 3}));
     expect(s.confusion.routine.human_review).toBe(0);
     expect(s.confusion.routine.routine).toBe(1);
     expect(s.human_review_rate).toBe(0);
@@ -175,7 +176,7 @@ describe('rescore', () => {
       base_reasons: ['unverified_excerpt'],
     };
     const exp = experiment([unverified], [SAVED[3]]);
-    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 12}));
+    const s = rescore(exp, applyPolicyOverrides(policy, {min_valid: 3}));
     expect(s.human_review_rate).toBe(0);
     expect(s.confusion.routine.routine).toBe(1);
     expect(s.flagged_rate).toBe(1);
@@ -184,7 +185,7 @@ describe('rescore', () => {
   it('sends a routed record to Human review when min_valid rises past its votes', () => {
     const exp = experiment([RECORDS[3]], [SAVED[3]]);
     const routed = {...exp, records: [{...RECORDS[3], fixed: null}]};
-    const s = rescore(routed, applyPolicyOverrides(policy, {min_valid: 13}));
+    const s = rescore(routed, applyPolicyOverrides(policy, {min_valid: 4}));
     expect(s.human_review_rate).toBe(1);
   });
 

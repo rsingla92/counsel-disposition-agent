@@ -1,11 +1,10 @@
 import {readFileSync} from 'node:fs';
 import {describe, expect, it} from 'vitest';
 import type {Level} from '../src/levels';
-import {loadPolicy} from '../src/policy';
 import {chooseLevel, cost, expectedCost, reviewReasons} from '../src/router';
-import {v} from './fixtures';
+import {policy20, v} from './fixtures';
 
-const policy = loadPolicy();
+const policy = policy20;
 
 interface CostFixture {
   true: Level;

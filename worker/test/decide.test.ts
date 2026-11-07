@@ -1,10 +1,9 @@
 import {describe, expect, it} from 'vitest';
 import {decide, type DecideInput} from '../src/decide';
 import {applyPolicyOverrides} from '../src/overrides';
-import {loadPolicy} from '../src/policy';
-import {v} from './fixtures';
+import {policy20, v} from './fixtures';
 
-const policy = loadPolicy();
+const policy = policy20;
 
 /** A unanimous 20-vote routine case with no secondary and nothing flagged. */
 function input(over: Partial<DecideInput> = {}): DecideInput {
@@ -22,6 +21,21 @@ function input(over: Partial<DecideInput> = {}): DecideInput {
 }
 
 describe('decide', () => {
+  it('keeps an emergency floor when too few of 5 votes come back', () => {
+    const n5 = {
+      ...policy,
+      sampling: {...policy.sampling, n: 5, min_valid: 4},
+      review: {...policy.review, min_top_votes: 3},
+    };
+    const d = decide(
+      input({primary: v({ed_now: 3}), primaryValid: 3, floor: 'ed_now'}),
+      n5,
+    );
+    expect(d.status).toBe('human_review');
+    expect(d.disposition).toBe('ed_now');
+    expect(d.reasons).toEqual(['sampling_failed']);
+  });
+
   it('routes a unanimous case with no reasons', () => {
     expect(decide(input(), policy)).toEqual({
       status: 'routed',

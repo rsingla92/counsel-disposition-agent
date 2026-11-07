@@ -157,7 +157,7 @@ describe('policy', () => {
     expect(f.cases).toEqual([]);
   });
 
-  it('is policy 0.2.0', () => expect(policy.policy_version).toBe('0.2.0'));
+  it('is policy 0.3.0', () => expect(policy.policy_version).toBe('0.3.0'));
 
   it('caps modifiers at in_person_today', () =>
     expect(policy.modifier_cap).toBe('in_person_today'));

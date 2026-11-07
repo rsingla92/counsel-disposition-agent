@@ -3,15 +3,17 @@
 # here is read by the Worker at build time (worker/scripts/build-policy.mjs).
 # Levels run from most to least acute: call_911, ed_now, in_person_today,
 # physician_contact_today, within_few_days, routine, self_care.
-policy_version: "0.2.0"
+policy_version: "0.3.0"
 
 intake:
   max_chars: 4000
 
+# 5 votes per model (0.3.0): saved 20-vote runs route the same with 5
+# (reports/2026-11-06-vote-stability.md), and 20 hit provider rate limits.
 sampling:
-  n: 20
+  n: 5
   temperature: 0.7
-  min_valid: 15
+  min_valid: 4
   timeout_ms: 15000 # samples take 2-8 s; allows for slow providers
 
 # Extraction answers every red flag, so its output is long (about 2,000 tokens).
@@ -19,7 +21,7 @@ extraction:
   timeout_ms: 20000
 
 review:
-  min_top_votes: 12
+  min_top_votes: 3
   max_span: 2
   family_tier_disagreement: true
 
