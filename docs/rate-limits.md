@@ -46,6 +46,11 @@ zero-data-retention route.
   [Sonnet + Flash](../reports/2026-11-07-policy-0.2.0.md),
   [Sonnet only](../reports/2026-11-07-policy-0.2.0-sonnet.md),
   [Flash only](../reports/2026-11-07-policy-0.2.0-flash.md).
+- **Policy 0.3.0, 5 samples, cases 40 s apart.** On 2026-11-07, Sonnet +
+  Flash, Sonnet only and Flash only each missed 0 of 14 emergencies, with
+  Human review at 0%, 0% and 4% and a median time of 16 to 18 s. Spacing
+  the cases kept the run under the per-minute limit, so this measures
+  routing, not throughput ([eval](eval.md#results-policy-030)).
 
 On the cases that got enough samples, the router behaved as designed. The
 failures come from throughput, not from model judgement.
@@ -107,6 +112,12 @@ only the Human review message ("if this is an emergency, call 911").
   slowest full case, a late extraction followed by rate-limited sampling,
   takes about 140 s, so the web page now waits 210 s instead of 150 s and
   says when it gave up waiting.
+- **Burst test after the longer extraction wait (2026-11-07).** Two
+  bursts of five made-up messages, back to back. The first routed all
+  five with every vote in, chest pain to Call 911. In the second,
+  extraction succeeded on all five and chest pain kept its Call 911
+  floor, but sampling ran out of retries, so all five ended at Human
+  review. A burst now costs physician time, not the emergency message.
 - **The page says it is still working.** After 10 s the status line counts
   up in steps of 10 s and says the message is queued, not lost, and the patient view says
   the message arrived and to call 911 if this is an emergency.
